@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Duyurular - Sakin Paneli</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body class="admin-body">
+
+<div class="admin-layout">
+    <aside class="admin-sidebar">
+        <div class="brand">
+            <div class="brand-icon">🏢</div>
+            <div>
+                <div class="brand-title">Apartment</div>
+                <div class="brand-sub">Management</div>
+            </div>
+        </div>
+        <nav class="nav-links">
+            <a class="nav-link" href="/user/dashboard">Dashboard</a>
+            <a class="nav-link" href="#">Ödemelerim</a>
+            <a class="nav-link active" href="/user/announcements">Duyurular</a>
+            <a class="nav-link" href="#">Bakım Talebi</a>
+        </nav>
+        <a href="/logout" class="sidebar-logout">Çıkış Yap</a>
+    </aside>
+
+    <main class="admin-main">
+        <header class="topbar">
+            <div>
+                <h1>Tüm Duyurular</h1>
+                <p>Apartman yönetimi tarafından yapılan güncel bilgilendirmeler</p>
+            </div>
+            <div class="topbar-actions">
+                <div class="user-chip">
+                    <span th:text="${#strings.substring(user.username, 0, 1)}">U</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="panel">
+            <ul class="announcements">
+                <li th:each="ann : ${announcements}" style="padding: 20px 0;">
+                    <div style="width: 100%;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <div class="ann-title" style="font-size: 1.1rem;" th:text="${ann.title}">Başlık</div>
+                            <span class="badge" th:classappend="${ann.badgeClass}" th:text="${ann.priority}">Normal</span>
+                        </div>
+
+                        <p style="color: #555; margin: 5px 0 10px 0; line-height: 1.5;" th:text="${ann.content}">
+                            Duyuru içeriği buraya gelecek...
+                        </p>
+
+                        <div class="ann-meta">
+                            <span th:text="'Yayınlanma Tarihi: ' + ${ann.formattedDate}">Tarih</span>
+                        </div>
+                    </div>
+                </li>
+
+                <li th:if="${#lists.isEmpty(announcements)}" style="text-align: center; padding: 40px; color: #999;">
+                    Şu an aktif bir duyuru bulunmamaktadır.
+                </li>
+            </ul>
+        </div>
+    </main>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Giriş</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="gradient-bg">
+    <div class="login-shell">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="logo">🏢</div>
+                <h1>Apartment Management</h1>
+                <p>Sistem Giriş</p>
+            </div>
+
+            <div th:if="${error}" class="error-message">
+                <p th:text="${error}"></p>
+            </div>
+
+            <form th:action="@{/login}" method="post" class="login-form">
+                <div class="form-group">
+                    <label for="email">E-posta:</label>
+                    <input type="email" id="email" name="email" placeholder="Email adresinizi girin" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Şifre:</label>
+                    <input type="password" id="password" name="password" placeholder="Şifrenizi girin" required>
+                </div>
+
+                <div class="remember-row">
+                    <input type="checkbox" id="remember" name="remember">
+                    <label for="remember">Beni Hatırla</label>
+                </div>
+
+                <button type="submit" class="login-btn">Giriş Yap</button>
+                <a href="#" class="forgot-password">Şifremi Unuttum</a>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

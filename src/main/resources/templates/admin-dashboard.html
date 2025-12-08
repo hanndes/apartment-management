@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apartment Management - Yönetim Paneli</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body class="admin-body">
+<div class="admin-layout">
+    <aside class="admin-sidebar">
+        <div class="brand">
+            <div class="brand-icon">🏢</div>
+            <div>
+                <div class="brand-title">Apartment</div>
+                <div class="brand-sub">Management</div>
+            </div>
+        </div>
+        <nav class="nav-links">
+            <a class="nav-link active" href="#">Dashboard</a>
+            <a class="nav-link" href="#">Daireler</a>
+            <a class="nav-link" href="#">Aidat & Ödemeler</a>
+            <a class="nav-link" href="#">Duyurular</a>
+            <a class="nav-link" href="#">Kullanıcılar</a>
+            <a class="nav-link" href="#">Bakım & Talepler</a>
+        </nav>
+        <button class="sidebar-logout">Çıkış</button>
+    </aside>
+
+    <main class="admin-main">
+        <header class="topbar">
+            <div>
+                <h1>Yönetim Paneli</h1>
+                <p>Son durum ve hızlı işlemler</p>
+            </div>
+            <div class="topbar-actions">
+                <button class="btn ghost">Bildirimler</button>
+                <div class="user-chip">A</div>
+            </div>
+        </header>
+
+        <section class="stat-grid">
+            <article class="stat-card">
+                <div class="stat-label">Aidat Tahsilat Oranı</div>
+                <div class="stat-value">82%</div>
+                <div class="stat-trend positive">+4% bu ay</div>
+            </article>
+            <article class="stat-card">
+                <div class="stat-label">Ödenen Daire</div>
+                <div class="stat-value">34 / 42</div>
+                <div class="stat-trend positive">+3 yeni ödeme</div>
+            </article>
+            <article class="stat-card">
+                <div class="stat-label">Bekleyen Bakım</div>
+                <div class="stat-value">5 talep</div>
+                <div class="stat-trend warning">2 acil</div>
+            </article>
+            <article class="stat-card">
+                <div class="stat-label">Kasa Bakiyesi</div>
+                <div class="stat-value">₺124.500</div>
+                <div class="stat-trend positive">+₺7.200</div>
+            </article>
+        </section>
+
+        <section class="panel-grid">
+            <article class="panel">
+                <div class="panel-head">
+                    <div>
+                        <h3>Hızlı İşlemler</h3>
+                        <p>Yeni kayıt, duyuru veya hatırlatma</p>
+                    </div>
+                </div>
+                <div class="quick-actions">
+                    <button class="btn primary">Aidat Talebi Oluştur</button>
+                    <button class="btn secondary">Duyuru Yayınla</button>
+                    <button class="btn ghost">Yeni Kullanıcı Ekle</button>
+                </div>
+            </article>
+
+            <article class="panel">
+                <div class="panel-head">
+                    <div>
+                        <h3>Son Ödemeler</h3>
+                        <p>En son yapılan işlemler</p>
+                    </div>
+                    <a href="#" class="link">Tümü</a>
+                </div>
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                        <tr>
+                            <th>Daire</th>
+                            <th>İsim</th>
+                            <th>Tutar</th>
+                            <th>Durum</th>
+                            <th>Tarih</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>3B</td>
+                            <td>Ayşe Yılmaz</td>
+                            <td>₺1.250</td>
+                            <td><span class="badge success">Ödendi</span></td>
+                            <td>08 Ara</td>
+                        </tr>
+                        <tr>
+                            <td>5A</td>
+                            <td>Mehmet Demir</td>
+                            <td>₺1.250</td>
+                            <td><span class="badge success">Ödendi</span></td>
+                            <td>07 Ara</td>
+                        </tr>
+                        <tr>
+                            <td>2C</td>
+                            <td>Elif Kaya</td>
+                            <td>₺1.250</td>
+                            <td><span class="badge warning">Bekliyor</span></td>
+                            <td>07 Ara</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </article>
+
+            <article class="panel">
+                <div class="panel-head">
+                    <div>
+                        <h3>Duyurular</h3>
+                        <p>Güncel bilgilendirmeler</p>
+                    </div>
+                    <a href="#" class="link">Yeni Duyuru</a>
+                </div>
+                <ul class="announcements">
+                    <li>
+                        <div>
+                            <div class="ann-title">Otopark bakımı</div>
+                            <div class="ann-meta">09 Ara - 10:00</div>
+                        </div>
+                        <span class="badge info">Bilgilendirme</span>
+                    </li>
+                    <li>
+                        <div>
+                            <div class="ann-title">Asansör servisi</div>
+                            <div class="ann-meta">08 Ara - 18:00</div>
+                        </div>
+                        <span class="badge warning">Planlı</span>
+                    </li>
+                    <li>
+                        <div>
+                            <div class="ann-title">Aidat son tarih</div>
+                            <div class="ann-meta">12 Ara</div>
+                        </div>
+                        <span class="badge danger">Önemli</span>
+                    </li>
+                </ul>
+            </article>
+        </section>
+    </main>
+</div>
+</body>
+</html>
+

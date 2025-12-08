@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sakin Paneli</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body class="admin-body">
+
+<div class="admin-layout">
+    <aside class="admin-sidebar">
+        <div class="brand">
+            <div class="brand-icon">🏢</div>
+            <div>
+                <div class="brand-title">Apartment</div>
+                <div class="brand-sub">Management</div>
+            </div>
+        </div>
+        <nav class="nav-links">
+            <a class="nav-link active" href="#">Dashboard</a>
+            <a class="nav-link" href="#">Ödemelerim</a>
+            <a class="nav-link" href="/user/announcements">Duyurular</a>
+            <a class="nav-link" href="#">Bakım Talebi</a>
+        </nav>
+
+        <a href="/logout" class="sidebar-logout">Çıkış Yap</a>
+    </aside>
+
+    <main class="admin-main">
+        <header class="topbar">
+            <div>
+                <h1>Hoş Geldiniz</h1>
+                <p>
+                    Sayın <span style="font-weight: bold; color: #6a8afc;" th:text="${user.username}">Kullanıcı</span>
+                    (<span th:text="${user.email}">email</span>)
+                </p>
+            </div>
+            <div class="topbar-actions">
+                <button class="btn ghost">Bildirimler</button>
+                <div class="user-chip">
+                    <span th:text="${#strings.substring(user.username, 0, 1)}">U</span>
+                </div>
+            </div>
+        </header>
+
+        <section class="stat-grid">
+            <article class="stat-card">
+                <div class="stat-label">Bu Ayki Aidat</div>
+                <div class="stat-value">Ödendi</div>
+                <div class="stat-trend positive">Teşekkürler</div>
+            </article>
+            <article class="stat-card">
+                <div class="stat-label">Toplam Borç</div>
+                <div class="stat-value">₺0</div>
+                <div class="stat-trend positive">Borcunuz yok</div>
+            </article>
+            <article class="stat-card">
+                <div class="stat-label">Aktif Talepler</div>
+                <div class="stat-value">0</div>
+                <div class="stat-trend warning">Bekleyen yok</div>
+            </article>
+        </section>
+
+        <section class="panel-grid">
+
+            <article class="panel">
+                <div class="panel-head">
+                    <div>
+                        <h3>Hızlı İşlemler</h3>
+                        <p>Sık kullanılan menüler</p>
+                    </div>
+                </div>
+                <div class="quick-actions">
+                    <button class="btn primary">💳 Aidat Öde</button>
+                    <button class="btn secondary">🔧 Arıza Bildir</button>
+                </div>
+            </article>
+
+            <article class="panel">
+                <div class="panel-head">
+                    <div>
+                        <h3>📢 Duyurular</h3>
+                        <p>Yönetimden mesajlar</p>
+                    </div>
+                </div>
+                <ul class="announcements">
+                    <li th:each="ann : ${announcements}">
+                        <div>
+                            <div class="ann-title" th:text="${ann.title}">Duyuru Başlığı</div>
+                            <div class="ann-meta" th:text="${ann.formattedDate}">Tarih</div>
+                        </div>
+                        <span class="badge"
+                              th:classappend="${ann.badgeClass}"
+                              th:text="${ann.priority}">Bilgi</span>
+                    </li>
+
+                    <li th:if="${#lists.isEmpty(announcements)}" style="justify-content: center; color: #999;">
+                        Henüz duyuru bulunmamaktadır.
+                    </li>
+                </ul>
+            </article>
+
+            <article class="panel">
+                <div class="panel-head">
+                    <div>
+                        <h3>📦 Kargolarım</h3>
+                        <p>Dairenize bırakılan paketler</p>
+                    </div>
+                </div>
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                        <tr>
+                            <th>Alıcı</th> <th>Kargo Şirketi</th>
+                            <th>Tarih</th>
+                            <th>Durum</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="pkg : ${packages}">
+                            <td th:text="${pkg.recipientName}">Ahmet Yılmaz</td>
+
+                            <td style="font-weight: 500;" th:text="${pkg.companyName}">Aras</td>
+                            <td style="color: #888; font-size: 0.9em;" th:text="${pkg.formattedArrivalDate}">10 Ara</td>
+                            <td>
+                    <span class="badge"
+                          th:classappend="${pkg.statusClass}"
+                          th:text="${pkg.statusText}">Durum</span>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(packages)}">
+                            <td colspan="4" style="text-align: center; color: #999; padding: 20px;">
+                                Bekleyen kargonuz yok.
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </article>
+
+            <article class="panel" style="grid-column: 1 / -1;">
+                <div class="panel-head">
+                    <div>
+                        <h3>Son Ödemeler</h3>
+                        <p>Geçmiş aidat hareketleriniz</p>
+                    </div>
+                </div>
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                        <tr>
+                            <th>Dönem</th>
+                            <th>Tutar</th>
+                            <th>Durum</th>
+                            <th>Tarih</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>Kasım 2024</td>
+                            <td>₺1.250</td>
+                            <td><span class="badge success">Ödendi</span></td>
+                            <td>05.11.2024</td>
+                        </tr>
+                        <tr>
+                            <td>Ekim 2024</td>
+                            <td>₺1.250</td>
+                            <td><span class="badge success">Ödendi</span></td>
+                            <td>03.10.2024</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </article>
+
+        </section>
+    </main>
+</div>
+
+</body>
+</html>
