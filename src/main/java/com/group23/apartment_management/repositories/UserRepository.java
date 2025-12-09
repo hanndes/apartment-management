@@ -1,6 +1,6 @@
 package com.group23.apartment_management.repositories;
 
-import com.group23.apartment_management.config.DatabaseConnection; // Senin sınıfın
+import com.group23.apartment_management.config.DatabaseConnection;
 import com.group23.apartment_management.entities.User;
 import org.springframework.stereotype.Repository;
 

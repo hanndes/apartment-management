@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Bakım Talepleri</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        /* Form elemanları için özel stil */
+        .form-control { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
+        .form-row { display: flex; gap: 20px; }
+        .form-group { flex: 1; }
+        .btn-submit { background: #3498db; color: white; border: none; padding: 12px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%; }
+        .btn-submit:hover { background: #2980b9; }
+    </style>
+</head>
+<body class="admin-body">
+
+<div class="admin-layout">
+    <aside class="admin-sidebar">
+        <div class="brand">
+            <div class="brand-icon">🏢</div>
+            <div>
+                <div class="brand-title">Apartment</div>
+                <div class="brand-sub">Management</div>
+            </div>
+        </div>
+        <nav class="nav-links">
+            <a class="nav-link" href="/user/dashboard">Dashboard</a>
+            <a class="nav-link" href="#">Ödemelerim</a>
+            <a class="nav-link" href="/user/announcements">Duyurular</a>
+            <a class="nav-link active" href="/user/complaints">Bakım Talebi</a>
+        </nav>
+        <a href="/logout" class="sidebar-logout">Çıkış Yap</a>
+    </aside>
+
+    <main class="admin-main">
+        <header class="topbar">
+            <div>
+                <h1>Bakım ve Arıza Talepleri</h1>
+                <p>Yeni bir sorun bildirin veya mevcut durumları takip edin.</p>
+            </div>
+            <div class="topbar-actions">
+                <div class="user-chip">
+                    <span th:text="${#strings.substring(user.username, 0, 1)}">U</span>
+                </div>
+            </div>
+        </header>
+
+        <section class="panel-grid" style="grid-template-columns: 1fr;"> <article class="panel">
+            <div class="panel-head">
+                <h3>📝 Yeni Talep Oluştur</h3>
+            </div>
+
+            <form action="#" th:action="@{/user/complaints/add}" th:object="${newComplaint}" method="post">
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Konu Başlığı</label>
+                        <input type="text" th:field="*{title}" class="form-control" placeholder="Örn: Koridor ışığı yanmıyor" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Kategori</label>
+                        <select th:field="*{category}" class="form-control">
+                            <option value="Arıza">Arıza</option>
+                            <option value="Temizlik">Temizlik</option>
+                            <option value="Gürültü">Gürültü</option>
+                            <option value="Güvenlik">Güvenlik</option>
+                            <option value="Diğer">Diğer</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Öncelik</label>
+                        <select th:field="*{priority}" class="form-control">
+                            <option value="Normal">Normal</option>
+                            <option value="Acil">Acil</option>
+                            <option value="Düşük">Düşük</option>
+                        </select>
+                    </div>
+                </div>
+
+                <label>Detaylı Açıklama</label>
+                <textarea th:field="*{description}" class="form-control" rows="4" placeholder="Sorunu detaylıca anlatınız..." required></textarea>
+
+                <button type="submit" class="btn-submit">Talebi Gönder</button>
+            </form>
+        </article>
+
+            <article class="panel">
+                <div class="panel-head">
+                    <h3>📋 Geçmiş Taleplerim</h3>
+                </div>
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                        <tr>
+                            <th>Başlık</th>
+                            <th>Kategori</th>
+                            <th>Tarih</th>
+                            <th>Durum</th>
+                            <th>Yönetim Notu</th> </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="comp : ${complaints}">
+                            <td style="font-weight: 500;" th:text="${comp.title}">Başlık</td>
+                            <td th:text="${comp.category}">Kategori</td>
+                            <td style="color: #888;" th:text="${comp.formattedDate}">Tarih</td>
+                            <td>
+                                <span class="badge"
+                                      th:classappend="${comp.statusClass}"
+                                      th:text="${comp.status}">Bekliyor</span>
+                            </td>
+                            <td th:text="${comp.adminResponse != null ? comp.adminResponse : '-'}"></td>
+                        </tr>
+
+                        <tr th:if="${#lists.isEmpty(complaints)}">
+                            <td colspan="5" style="text-align: center; color: #999; padding: 20px;">
+                                Henüz bir talebiniz bulunmamaktadır.
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </article>
+
+        </section>
+    </main>
+</div>
+
+</body>
+</html>

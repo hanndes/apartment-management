@@ -1,8 +1,9 @@
 package com.group23.apartment_management.repositories;
 
 import com.group23.apartment_management.config.DatabaseConnection;
-import org.springframework.stereotype.Repository;
 import com.group23.apartment_management.entities.Package;
+import org.springframework.stereotype.Repository;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

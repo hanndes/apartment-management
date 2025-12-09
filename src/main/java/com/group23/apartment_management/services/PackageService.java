@@ -1,6 +1,6 @@
 package com.group23.apartment_management.services;
 
-import com.group23.apartment_management.entities.Package; // Entity paketine dikkat et
+import com.group23.apartment_management.entities.Package;
 import com.group23.apartment_management.repositories.PackageRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

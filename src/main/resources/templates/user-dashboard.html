@@ -18,10 +18,10 @@
             </div>
         </div>
         <nav class="nav-links">
-            <a class="nav-link active" href="#">Dashboard</a>
+            <a class="nav-link active" href="/user/dashboard">Dashboard</a>
             <a class="nav-link" href="#">Ödemelerim</a>
             <a class="nav-link" href="/user/announcements">Duyurular</a>
-            <a class="nav-link" href="#">Bakım Talebi</a>
+            <a class="nav-link" href="/user/complaints">Bakım Talebi</a>
         </nav>
 
         <a href="/logout" class="sidebar-logout">Çıkış Yap</a>
@@ -57,8 +57,8 @@
             </article>
             <article class="stat-card">
                 <div class="stat-label">Aktif Talepler</div>
-                <div class="stat-value">0</div>
-                <div class="stat-trend warning">Bekleyen yok</div>
+                <div class="stat-value" th:text="${#lists.size(complaints)}">0</div>
+                <div class="stat-trend warning">Tane kaydınız var</div>
             </article>
         </section>
 
@@ -73,7 +73,7 @@
                 </div>
                 <div class="quick-actions">
                     <button class="btn primary">💳 Aidat Öde</button>
-                    <button class="btn secondary">🔧 Arıza Bildir</button>
+                    <a href="/user/complaints" class="btn secondary" style="text-decoration: none; display: inline-block; text-align: center;">🔧 Arıza Bildir</a>
                 </div>
             </article>
 
@@ -83,6 +83,7 @@
                         <h3>📢 Duyurular</h3>
                         <p>Yönetimden mesajlar</p>
                     </div>
+                    <a href="/user/announcements" class="link">Tümü</a>
                 </div>
                 <ul class="announcements">
                     <li th:each="ann : ${announcements}">
@@ -112,26 +113,65 @@
                     <table class="data-table">
                         <thead>
                         <tr>
-                            <th>Alıcı</th> <th>Kargo Şirketi</th>
+                            <th>Alıcı</th>
+                            <th>Kargo Şirketi</th>
                             <th>Tarih</th>
                             <th>Durum</th>
                         </tr>
                         </thead>
                         <tbody>
                         <tr th:each="pkg : ${packages}">
-                            <td th:text="${pkg.recipientName}">Ahmet Yılmaz</td>
-
+                            <td th:text="${pkg.recipientName}">Ahmet</td>
                             <td style="font-weight: 500;" th:text="${pkg.companyName}">Aras</td>
                             <td style="color: #888; font-size: 0.9em;" th:text="${pkg.formattedArrivalDate}">10 Ara</td>
                             <td>
-                    <span class="badge"
-                          th:classappend="${pkg.statusClass}"
-                          th:text="${pkg.statusText}">Durum</span>
+                                <span class="badge"
+                                      th:classappend="${pkg.statusClass}"
+                                      th:text="${pkg.statusText}">Durum</span>
                             </td>
                         </tr>
                         <tr th:if="${#lists.isEmpty(packages)}">
                             <td colspan="4" style="text-align: center; color: #999; padding: 20px;">
                                 Bekleyen kargonuz yok.
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </article>
+
+            <article class="panel">
+                <div class="panel-head">
+                    <div>
+                        <h3>🛠 Bakım Taleplerim</h3>
+                        <p>Arıza ve şikayet durumları</p>
+                    </div>
+                    <a href="/user/complaints" class="link">Yeni Oluştur</a>
+                </div>
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                        <tr>
+                            <th>Başlık</th>
+                            <th>Kategori</th>
+                            <th>Tarih</th>
+                            <th>Durum</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="comp : ${complaints}">
+                            <td style="font-weight: 500;" th:text="${comp.title}">Lamba Patlak</td>
+                            <td th:text="${comp.category}">Arıza</td>
+                            <td style="color: #888; font-size: 0.9em;" th:text="${comp.formattedDate}">12 Ara</td>
+                            <td>
+                                <span class="badge"
+                                      th:classappend="${comp.statusClass}"
+                                      th:text="${comp.status}">Bekliyor</span>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(complaints)}">
+                            <td colspan="4" style="text-align: center; color: #999; padding: 20px;">
+                                Aktif bir talebiniz bulunmamaktadır.
                             </td>
                         </tr>
                         </tbody>
