@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apartment Management - Duyurular</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body class="admin-body">
+<div class="admin-layout">
+    <aside class="admin-sidebar">
+        <div class="brand">
+            <div class="brand-icon">🏢</div>
+            <div>
+                <div class="brand-title">Apartment</div>
+                <div class="brand-sub">Management</div>
+            </div>
+        </div>
+        <nav class="nav-links">
+            <a class="nav-link" th:classappend="${currentPage == 'dashboard'} ? 'active'" th:href="@{/admin/dashboard}">Dashboard</a>
+            <a class="nav-link" th:classappend="${currentPage == 'flats'} ? 'active'" th:href="@{/admin/flats}">Daireler</a>
+            <a class="nav-link" th:classappend="${currentPage == 'debts'} ? 'active'" th:href="@{/admin/debts}">Aidat & Ödemeler</a>
+            <a class="nav-link" th:classappend="${currentPage == 'announcements'} ? 'active'" th:href="@{/admin/announcements}">Duyurular</a>
+            <a class="nav-link" th:classappend="${currentPage == 'users'} ? 'active'" th:href="@{/admin/users}">Kullanıcılar</a>
+            <a class="nav-link" th:classappend="${currentPage == 'complaints'} ? 'active'" th:href="@{/admin/complaints}">Bakım & Talepler</a>
+        </nav>
+        <button class="sidebar-logout">Çıkış</button>
+    </aside>
+
+    <main class="admin-main">
+        <header class="topbar">
+            <div>
+                <h1>Duyurular</h1>
+                <p>Tüm duyuruları yönetin</p>
+            </div>
+            <div class="topbar-actions">
+                <button class="btn ghost">Bildirimler</button>
+                <div class="user-chip">A</div>
+            </div>
+        </header>
+
+        <section class="panel-grid">
+            <article class="panel">
+                <div class="panel-head">
+                    <div>
+                        <h3>Duyurular Listesi</h3>
+                        <p>Aktif duyurular</p>
+                    </div>
+                    <button class="btn secondary">+ Yeni Duyuru</button>
+                </div>
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                        <tr>
+                            <th>Başlık</th>
+                            <th>İçerik</th>
+                            <th>Öncelik</th>
+                            <th>Tarih</th>
+                            <th>İşlemler</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="announcement : ${announcements}">
+                            <td th:text="${announcement.title}">Otopark bakımı</td>
+                            <td th:text="${#strings.abbreviate(announcement.content, 50)}">Otopark bakım çalışmaları</td>
+                            <td>
+                                <span class="badge" 
+                                      th:classappend="${announcement.getBadgeClass()}"
+                                      th:text="${announcement.priority}">Normal</span>
+                            </td>
+                            <td th:text="${announcement.getFormattedDate()}">09 Ara - 10:00</td>
+                            <td>
+                                <button class="btn ghost" style="padding: 4px 8px; font-size: 12px;">Düzenle</button>
+                                <button class="btn ghost" style="padding: 4px 8px; font-size: 12px;">Sil</button>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(announcements)}">
+                            <td colspan="5" style="text-align: center; padding: 20px;">Duyuru bulunmamaktadır</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </article>
+        </section>
+    </main>
+</div>
+</body>
+</html>

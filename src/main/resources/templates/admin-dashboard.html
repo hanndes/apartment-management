@@ -17,12 +17,12 @@
             </div>
         </div>
         <nav class="nav-links">
-            <a class="nav-link active" href="#">Dashboard</a>
-            <a class="nav-link" href="#">Daireler</a>
-            <a class="nav-link" href="#">Aidat & Ödemeler</a>
-            <a class="nav-link" href="#">Duyurular</a>
-            <a class="nav-link" href="#">Kullanıcılar</a>
-            <a class="nav-link" href="#">Bakım & Talepler</a>
+            <a class="nav-link" th:classappend="${currentPage == 'dashboard'} ? 'active'" th:href="@{/admin/dashboard}">Dashboard</a>
+            <a class="nav-link" th:classappend="${currentPage == 'flats'} ? 'active'" th:href="@{/admin/flats}">Daireler</a>
+            <a class="nav-link" th:classappend="${currentPage == 'debts'} ? 'active'" th:href="@{/admin/debts}">Aidat & Ödemeler</a>
+            <a class="nav-link" th:classappend="${currentPage == 'announcements'} ? 'active'" th:href="@{/admin/announcements}">Duyurular</a>
+            <a class="nav-link" th:classappend="${currentPage == 'users'} ? 'active'" th:href="@{/admin/users}">Kullanıcılar</a>
+            <a class="nav-link" th:classappend="${currentPage == 'complaints'} ? 'active'" th:href="@{/admin/complaints}">Bakım & Talepler</a>
         </nav>
         <button class="sidebar-logout">Çıkış</button>
     </aside>

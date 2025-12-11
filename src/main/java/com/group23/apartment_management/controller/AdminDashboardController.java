@@ -65,7 +65,26 @@ public class AdminDashboardController {
 
         model.addAttribute("announcements", announcements);
 
+        model.addAttribute("currentPage", "dashboard");
+
         return "admin-dashboard";
+    }
+    @GetMapping("/admin/announcements")
+    public String showAnnouncementsPage(HttpSession session, Model model) {
+        // 0) Giriş kontrolü
+        User admin = (User) session.getAttribute("loggedInUser");
+        if (admin == null || !"ADMIN".equals(admin.getRole())) {
+            return "redirect:/login";
+        }
+        model.addAttribute("user", admin);
+
+        // Tüm duyuruları getir
+        List<Announcement> announcements = announcementService.getActiveAnnouncements();
+        model.addAttribute("announcements", announcements);
+
+        model.addAttribute("currentPage", "announcements");
+
+        return "admin-announcements";
     }
     
 }
