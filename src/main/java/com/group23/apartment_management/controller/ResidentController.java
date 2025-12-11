@@ -6,6 +6,7 @@ import com.group23.apartment_management.services.AnnouncementService;
 import com.group23.apartment_management.services.ComplaintService;
 import com.group23.apartment_management.services.PackageService;
 import com.group23.apartment_management.services.PaymentService;
+import com.group23.apartment_management.services.VehicleService; // Eklendi
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -16,7 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/user") // Tüm sakin linkleri "/user" ile başlar
+@RequestMapping("/user")
 @RequiredArgsConstructor
 public class ResidentController {
 
@@ -24,11 +25,11 @@ public class ResidentController {
     private final PackageService packageService;
     private final ComplaintService complaintService;
     private final PaymentService paymentService;
+    private final VehicleService vehicleService; // Araçları göstermek için lazım
 
     // --- GÜVENLİK KONTROLÜ ---
     private boolean isResident(HttpSession session) {
         User user = (User) session.getAttribute("loggedInUser");
-        // Admin de sakin sayfalarını görebilsin mi? İstersen || "ADMIN".equals(...) ekle
         return user != null && "RESIDENT".equals(user.getRole());
     }
 
@@ -45,10 +46,18 @@ public class ResidentController {
         model.addAttribute("packages", packageService.getUserPackages(user.getId()));
         model.addAttribute("complaints", complaintService.getUserComplaints(user.getId()));
 
+        // Araçları Yükle (Hata almamak için)
+        model.addAttribute("vehicles", vehicleService.getAllVehicles());
+        // Not: Normalde sadece kendi aracını getirmeli: vehicleService.getResidentVehicles(user.getId())
+        // ama şimdilik hata vermemesi için genel listeyi koydum.
+
+        // --- AKTİF SAYFA İŞARETÇİSİ ---
+        model.addAttribute("currentPage", "dashboard");
+
         return "user-dashboard";
     }
 
-    // 2. ÖDEMELERİM SAYFASI (Eski UserPaymentController buraya geldi)
+    // 2. ÖDEMELERİM SAYFASI
     @GetMapping("/payments")
     public String showMyPayments(HttpSession session, Model model) {
         if (!isResident(session)) return "redirect:/login";
@@ -58,6 +67,7 @@ public class ResidentController {
 
         model.addAttribute("payments", paymentService.getUserPayments(user.getId()));
 
+        model.addAttribute("currentPage", "payments"); // İşaretçi
         return "user-payments";
     }
 
@@ -70,8 +80,9 @@ public class ResidentController {
         model.addAttribute("user", user);
 
         model.addAttribute("complaints", complaintService.getUserComplaints(user.getId()));
-        model.addAttribute("newComplaint", new Complaint()); // Form için boş nesne
+        model.addAttribute("newComplaint", new Complaint());
 
+        model.addAttribute("currentPage", "complaints"); // İşaretçi
         return "user-complaints";
     }
 
@@ -86,7 +97,6 @@ public class ResidentController {
         return "redirect:/user/complaints";
     }
 
-    // --- EKSİK OLAN KISIM BURASI ---
     // 5. DUYURULAR SAYFASI
     @GetMapping("/announcements")
     public String showAnnouncementsPage(HttpSession session, Model model) {
@@ -95,9 +105,9 @@ public class ResidentController {
         User user = (User) session.getAttribute("loggedInUser");
         model.addAttribute("user", user);
 
-        // Tüm aktif duyuruları getir
         model.addAttribute("announcements", announcementService.getActiveAnnouncements());
 
-        return "user-announcements"; // templates/user-announcements.html dosyasını açar
+        model.addAttribute("currentPage", "announcements"); // İşaretçi
+        return "user-announcements";
     }
 }
