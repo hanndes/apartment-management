@@ -96,7 +96,7 @@
                         <h3>Son Ödemeler</h3>
                         <p>En son yapılan işlemler</p>
                     </div>
-                    <a href="#" class="link">Tümü</a>
+                    <a th:href="@{/admin/debts}" class="link">Tümü</a>
                 </div>
                 <div class="table-wrapper">
                     <table class="data-table">
@@ -110,26 +110,15 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr>
-                            <td>3B</td>
-                            <td>Ayşe Yılmaz</td>
-                            <td>₺1.250</td>
-                            <td><span class="badge success">Ödendi</span></td>
-                            <td>08 Ara</td>
+                        <tr th:each="payment : ${recentPayments}">
+                            <td th:text="${payment.flatNumber}">3B</td>
+                            <td th:text="${payment.userName}">Ayşe Yılmaz</td>
+                            <td th:text="${'₺' + #numbers.formatDecimal(payment.amount, 0, 0)}">₺1.250</td>
+                            <td><span class="badge success" th:text="${payment.status}">Ödendi</span></td>
+                            <td th:text="${#dates.format(payment.paymentDate, 'dd MMM')}">08 Ara</td>
                         </tr>
-                        <tr>
-                            <td>5A</td>
-                            <td>Mehmet Demir</td>
-                            <td>₺1.250</td>
-                            <td><span class="badge success">Ödendi</span></td>
-                            <td>07 Ara</td>
-                        </tr>
-                        <tr>
-                            <td>2C</td>
-                            <td>Elif Kaya</td>
-                            <td>₺1.250</td>
-                            <td><span class="badge warning">Bekliyor</span></td>
-                            <td>07 Ara</td>
+                        <tr th:if="${#lists.isEmpty(recentPayments)}">
+                            <td colspan="5" style="text-align: center; padding: 20px;">Ödeme kaydı bulunmamaktadır</td>
                         </tr>
                         </tbody>
                     </table>
@@ -142,7 +131,7 @@
                         <h3>Duyurular</h3>
                         <p>Güncel bilgilendirmeler</p>
                     </div>
-                    <a href="#" class="link">Yeni Duyuru</a>
+                    <a th:href="@{/admin/announcements}" class="link">Yeni Duyuru</a>
                 </div>
                 <ul class="announcements">
                     <li th:each="announcement : ${announcements}">

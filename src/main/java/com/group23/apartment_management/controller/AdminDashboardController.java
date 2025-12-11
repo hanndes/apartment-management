@@ -8,6 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import com.group23.apartment_management.entities.Announcement;
+import com.group23.apartment_management.entities.Payment;
 import com.group23.apartment_management.entities.User;
 import com.group23.apartment_management.services.AnnouncementService;
 import com.group23.apartment_management.services.ComplaintService;
@@ -64,6 +65,10 @@ public class AdminDashboardController {
                 announcementService.getRecentActiveAnnouncements(5); // son 5 duyuru
 
         model.addAttribute("announcements", announcements);
+
+        //son ödemeler kartı
+        List<Payment> recentPayments = paymentService.getRecentPaymentsForDashboard(3);
+        model.addAttribute("recentPayments", recentPayments);
 
         model.addAttribute("currentPage", "dashboard");
 

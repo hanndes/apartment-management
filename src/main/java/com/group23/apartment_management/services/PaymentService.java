@@ -29,4 +29,9 @@ public class PaymentService {
     public boolean addPayment(Payment payment){
         return paymentRepository.save(payment);
     }
+
+    //Admin dashboard: son ödemeler kartı
+    public List<Payment> getRecentPaymentsForDashboard(int limit) {
+        return paymentRepository.findRecentPayments(limit);
+    }
 }

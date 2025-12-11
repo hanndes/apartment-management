@@ -127,4 +127,44 @@ public class PaymentRepository {
             return false;
         }
     }
+    // Dashboard’taki "Son Ödemeler" tablosu için son N ödemeyi getirir
+    public List<Payment> findRecentPayments(int limit){
+        List<Payment> list = new ArrayList<>();
+
+        String sql = "SELECT TOP " + "* FROM Payments ORDER BY payment_date DESC";
+
+        try (Connection con = DatabaseConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                Payment p = mapRow(rs);
+                list.add(p);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+    // ortak satır-mapping yardımcısı
+    private Payment mapRow(ResultSet rs) throws Exception {
+        Payment p = new Payment();
+        p.setId(rs.getInt("payment_id"));
+        p.setDebtId(rs.getInt("debt_id"));
+
+        int residentId = rs.getInt("resident_id");
+        if (rs.wasNull()) {
+            p.setResidentId(null);
+        } else {
+            p.setResidentId(residentId);
+        }
+
+        p.setAmountPaid(rs.getBigDecimal("amount_paid"));
+        p.setPaymentDate(rs.getTimestamp("payment_date"));
+        p.setPaymentMethod(rs.getString("payment_method"));
+        p.setReferenceNo(rs.getString("reference_no"));
+        p.setCreatedAt(rs.getTimestamp("created_at"));
+        return p;
+    }
 }
