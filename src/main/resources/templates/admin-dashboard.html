@@ -39,42 +39,41 @@
             </div>
         </header>
 
-<section class="stat-grid">
-    <article class="stat-card">
-        <div class="stat-label">Aidat Tahsilat Oranı</div>
-        <div class="stat-value"
-             th:text="${#numbers.formatDecimal(collectionRate, 0, 0)}">82%</div>
-        <div class="stat-trend positive"
-             th:text="|Güncel oran: ${#numbers.formatDecimal(collectionRate, 0, 0)}%|">
-            +4% bu ay
-        </div>
-    </article>
+        <section class="stat-grid">
+            <article class="stat-card">
+                <div class="stat-label">Aidat Tahsilat Oranı</div>
+                <div class="stat-value"
+                     th:text="${#numbers.formatDecimal(collectionRate, 0, 0)}">82%</div>
+                <div class="stat-trend positive"
+                     th:text="|Güncel oran: ${#numbers.formatDecimal(collectionRate, 0, 0)}%|">
+                    +4% bu ay
+                </div>
+            </article>
 
-    <article class="stat-card">
-        <div class="stat-label">Ödenen Daire</div>
-        <div class="stat-value"
-             th:text="|${paidFlats} / ${totalFlats}|">34 / 42</div>
-        <div class="stat-trend positive"
-             th:text="|${paidFlats} daire ödedi|">+3 yeni ödeme</div>
-    </article>
+            <article class="stat-card">
+                <div class="stat-label">Ödenen Daire</div>
+                <div class="stat-value"
+                     th:text="|${paidFlats} / ${totalFlats}|">34 / 42</div>
+                <div class="stat-trend positive"
+                     th:text="|${paidFlats} daire ödedi|">+3 yeni ödeme</div>
+            </article>
 
-    <article class="stat-card">
-        <div class="stat-label">Bekleyen Bakım</div>
-        <div class="stat-value"
-             th:text="|${pendingComplaints} talep|">5 talep</div>
-        <div class="stat-trend warning"
-             th:text="|${pendingComplaints} beklemede|">2 acil</div>
-    </article>
+            <article class="stat-card">
+                <div class="stat-label">Bekleyen Bakım</div>
+                <div class="stat-value"
+                     th:text="|${pendingComplaints} talep|">5 talep</div>
+                <div class="stat-trend warning"
+                     th:text="|${pendingComplaints} beklemede|">2 acil</div>
+            </article>
 
-    <article class="stat-card">
-        <div class="stat-label">Kasa Bakiyesi</div>
-        <div class="stat-value"
-             th:text="|'₺' + ${#numbers.formatDecimal(currentBalance, 0, 0)}">₺124.500</div>
-        <div class="stat-trend positive"
-             th:text="'Mevcut Bakiye'">+₺7.200</div>
-    </article>
-</section>
-
+            <article class="stat-card">
+                <div class="stat-label">Kasa Bakiyesi</div>
+                <div class="stat-value"
+                     th:text="|'₺' + ${#numbers.formatDecimal(currentBalance, 0, 0)}|">₺124.500</div>
+                <div class="stat-trend positive"
+                     th:text="'Mevcut Bakiye'">+₺7.200</div>
+            </article>
+        </section>
 
         <section class="panel-grid">
             <article class="panel">
@@ -146,26 +145,19 @@
                     <a href="#" class="link">Yeni Duyuru</a>
                 </div>
                 <ul class="announcements">
-                    <li>
+                    <li th:each="announcement : ${announcements}">
                         <div>
-                            <div class="ann-title">Otopark bakımı</div>
-                            <div class="ann-meta">09 Ara - 10:00</div>
+                            <div class="ann-title" th:text="${announcement.title}">Otopark bakımı</div>
+                            <div class="ann-meta" th:text="${announcement.getFormattedDate()}">09 Ara - 10:00</div>
                         </div>
-                        <span class="badge info">Bilgilendirme</span>
+                        <span class="badge" 
+                              th:classappend="${announcement.getBadgeClass()}"
+                              th:text="${announcement.priority}">Bilgilendirme</span>
                     </li>
-                    <li>
+                    <li th:if="${#lists.isEmpty(announcements)}">
                         <div>
-                            <div class="ann-title">Asansör servisi</div>
-                            <div class="ann-meta">08 Ara - 18:00</div>
+                            <div class="ann-title">Duyuru bulunmamaktadır</div>
                         </div>
-                        <span class="badge warning">Planlı</span>
-                    </li>
-                    <li>
-                        <div>
-                            <div class="ann-title">Aidat son tarih</div>
-                            <div class="ann-meta">12 Ara</div>
-                        </div>
-                        <span class="badge danger">Önemli</span>
                     </li>
                 </ul>
             </article>
@@ -174,4 +166,3 @@
 </div>
 </body>
 </html>
-

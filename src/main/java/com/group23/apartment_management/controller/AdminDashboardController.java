@@ -57,7 +57,12 @@ public class AdminDashboardController {
         model.addAttribute("currentBalance", currentBalance);
 
         //5.duyurular
-        List<Announcement> announcements = announcementService.getActiveAnnouncements();
+        //List<Announcement> announcements = announcementService.getActiveAnnouncements();
+        //model.addAttribute("announcements", announcements);
+
+        List<Announcement> announcements =
+                announcementService.getRecentActiveAnnouncements(5); // son 5 duyuru
+
         model.addAttribute("announcements", announcements);
 
         return "admin-dashboard";
