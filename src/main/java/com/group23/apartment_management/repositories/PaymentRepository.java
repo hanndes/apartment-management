@@ -127,11 +127,14 @@ public class PaymentRepository {
             return false;
         }
     }
-    // Dashboard’taki "Son Ödemeler" tablosu için son N ödemeyi getirir
+// PaymentRepository.java içinde bu metodu bulun ve değiştirin:
+
     public List<Payment> findRecentPayments(int limit){
         List<Payment> list = new ArrayList<>();
 
-        String sql = "SELECT TOP " + "* FROM Payments ORDER BY payment_date DESC";
+        // DÜZELTME: "TOP " ile "*" arasına 'limit' değişkenini ekliyoruz.
+        // Oluşan SQL şuna benzeyecek: SELECT TOP 5 * FROM ...
+        String sql = "SELECT TOP " + limit + " * FROM Payments ORDER BY payment_date DESC";
 
         try (Connection con = DatabaseConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql);

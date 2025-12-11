@@ -18,13 +18,13 @@
             </div>
         </div>
         <nav class="nav-links">
-            <a class="nav-link active" href="/user/dashboard">Dashboard</a>
-            <a class="nav-link" href="#">Ödemelerim</a>
-            <a class="nav-link" href="/user/announcements">Duyurular</a>
-            <a class="nav-link" href="/user/complaints">Bakım Talebi</a>
+            <a class="nav-link active" th:href="@{/user/dashboard}">Dashboard</a>
+            <a class="nav-link" th:href="@{/user/payments}">Ödemelerim</a>
+            <a class="nav-link" th:href="@{/user/announcements}">Duyurular</a>
+            <a class="nav-link" th:href="@{/user/complaints}">Bakım Talebi</a>
         </nav>
 
-        <a href="/logout" class="sidebar-logout">Çıkış Yap</a>
+        <a th:href="@{/logout}" class="sidebar-logout">Çıkış Yap</a>
     </aside>
 
     <main class="admin-main">
@@ -39,7 +39,7 @@
             <div class="topbar-actions">
                 <button class="btn ghost">Bildirimler</button>
                 <div class="user-chip">
-                    <span th:text="${#strings.substring(user.username, 0, 1)}">U</span>
+                    <span th:text="${user.username != null ? #strings.substring(user.username, 0, 1) : 'U'}">U</span>
                 </div>
             </div>
         </header>
@@ -57,7 +57,7 @@
             </article>
             <article class="stat-card">
                 <div class="stat-label">Aktif Talepler</div>
-                <div class="stat-value" th:text="${#lists.size(complaints)}">0</div>
+                <div class="stat-value" th:text="${complaints != null ? #lists.size(complaints) : 0}">0</div>
                 <div class="stat-trend warning">Tane kaydınız var</div>
             </article>
         </section>
@@ -72,8 +72,44 @@
                     </div>
                 </div>
                 <div class="quick-actions">
-                    <button class="btn primary">💳 Aidat Öde</button>
-                    <a href="/user/complaints" class="btn secondary" style="text-decoration: none; display: inline-block; text-align: center;">🔧 Arıza Bildir</a>
+                    <a th:href="@{/user/payments}" class="btn primary" style="text-decoration: none; display: inline-block; text-align: center;">💳 Aidat Öde</a>
+                    <a th:href="@{/user/complaints}" class="btn secondary" style="text-decoration: none; display: inline-block; text-align: center;">🔧 Arıza Bildir</a>
+                </div>
+            </article>
+
+            <article class="panel">
+                <div class="panel-head">
+                    <div>
+                        <h3>🚗 Araçlarım</h3>
+                        <p>Sisteme kayıtlı araçlarınız</p>
+                    </div>
+                </div>
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                        <tr>
+                            <th>Plaka</th>
+                            <th>Araç</th>
+                            <th>Durum</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="car : ${vehicles}">
+                            <td style="font-weight: bold;" th:text="${car.formattedPlate}">34 ABC 123</td>
+                            <td th:text="${car.fullName}">Fiat Egea</td>
+                            <td>
+                                <span class="badge"
+                                      th:classappend="${car.statusClass}"
+                                      th:text="${car.statusText}">Aktif</span>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(vehicles)}">
+                            <td colspan="3" style="text-align: center; color: #999; padding: 20px;">
+                                Kayıtlı aracınız bulunmamaktadır.
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
                 </div>
             </article>
 
@@ -83,7 +119,7 @@
                         <h3>📢 Duyurular</h3>
                         <p>Yönetimden mesajlar</p>
                     </div>
-                    <a href="/user/announcements" class="link">Tümü</a>
+                    <a th:href="@{/user/announcements}" class="link">Tümü</a>
                 </div>
                 <ul class="announcements">
                     <li th:each="ann : ${announcements}">
@@ -96,7 +132,7 @@
                               th:text="${ann.priority}">Bilgi</span>
                     </li>
 
-                    <li th:if="${#lists.isEmpty(announcements)}" style="justify-content: center; color: #999;">
+                    <li th:if="${announcements == null or #lists.isEmpty(announcements)}" style="justify-content: center; color: #999;">
                         Henüz duyuru bulunmamaktadır.
                     </li>
                 </ul>
@@ -130,7 +166,7 @@
                                       th:text="${pkg.statusText}">Durum</span>
                             </td>
                         </tr>
-                        <tr th:if="${#lists.isEmpty(packages)}">
+                        <tr th:if="${packages == null or #lists.isEmpty(packages)}">
                             <td colspan="4" style="text-align: center; color: #999; padding: 20px;">
                                 Bekleyen kargonuz yok.
                             </td>
@@ -146,7 +182,7 @@
                         <h3>🛠 Bakım Taleplerim</h3>
                         <p>Arıza ve şikayet durumları</p>
                     </div>
-                    <a href="/user/complaints" class="link">Yeni Oluştur</a>
+                    <a th:href="@{/user/complaints}" class="link">Yeni Oluştur</a>
                 </div>
                 <div class="table-wrapper">
                     <table class="data-table">
@@ -169,7 +205,7 @@
                                       th:text="${comp.status}">Bekliyor</span>
                             </td>
                         </tr>
-                        <tr th:if="${#lists.isEmpty(complaints)}">
+                        <tr th:if="${complaints == null or #lists.isEmpty(complaints)}">
                             <td colspan="4" style="text-align: center; color: #999; padding: 20px;">
                                 Aktif bir talebiniz bulunmamaktadır.
                             </td>

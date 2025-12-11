@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yönetici Girişi - Apartment Management</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        /* Yönetici Sayfasına Özel Küçük Dokunuşlar */
+        .login-header h1.admin-title {
+            color: #d9534f; /* Yönetici için kırmızımsı bir başlık rengi */
+        }
+        .login-btn.admin-btn {
+            /* Butonu da başlıkla uyumlu hale getirelim */
+            background: linear-gradient(135deg, #d9534f 0%, #c9302c 100%);
+        }
+        .login-btn.admin-btn:hover {
+            background: linear-gradient(135deg, #c9302c 0%, #ac2925 100%);
+        }
+        .back-to-user-link {
+             font-size: 0.9rem;
+             color: #666;
+             text-decoration: none;
+             display: flex;
+             align-items: center;
+        }
+        .back-to-user-link:hover {
+            color: #d9534f;
+        }
+    </style>
+</head>
+<body>
+<div class="gradient-bg">
+    <div class="login-shell">
+        <div class="login-card" style="border-top: 4px solid #d9534f;"> <div class="login-header">
+            <div class="logo" style="font-size: 3rem;">🛡️</div> <h1 class="admin-title">Yönetici Paneli</h1>
+            <p>Güvenli Yönetici Girişi</p>
+        </div>
+
+            <div th:if="${error}" class="error-message">
+                <p th:text="${error}"></p>
+            </div>
+
+            <form th:action="@{/login/admin-auth}" method="post" class="login-form">
+                <div class="form-group">
+                    <label for="email">Yönetici E-posta:</label>
+                    <input type="email" id="email" name="email" placeholder="Yönetici e-postanızı girin" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Şifre:</label>
+                    <input type="password" id="password" name="password" placeholder="Yönetici şifrenizi girin" required>
+                </div>
+
+                <div class="remember-row" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <input type="checkbox" id="remember" name="remember">
+                        <label for="remember">Beni Hatırla</label>
+                    </div>
+                    <a th:href="@{/login}" class="back-to-user-link">
+                        <span style="margin-right: 5px;">⬅️</span>Kullanıcı Girişine Dön
+                    </a>
+                </div>
+
+                <button type="submit" class="login-btn admin-btn">Yönetim Paneline Gir</button>
+                <a href="#" class="forgot-password">Şifremi Unuttum</a>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

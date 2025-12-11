@@ -18,13 +18,13 @@
         </div>
         <nav class="nav-links">
             <a class="nav-link" th:classappend="${currentPage == 'dashboard'} ? 'active'" th:href="@{/admin/dashboard}">Dashboard</a>
-            <a class="nav-link" th:classappend="${currentPage == 'flats'} ? 'active'" th:href="@{/admin/flats}">Daireler</a>
-            <a class="nav-link" th:classappend="${currentPage == 'debts'} ? 'active'" th:href="@{/admin/debts}">Aidat & Ödemeler</a>
+            <a class="nav-link" th:classappend="${currentPage == 'vehicles'} ? 'active'" th:href="@{/admin/vehicles}">Araçlar</a>
+            <a class="nav-link" th:classappend="${currentPage == 'payments'} ? 'active'" th:href="@{/admin/payments}">Ödemeler</a>
             <a class="nav-link" th:classappend="${currentPage == 'announcements'} ? 'active'" th:href="@{/admin/announcements}">Duyurular</a>
             <a class="nav-link" th:classappend="${currentPage == 'users'} ? 'active'" th:href="@{/admin/users}">Kullanıcılar</a>
-            <a class="nav-link" th:classappend="${currentPage == 'complaints'} ? 'active'" th:href="@{/admin/complaints}">Bakım & Talepler</a>
         </nav>
-        <button class="sidebar-logout">Çıkış</button>
+
+        <a th:href="@{/logout}" class="sidebar-logout">Çıkış Yap</a>
     </aside>
 
     <main class="admin-main">
@@ -35,7 +35,9 @@
             </div>
             <div class="topbar-actions">
                 <button class="btn ghost">Bildirimler</button>
-                <div class="user-chip">A</div>
+                <div class="user-chip">
+                    <span th:text="${user.username != null ? #strings.substring(user.username, 0, 1) : 'A'}">A</span>
+                </div>
             </div>
         </header>
 
@@ -43,35 +45,34 @@
             <article class="stat-card">
                 <div class="stat-label">Aidat Tahsilat Oranı</div>
                 <div class="stat-value"
-                     th:text="${#numbers.formatDecimal(collectionRate, 0, 0)}">82%</div>
-                <div class="stat-trend positive"
-                     th:text="|Güncel oran: ${#numbers.formatDecimal(collectionRate, 0, 0)}%|">
-                    +4% bu ay
+                     th:text="${collectionRate != null ? #numbers.formatDecimal(collectionRate, 0, 0) + '%' : '0%'}">82%</div>
+                <div class="stat-trend positive">
+                    Bu ayki durum
                 </div>
             </article>
 
             <article class="stat-card">
                 <div class="stat-label">Ödenen Daire</div>
                 <div class="stat-value"
-                     th:text="|${paidFlats} / ${totalFlats}|">34 / 42</div>
+                     th:text="${paidFlats} + ' / ' + ${totalFlats}">34 / 42</div>
                 <div class="stat-trend positive"
-                     th:text="|${paidFlats} daire ödedi|">+3 yeni ödeme</div>
+                     th:text="${paidFlats} + ' daire ödedi'">+3 yeni ödeme</div>
             </article>
 
             <article class="stat-card">
                 <div class="stat-label">Bekleyen Bakım</div>
                 <div class="stat-value"
-                     th:text="|${pendingComplaints} talep|">5 talep</div>
-                <div class="stat-trend warning"
-                     th:text="|${pendingComplaints} beklemede|">2 acil</div>
+                     th:text="${pendingComplaints} + ' talep'">5 talep</div>
+                <div class="stat-trend warning">
+                    İşlem bekliyor
+                </div>
             </article>
 
             <article class="stat-card">
                 <div class="stat-label">Kasa Bakiyesi</div>
                 <div class="stat-value"
-                     th:text="|'₺' + ${#numbers.formatDecimal(currentBalance, 0, 0)}|">₺124.500</div>
-                <div class="stat-trend positive"
-                     th:text="'Mevcut Bakiye'">+₺7.200</div>
+                     th:text="'₺' + ${currentBalance != null ? #numbers.formatDecimal(currentBalance, 0, 0) : '0'}">₺124.500</div>
+                <div class="stat-trend positive">Mevcut Bakiye</div>
             </article>
         </section>
 
@@ -84,9 +85,9 @@
                     </div>
                 </div>
                 <div class="quick-actions">
-                    <button class="btn primary">Aidat Talebi Oluştur</button>
-                    <button class="btn secondary">Duyuru Yayınla</button>
-                    <button class="btn ghost">Yeni Kullanıcı Ekle</button>
+                    <a href="#" class="btn primary">Aidat Talebi Oluştur</a>
+                    <a th:href="@{/admin/announcements}" class="btn secondary">Duyuru Yayınla</a>
+                    <a th:href="@{/admin/users}" class="btn ghost">Yeni Kullanıcı Ekle</a>
                 </div>
             </article>
 
@@ -96,7 +97,7 @@
                         <h3>Son Ödemeler</h3>
                         <p>En son yapılan işlemler</p>
                     </div>
-                    <a th:href="@{/admin/debts}" class="link">Tümü</a>
+                    <a th:href="@{/admin/payments}" class="link">Tümü</a>
                 </div>
                 <div class="table-wrapper">
                     <table class="data-table">
@@ -113,12 +114,12 @@
                         <tr th:each="payment : ${recentPayments}">
                             <td th:text="${payment.flatNumber}">3B</td>
                             <td th:text="${payment.userName}">Ayşe Yılmaz</td>
-                            <td th:text="${'₺' + #numbers.formatDecimal(payment.amount, 0, 0)}">₺1.250</td>
+                            <td th:text="'₺' + ${payment.amount}">₺1.250</td>
                             <td><span class="badge success" th:text="${payment.status}">Ödendi</span></td>
-                            <td th:text="${#dates.format(payment.paymentDate, 'dd MMM')}">08 Ara</td>
+                            <td th:text="${payment.paymentDate != null ? #dates.format(payment.paymentDate, 'dd MMM') : '-'}">08 Ara</td>
                         </tr>
-                        <tr th:if="${#lists.isEmpty(recentPayments)}">
-                            <td colspan="5" style="text-align: center; padding: 20px;">Ödeme kaydı bulunmamaktadır</td>
+                        <tr th:if="${recentPayments == null or #lists.isEmpty(recentPayments)}">
+                            <td colspan="5" style="text-align: center; padding: 20px; color: #999;">Ödeme kaydı bulunmamaktadır</td>
                         </tr>
                         </tbody>
                     </table>
@@ -131,21 +132,21 @@
                         <h3>Duyurular</h3>
                         <p>Güncel bilgilendirmeler</p>
                     </div>
-                    <a th:href="@{/admin/announcements}" class="link">Yeni Duyuru</a>
+                    <a th:href="@{/admin/announcements}" class="link">Yönet</a>
                 </div>
                 <ul class="announcements">
                     <li th:each="announcement : ${announcements}">
                         <div>
                             <div class="ann-title" th:text="${announcement.title}">Otopark bakımı</div>
-                            <div class="ann-meta" th:text="${announcement.getFormattedDate()}">09 Ara - 10:00</div>
+                            <div class="ann-meta" th:text="${announcement.formattedDate}">09 Ara - 10:00</div>
                         </div>
-                        <span class="badge" 
-                              th:classappend="${announcement.getBadgeClass()}"
-                              th:text="${announcement.priority}">Bilgilendirme</span>
+                        <span class="badge"
+                              th:classappend="${announcement.badgeClass}"
+                              th:text="${announcement.priority}">Bilgi</span>
                     </li>
-                    <li th:if="${#lists.isEmpty(announcements)}">
+                    <li th:if="${announcements == null or #lists.isEmpty(announcements)}" style="padding: 15px; color: #999;">
                         <div>
-                            <div class="ann-title">Duyuru bulunmamaktadır</div>
+                            <div class="ann-title">Henüz duyuru bulunmamaktadır</div>
                         </div>
                     </li>
                 </ul>

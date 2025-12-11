@@ -18,11 +18,21 @@ public class LoginController {
 
     private final UserService userService;
 
+    // 1. Mavi Ekran (Sakin Girişi)
     @GetMapping("/login")
     public String showLoginPage() {
         return "login";
     }
 
+    // 2. Kırmızı Ekran (Admin Giriş)
+    @GetMapping("/admin-login")
+    public String showAdminLoginPage() {
+        return "admin-login";
+    }
+
+    // ---------------------------------------------------------
+    // SENARYO A: MAVİ EKRANDAN GİRİŞ (Sakinler İçin)
+    // ---------------------------------------------------------
     @PostMapping("/login")
     public String handleLogin(@RequestParam String email,
                               @RequestParam String password,
@@ -32,32 +42,48 @@ public class LoginController {
         User user = userService.authenticate(email, password);
 
         if (user != null) {
-            session.setAttribute("loggedInUser", user);
-
+            // KONTROL: Eğer giren kişi ADMIN ise Mavi Ekranda HATA ver!
             if ("ADMIN".equals(user.getRole())) {
+                model.addAttribute("error", "Yöneticiler bu ekrandan giriş yapamaz! Lütfen Yönetici Panelini kullanın.");
+                return "login"; // Tekrar mavi ekrana döner
+            }
+
+            // Eğer Sakin ise (RESIDENT), içeri al
+            if ("RESIDENT".equals(user.getRole())) {
+                session.setAttribute("loggedInUser", user);
+                return "redirect:/user/dashboard";
+            }
+        }
+
+        // Kullanıcı yoksa veya şifre yanlışsa
+        model.addAttribute("error", "Email veya şifre hatalı!");
+        return "login";
+    }
+
+    // ---------------------------------------------------------
+    // SENARYO B: KIRMIZI EKRANDAN GİRİŞ (Sadece Admin İçin)
+    // ---------------------------------------------------------
+    @PostMapping("/login/admin-auth")
+    public String handleAdminLogin(@RequestParam String email,
+                                   @RequestParam String password,
+                                   HttpSession session,
+                                   Model model) {
+
+        User user = userService.authenticate(email, password);
+
+        if (user != null) {
+            if ("ADMIN".equals(user.getRole())) {
+                session.setAttribute("loggedInUser", user);
                 return "redirect:/admin/dashboard";
             } else {
-                // Burada sadece yönlendirme yapıyoruz.
-                // Asıl işi UserDashboardController yapacak.
-                return "redirect:/user/dashboard";
+                model.addAttribute("error", "Bu panel sadece yöneticiler içindir!");
+                return "admin-login";
             }
         } else {
             model.addAttribute("error", "Email veya şifre hatalı!");
-            return "login";
+            return "admin-login";
         }
     }
-
-    /* 
-    @GetMapping("/admin/dashboard")
-    public String showAdminDashboard(HttpSession session) {
-        User user = (User) session.getAttribute("loggedInUser");
-
-        if (user == null || !"ADMIN".equals(user.getRole())) {
-            return "redirect:/login";
-        }
-
-        return "admin-dashboard";
-    }*/
 
     @GetMapping("/logout")
     public String logout(HttpSession session) {
