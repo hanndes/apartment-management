@@ -1,14 +1,16 @@
 package com.group23.apartment_management.controller;
 
-import com.group23.apartment_management.entities.User;
-import com.group23.apartment_management.services.UserService;
-import jakarta.servlet.http.HttpSession;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import com.group23.apartment_management.entities.User;
+import com.group23.apartment_management.services.UserService;
+
+import jakarta.servlet.http.HttpSession;
+import lombok.RequiredArgsConstructor;
 
 @Controller
 @RequiredArgsConstructor
@@ -45,6 +47,7 @@ public class LoginController {
         }
     }
 
+    /* 
     @GetMapping("/admin/dashboard")
     public String showAdminDashboard(HttpSession session) {
         User user = (User) session.getAttribute("loggedInUser");
@@ -54,7 +57,7 @@ public class LoginController {
         }
 
         return "admin-dashboard";
-    }
+    }*/
 
     @GetMapping("/logout")
     public String logout(HttpSession session) {
