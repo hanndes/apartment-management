@@ -2,9 +2,17 @@
 <html lang="tr" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apartment Management - Ödemeler</title>
+    <title>Ödeme Yönetimi</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .split-layout {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+        @media (max-width: 992px) { .split-layout { grid-template-columns: 1fr; } }
+    </style>
 </head>
 <body class="admin-body">
 <div class="admin-layout">
@@ -17,68 +25,113 @@
             </div>
         </div>
         <nav class="nav-links">
-            <a class="nav-link" th:classappend="${currentPage == 'dashboard'} ? 'active'" th:href="@{/admin/dashboard}">Dashboard</a>
-            <a class="nav-link" th:classappend="${currentPage == 'flats'} ? 'active'" th:href="@{/admin/flats}">Daireler</a>
-            <a class="nav-link" th:classappend="${currentPage == 'debts'} ? 'active'" th:href="@{/admin/debts}">Aidat & Ödemeler</a>
-            <a class="nav-link" th:classappend="${currentPage == 'announcements'} ? 'active'" th:href="@{/admin/announcements}">Duyurular</a>
-            <a class="nav-link" th:classappend="${currentPage == 'users'} ? 'active'" th:href="@{/admin/users}">Kullanıcılar</a>
-            <a class="nav-link" th:classappend="${currentPage == 'complaints'} ? 'active'" th:href="@{/admin/complaints}">Bakım & Talepler</a>
+            <a class="nav-link" th:href="@{/admin/dashboard}">Dashboard</a>
+            <a class="nav-link" th:href="@{/admin/vehicles}">Araçlar</a>
+            <a class="nav-link" th:href="@{/admin/residents}">Sakinler</a>
+            <a class="nav-link active" th:href="@{/admin/payments}">Ödemeler</a>
+            <a class="nav-link" th:href="@{/admin/complaints}">Bakım & Talepler</a>
+            <a class="nav-link" th:href="@{/admin/announcements}">Duyurular</a>
+            <a class="nav-link" th:href="@{/admin/users}">Kullanıcılar</a>
         </nav>
-        <button class="sidebar-logout">Çıkış</button>
+        <a th:href="@{/logout}" class="sidebar-logout">Çıkış Yap</a>
     </aside>
 
     <main class="admin-main">
         <header class="topbar">
             <div>
-                <h1>Aidat & Ödemeler</h1>
-                <p>Tüm ödemeleri yönetin</p>
+                <h1>Ödeme Yönetimi</h1>
+                <p>Aidat ve diğer tahsilat işlemleri</p>
             </div>
-            <div class="topbar-actions">
-                <button class="btn ghost">Bildirimler</button>
-                <div class="user-chip">A</div>
-            </div>
+            <div class="user-chip">A</div>
         </header>
 
-        <section class="panel-grid">
+        <section class="split-layout">
+
             <article class="panel">
                 <div class="panel-head">
-                    <div>
-                        <h3>Ödeme Kayıtları</h3>
-                        <p>Tüm yapılan ödemeler</p>
+                    <h3>💳 Yeni Ödeme Al</h3>
+                </div>
+
+                <form th:action="@{/admin/payments/add}" method="post">
+
+                    <div class="form-group">
+                        <label>Ödemeyi Yapan (Sakin)</label>
+                        <select name="residentId" required style="cursor: pointer; width: 100%; padding: 8px;">
+                            <option value="" disabled selected>Listeden seçiniz...</option>
+                            <option th:each="res : ${residents}"
+                                    th:value="${res.residentId}"
+                                    th:text="${res.firstName + ' ' + res.lastName}">
+                            </option>
+                        </select>
                     </div>
-                    <button class="btn secondary">+ Yeni Ödeme</button>
-                </div>
-                <div class="table-wrapper">
-                    <table class="data-table">
-                        <thead>
-                        <tr>
-                            <th>Daire</th>
-                            <th>Ödeyenin Adı</th>
-                            <th>Tutar</th>
-                            <th>Durum</th>
-                            <th>Ödeme Tarihi</th>
-                            <th>İşlemler</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr th:each="payment : ${payments}">
-                            <td th:text="${payment.flatNumber}">3B</td>
-                            <td th:text="${payment.userName}">Ayşe Yılmaz</td>
-                            <td th:text="${'₺' + #numbers.formatDecimal(payment.amount, 0, 0)}">₺1.250</td>
-                            <td><span class="badge success" th:text="${payment.status}">Ödendi</span></td>
-                            <td th:text="${#dates.format(payment.paymentDate, 'dd MMM yyyy')}">08 Ara 2025</td>
-                            <td>
-                                <button class="btn ghost" style="padding: 4px 8px; font-size: 12px;">Detay</button>
-                                <button class="btn ghost" style="padding: 4px 8px; font-size: 12px;">Yazdır</button>
-                            </td>
-                        </tr>
-                        <tr th:if="${#lists.isEmpty(payments)}">
-                            <td colspan="6" style="text-align: center; padding: 20px;">Ödeme kaydı bulunmamaktadır</td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
+
+                    <div class="form-group">
+                        <label>Ödeme Tipi</label>
+                        <select name="paymentMethod" style="width: 100%; padding: 8px;">
+                            <option value="CASH">Nakit</option>
+                            <option value="CARD">Kredi Kartı</option>
+                            <option value="BANK">Havale / EFT</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tutar (₺)</label>
+                        <input type="number" name="amountPaid" placeholder="Örn: 1250" step="0.01" required style="width: 100%; padding: 8px;">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Referans / Açıklama</label>
+                        <input type="text" name="referenceNo" placeholder="Dekont No veya Ay Bilgisi" style="width: 100%; padding: 8px;">
+                    </div>
+
+                    <div style="margin-top: 20px;">
+                        <button type="submit" class="btn primary" style="width: 100%;">Ödemeyi Kaydet</button>
+                    </div>
+
+                </form>
             </article>
+
+            <article class="panel">
+                <div class="panel-head">
+                    <h3>📜 Son İşlemler</h3>
+                    <p>Sisteme girilen son ödemeler</p>
+                </div>
+
+                <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                    <thead>
+                    <tr style="text-align: left; color: #666; font-size: 0.9em; border-bottom: 2px solid #eee;">
+                        <th style="padding: 10px;">Sakin</th>
+                        <th style="padding: 10px;">Daire</th>
+                        <th style="padding: 10px;">Tutar</th>
+                        <th style="padding: 10px;">Tarih</th>
+                        <th style="padding: 10px;">Yöntem</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="payment : ${payments}" style="border-bottom: 1px solid #eee;">
+                        <td style="padding: 10px;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <div style="width: 24px; height: 24px; background: #eee; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px;">
+                                    <span th:text="${payment.userName != null ? #strings.substring(payment.userName, 0, 1) : '?'}">A</span>
+                                </div>
+                                <span th:text="${payment.userName}">İsim</span>
+                            </div>
+                        </td>
+                        <td style="padding: 10px;" th:text="${payment.flatNumber}">A-1</td>
+                        <td style="padding: 10px; font-weight: bold; color: #1e7e34;" th:text="'₺' + ${payment.amount}">₺0</td>
+                        <td style="padding: 10px; color: #666; font-size: 0.9em;"
+                            th:text="${#dates.format(payment.paymentDate, 'dd-MM-yyyy HH:mm')}">01-01-2023</td>
+                        <td style="padding: 10px;">
+                            <span class="badge" th:text="${payment.paymentMethod}">Nakit</span>
+                        </td>
+                    </tr>
+                    <tr th:if="${payments == null or #lists.isEmpty(payments)}">
+                        <td colspan="5" style="text-align: center; padding: 20px; color: #999;">Kayıt bulunamadı.</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </article>
+
         </section>
     </main>
 </div>

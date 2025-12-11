@@ -8,6 +8,7 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.group23.apartment_management.entities.dto.PaymentDTO;
 import org.springframework.stereotype.Repository;
 
 import com.group23.apartment_management.config.DatabaseConnection;
@@ -19,12 +20,11 @@ public class PaymentRepository {
     public List<Payment> findPaymentsByUserId(int userId){
         List<Payment> list = new ArrayList<>();
 
-        String sql = "SELECT p.*" +
-                     "FROM Payments p" +
-                     "JOIN Residents r ON p.apartment_id = r.apartment_id" +
-                     "WHERE r.user_id = ?" +
-                     "ORDER BY p.payment_date DESC"; 
-
+        String sql = "SELECT p.* " +  // Boşluk eklendi
+                "FROM Payments p " + // Boşluk eklendi
+                "JOIN Residents r ON p.apartment_id = r.apartment_id " + // Boşluk eklendi
+                "WHERE r.user_id = ? " +
+                "ORDER BY p.payment_date DESC";
         try (Connection con = DatabaseConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
@@ -129,20 +129,55 @@ public class PaymentRepository {
     }
 // PaymentRepository.java içinde bu metodu bulun ve değiştirin:
 
-    public List<Payment> findRecentPayments(int limit){
-        List<Payment> list = new ArrayList<>();
+    // LİSTEYİ PaymentDTO OLARAK DÖNDÜRÜYORUZ
+    public List<PaymentDTO> findRecentPayments(int limit){
+        List<PaymentDTO> list = new ArrayList<>();
 
-        // DÜZELTME: "TOP " ile "*" arasına 'limit' değişkenini ekliyoruz.
-        // Oluşan SQL şuna benzeyecek: SELECT TOP 5 * FROM ...
-        String sql = "SELECT TOP " + limit + " * FROM Payments ORDER BY payment_date DESC";
+        String sql = "SELECT TOP " + limit + " p.*, r.first_name, r.last_name, b.block_name, a.door_number " +
+                "FROM Payments p " +
+                "LEFT JOIN Residents r ON p.resident_id = r.resident_id " +
+                "LEFT JOIN Apartments a ON r.apartment_id = a.apartment_id " +
+                "LEFT JOIN Blocks b ON a.block_id = b.block_id " +
+                "ORDER BY p.payment_date DESC";
 
         try (Connection con = DatabaseConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
-                Payment p = mapRow(rs);
-                list.add(p);
+                PaymentDTO dto = new PaymentDTO();
+
+                // 1. Standart Alanları Doldur (Parent)
+                dto.setId(rs.getInt("payment_id"));
+                dto.setDebtId(rs.getInt("debt_id"));
+                dto.setResidentId(rs.getInt("resident_id"));
+                dto.setAmountPaid(rs.getBigDecimal("amount_paid"));
+                dto.setPaymentDate(rs.getTimestamp("payment_date"));
+                dto.setPaymentMethod(rs.getString("payment_method"));
+                dto.setReferenceNo(rs.getString("reference_no"));
+                dto.setCreatedAt(rs.getTimestamp("created_at"));
+
+                // 2. DTO'ya Özel Alanları Doldur
+
+                // İsim Birleştirme
+                String fname = rs.getString("first_name");
+                String lname = rs.getString("last_name");
+                if(fname != null) {
+                    dto.setUserName(fname + " " + lname);
+                } else {
+                    dto.setUserName("Silinmiş Kişi");
+                }
+
+                // Daire Bilgisi
+                String block = rs.getString("block_name");
+                String door = rs.getString("door_number");
+                if(block != null) {
+                    dto.setFlatNumber(block + " - D:" + door);
+                } else {
+                    dto.setFlatNumber("-");
+                }
+
+                list.add(dto);
             }
 
         } catch (Exception e) {

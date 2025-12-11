@@ -34,4 +34,11 @@ public class Vehicle {
     public String getFullName() {
         return brand + " " + model;
     }
+
+    // --- BU METODU MUTLAKA EKLE ---
+    public String getFormattedPlate() {
+        if (plateNumber == null) return "";
+        return plateNumber.toUpperCase(); // Plakayı büyük harf yapar
+    }
+    // -----
 }

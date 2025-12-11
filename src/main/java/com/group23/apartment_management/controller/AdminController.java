@@ -3,6 +3,7 @@ package com.group23.apartment_management.controller;
 import com.group23.apartment_management.entities.User;
 import com.group23.apartment_management.entities.Vehicle;
 import com.group23.apartment_management.entities.dto.ComplaintDTO;
+import com.group23.apartment_management.entities.dto.PaymentDTO;
 import com.group23.apartment_management.services.*;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -48,17 +49,22 @@ public class AdminController {
         return "admin-dashboard";
     }
 
-    // 2. ÖDEMELER
+// Import kısmına dikkat:
+    // import com.group23.apartment_management.entities.PaymentDTO;
+
     @GetMapping("/payments")
     public String showPayments(HttpSession session, Model model) {
-        if (!isAdmin(session)) return "redirect:/login";
-        User user = (User) session.getAttribute("loggedInUser");
-        model.addAttribute("user", user);
+        // ... (Güvenlik kontrolü) ...
 
-        model.addAttribute("payments", paymentService.getRecentPaymentsForDashboard(50));
-        model.addAttribute("currentPage", "payments");
+        // List<PaymentDTO> olarak alıyoruz
+        List<
+                PaymentDTO> payments = paymentService.getRecentPaymentsForDashboard(100);
+        model.addAttribute("payments", payments);
+
         return "admin-payments";
     }
+
+    // Dashboard metodunda da aynı şekilde PaymentDTO kullanılır.
 
     // 3. DUYURULAR
     @GetMapping("/announcements")

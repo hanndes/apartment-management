@@ -2,6 +2,7 @@ package com.group23.apartment_management.services;
 
 import java.util.List;
 
+import com.group23.apartment_management.entities.dto.PaymentDTO;
 import org.springframework.stereotype.Service;
 
 import com.group23.apartment_management.entities.Payment;
@@ -30,8 +31,8 @@ public class PaymentService {
         return paymentRepository.save(payment);
     }
 
-    //Admin dashboard: son ödemeler kartı
-    public List<Payment> getRecentPaymentsForDashboard(int limit) {
+    // Dönüş tipini List<Payment> yerine List<PaymentDTO> yap
+    public List<PaymentDTO> getRecentPaymentsForDashboard(int limit) {
         return paymentRepository.findRecentPayments(limit);
     }
 }
