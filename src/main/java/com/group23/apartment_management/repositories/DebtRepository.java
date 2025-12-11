@@ -108,5 +108,89 @@ public class DebtRepository {
             e.printStackTrace();
         }
     }
-    
+    //tüm borçların toplam tutarı 
+    public BigDecimal getTotalDebtAmount(){
+        String sql = "SELECT SUM(amount) AS total_amount FROM Debts";
+        BigDecimal result = BigDecimal.ZERO;
+
+            try (Connection con = DatabaseConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            if (rs.next()) {
+                BigDecimal val = rs.getBigDecimal("total_amount");
+                if (val != null) {
+                    result = val;
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }   
+
+    //ödenmiş borçların toplam tutarı
+    public BigDecimal getTotalPaidDebtAmount(){
+        String sql = "SELECT SUM(amount) AS total_paid FROM Debts WHERE is_paid = 1";
+        BigDecimal result = BigDecimal.ZERO;
+
+        try (Connection con = DatabaseConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            if (rs.next()) {
+                BigDecimal val = rs.getBigDecimal("total_paid");
+                if (val != null) {
+                    result = val;
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    /**
+     * En az bir borcu ödenmiş olan benzersiz daire sayısı
+     * (admin ekrandaki "Ödenen Daire" için)
+     */
+    public int countPaidApartments(){
+        String sql = "SELECT COUNT(DISTINCT apartment_id) AS cnt FROM Debts WHERE is_paid = 1";
+
+        int count = 0;
+        try (Connection con = DatabaseConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            if (rs.next()) {
+                count = rs.getInt("cnt");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return count;
+    }
+
+    //borç kaydı olan toplam benzersiz daire sayısı
+    public int countAllApartmentsWithDebt(){
+        String sql = "SELECT COUNT(DISTINCT apartment_id) AS cnt FROM Debts";
+
+        int count = 0;
+
+        try (Connection con = DatabaseConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            if (rs.next()) {
+                count = rs.getInt("cnt");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return count;
+    }
 }
