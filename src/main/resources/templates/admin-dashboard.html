@@ -39,28 +39,42 @@
             </div>
         </header>
 
-        <section class="stat-grid">
-            <article class="stat-card">
-                <div class="stat-label">Aidat Tahsilat Oranı</div>
-                <div class="stat-value">82%</div>
-                <div class="stat-trend positive">+4% bu ay</div>
-            </article>
-            <article class="stat-card">
-                <div class="stat-label">Ödenen Daire</div>
-                <div class="stat-value">34 / 42</div>
-                <div class="stat-trend positive">+3 yeni ödeme</div>
-            </article>
-            <article class="stat-card">
-                <div class="stat-label">Bekleyen Bakım</div>
-                <div class="stat-value">5 talep</div>
-                <div class="stat-trend warning">2 acil</div>
-            </article>
-            <article class="stat-card">
-                <div class="stat-label">Kasa Bakiyesi</div>
-                <div class="stat-value">₺124.500</div>
-                <div class="stat-trend positive">+₺7.200</div>
-            </article>
-        </section>
+<section class="stat-grid">
+    <article class="stat-card">
+        <div class="stat-label">Aidat Tahsilat Oranı</div>
+        <div class="stat-value"
+             th:text="${#numbers.formatDecimal(collectionRate, 0, 0)}">82%</div>
+        <div class="stat-trend positive"
+             th:text="|Güncel oran: ${#numbers.formatDecimal(collectionRate, 0, 0)}%|">
+            +4% bu ay
+        </div>
+    </article>
+
+    <article class="stat-card">
+        <div class="stat-label">Ödenen Daire</div>
+        <div class="stat-value"
+             th:text="|${paidFlats} / ${totalFlats}|">34 / 42</div>
+        <div class="stat-trend positive"
+             th:text="|${paidFlats} daire ödedi|">+3 yeni ödeme</div>
+    </article>
+
+    <article class="stat-card">
+        <div class="stat-label">Bekleyen Bakım</div>
+        <div class="stat-value"
+             th:text="|${pendingComplaints} talep|">5 talep</div>
+        <div class="stat-trend warning"
+             th:text="|${pendingComplaints} beklemede|">2 acil</div>
+    </article>
+
+    <article class="stat-card">
+        <div class="stat-label">Kasa Bakiyesi</div>
+        <div class="stat-value"
+             th:text="|'₺' + ${#numbers.formatDecimal(currentBalance, 0, 0)}">₺124.500</div>
+        <div class="stat-trend positive"
+             th:text="'Mevcut Bakiye'">+₺7.200</div>
+    </article>
+</section>
+
 
         <section class="panel-grid">
             <article class="panel">
