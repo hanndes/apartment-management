@@ -30,4 +30,10 @@ public class Complaint {
         if ("Reddedildi".equals(status)) return "danger";
         return "warning";
     }
+    // Öncelik Rengi
+    public String getPriorityClass() {
+        if ("Acil".equals(priority)) return "danger";
+        if ("Yüksek".equals(priority)) return "warning";
+        return "secondary";
+    }
 }

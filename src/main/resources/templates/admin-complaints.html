@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apartment Management - Bakım ve Talepler</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body class="admin-body">
+<div class="admin-layout">
+
+    <aside class="admin-sidebar">
+        <div class="brand">
+            <div class="brand-icon">🏢</div>
+            <div>
+                <div class="brand-title">Apartment</div>
+                <div class="brand-sub">Management</div>
+            </div>
+        </div>
+        <nav class="nav-links">
+            <a class="nav-link" th:classappend="${currentPage == 'dashboard'} ? 'active'" th:href="@{/admin/dashboard}">Dashboard</a>
+            <a class="nav-link" th:classappend="${currentPage == 'flats'} ? 'active'" th:href="@{/admin/flats}">Daireler</a>
+            <a class="nav-link" th:classappend="${currentPage == 'debts'} ? 'active'" th:href="@{/admin/debts}">Aidat & Ödemeler</a>
+            <a class="nav-link" th:classappend="${currentPage == 'announcements'} ? 'active'" th:href="@{/admin/announcements}">Duyurular</a>
+            <a class="nav-link" th:classappend="${currentPage == 'users'} ? 'active'" th:href="@{/admin/users}">Kullanıcılar</a>
+            <a class="nav-link" th:classappend="${currentPage == 'complaints'} ? 'active'" th:href="@{/admin/complaints}">Bakım & Talepler</a>
+        </nav>
+
+        <a th:href="@{/logout}" class="sidebar-logout">Çıkış Yap</a>
+    </aside>
+
+    <main class="admin-main">
+        <header class="topbar">
+            <div>
+                <h1>Bakım ve Talepler</h1>
+                <p>Sakinlerden gelen arıza ve şikayet bildirimleri</p>
+            </div>
+            <div class="topbar-actions">
+                <button class="btn ghost">Bildirimler</button>
+                <div class="user-chip">
+                    <span th:text="${user.username != null ? #strings.substring(user.username, 0, 1) : 'A'}">A</span>
+                </div>
+            </div>
+        </header>
+
+        <section class="stat-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 20px;">
+            <article class="stat-card">
+                <div class="stat-label">Bekleyen Talepler</div>
+                <div class="stat-value">5</div>
+                <div class="stat-trend warning">İşlem gerektiriyor</div>
+            </article>
+            <article class="stat-card">
+                <div class="stat-label">İncelenenler</div>
+                <div class="stat-value">2</div>
+                <div class="stat-trend">Usta yönlendirildi</div>
+            </article>
+            <article class="stat-card">
+                <div class="stat-label">Bu Ay Çözülen</div>
+                <div class="stat-value">12</div>
+                <div class="stat-trend positive">Başarıyla tamamlandı</div>
+            </article>
+        </section>
+
+        <section class="panel-grid">
+            <article class="panel">
+                <div class="panel-head">
+                    <div>
+                        <h3>Talep Listesi</h3>
+                        <p>Tüm arıza ve şikayet kayıtları</p>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn ghost btn-sm">Tümü</button>
+                        <button class="btn ghost btn-sm">Bekleyenler</button>
+                    </div>
+                </div>
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                        <tr>
+                            <th>Durum</th>
+                            <th>Öncelik</th>
+                            <th>Başlık & Kategori</th>
+                            <th>Sakin / Daire</th>
+                            <th>Tarih</th>
+                            <th>İşlemler</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="complaint : ${complaints}">
+                            <td>
+                                <span class="badge"
+                                      th:classappend="${complaint.status == 'Bekliyor' ? 'warning' :
+                                                       (complaint.status == 'Çözüldü' ? 'success' : 'secondary')}"
+                                      th:text="${complaint.status}">Bekliyor</span>
+                            </td>
+                            <td>
+                                <span style="font-size: 0.85rem; font-weight: 600;"
+                                      th:styleappend="${complaint.priority == 'Acil' ? 'color: #e63946;' :
+                                                       (complaint.priority == 'Yüksek' ? 'color: #f4a261;' : 'color: #2a9d8f;')}"
+                                      th:text="${complaint.priority}">Normal</span>
+                            </td>
+                            <td>
+                                <div style="font-weight: 600; color: #333;" th:text="${complaint.title}">Musluk Arızası</div>
+                                <small style="color: #666;" th:text="${complaint.category}">Tesisat</small>
+                            </td>
+                            <td>
+                                <div th:text="${complaint.userName}">Ahmet Yılmaz</div>
+                                <small style="color: #999;">Sakin</small>
+                            </td>
+                            <td th:text="${complaint.createdAt != null ? #dates.format(complaint.createdAt, 'dd MMM yyyy') : '-'}">
+                                10 Ara 2025
+                            </td>
+                            <td>
+                                <div style="display: flex; gap: 5px;">
+                                    <a href="#" class="btn primary" style="padding: 5px 10px; font-size: 12px;">Detay</a>
+                                    <a href="#" class="btn success" style="padding: 5px 10px; font-size: 12px;">✔</a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr th:if="${complaints == null or #lists.isEmpty(complaints)}">
+                            <td colspan="6" style="text-align: center; padding: 30px; color: #999;">
+                                Henüz bir talep veya şikayet bulunmamaktadır.
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </article>
+        </section>
+    </main>
+</div>
+</body>
+</html>

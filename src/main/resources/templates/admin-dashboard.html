@@ -8,6 +8,7 @@
 </head>
 <body class="admin-body">
 <div class="admin-layout">
+
     <aside class="admin-sidebar">
         <div class="brand">
             <div class="brand-icon">🏢</div>
@@ -18,10 +19,11 @@
         </div>
         <nav class="nav-links">
             <a class="nav-link" th:classappend="${currentPage == 'dashboard'} ? 'active'" th:href="@{/admin/dashboard}">Dashboard</a>
-            <a class="nav-link" th:classappend="${currentPage == 'vehicles'} ? 'active'" th:href="@{/admin/vehicles}">Araçlar</a>
-            <a class="nav-link" th:classappend="${currentPage == 'payments'} ? 'active'" th:href="@{/admin/payments}">Ödemeler</a>
+            <a class="nav-link" th:classappend="${currentPage == 'flats'} ? 'active'" th:href="@{/admin/flats}">Daireler</a>
+            <a class="nav-link" th:classappend="${currentPage == 'debts'} ? 'active'" th:href="@{/admin/debts}">Aidat & Ödemeler</a>
             <a class="nav-link" th:classappend="${currentPage == 'announcements'} ? 'active'" th:href="@{/admin/announcements}">Duyurular</a>
             <a class="nav-link" th:classappend="${currentPage == 'users'} ? 'active'" th:href="@{/admin/users}">Kullanıcılar</a>
+            <a class="nav-link" th:classappend="${currentPage == 'complaints'} ? 'active'" th:href="@{/admin/complaints}">Bakım & Talepler</a>
         </nav>
 
         <a th:href="@{/logout}" class="sidebar-logout">Çıkış Yap</a>
@@ -97,7 +99,7 @@
                         <h3>Son Ödemeler</h3>
                         <p>En son yapılan işlemler</p>
                     </div>
-                    <a th:href="@{/admin/payments}" class="link">Tümü</a>
+                    <a th:href="@{/admin/debts}" class="link">Tümü</a>
                 </div>
                 <div class="table-wrapper">
                     <table class="data-table">

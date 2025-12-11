@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Araç Yönetimi</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .vehicles-layout {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+        @media (max-width: 992px) { .vehicles-layout { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body class="admin-body">
+<div class="admin-layout">
+    <aside class="admin-sidebar">
+        <div class="brand">
+            <div class="brand-icon">🏢</div>
+            <div>
+                <div class="brand-title">Apartment</div>
+                <div class="brand-sub">Management</div>
+            </div>
+        </div>
+        <nav class="nav-links">
+            <a class="nav-link" th:href="@{/admin/dashboard}">Dashboard</a>
+            <a class="nav-link active" th:href="@{/admin/vehicles}">Araçlar</a>
+            <a class="nav-link" th:href="@{/admin/payments}">Ödemeler</a>
+            <a class="nav-link" th:href="@{/admin/announcements}">Duyurular</a>
+        </nav>
+        <a th:href="@{/logout}" class="sidebar-logout">Çıkış Yap</a>
+    </aside>
+
+    <main class="admin-main">
+        <header class="topbar">
+            <h1>Araç Yönetimi</h1>
+            <div class="user-chip">A</div>
+        </header>
+
+        <section class="vehicles-layout">
+
+            <article class="panel">
+                <div class="panel-head">
+                    <h3>🚘 Yeni Araç Ekle</h3>
+                </div>
+
+                <form th:action="@{/admin/vehicles/add}" method="post" th:object="${newVehicle}">
+
+                    <div class="form-group">
+                        <label>Plaka</label>
+                        <input type="text" name="plateNumber" placeholder="34 ABC 123" required
+                               style="text-transform: uppercase; font-weight: bold; letter-spacing: 1px;">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Araç Sahibi (Sakin)</label>
+
+                        <select name="residentId" required style="cursor: pointer;">
+                            <option value="" disabled selected>Listeden seçiniz...</option>
+                            <option th:each="res : ${residents}"
+                                    th:value="${res.residentId}"
+                                    th:text="${res.firstName + ' ' + res.lastName + ' (' + res.flatInfo + ')'}">
+                                Ahmet Yılmaz (A Blok - D:1)
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Marka & Model</label>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                            <input type="text" name="brand" placeholder="Marka" required>
+                            <input type="text" name="model" placeholder="Model" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tip & Renk</label>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                            <select name="vehicleType">
+                                <option value="Otomobil">Otomobil</option>
+                                <option value="SUV">SUV</option>
+                                <option value="Motosiklet">Motosiklet</option>
+                                <option value="Ticari">Ticari</option>
+                            </select>
+                            <input type="text" name="color" placeholder="Renk">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn primary" style="width: 100%; margin-top: 15px;">
+                        + Kaydet
+                    </button>
+                </form>
+            </article>
+
+            <article class="panel">
+                <div class="panel-head">
+                    <div style="display: flex; justify-content: space-between; width: 100%;">
+                        <h3>📋 Kayıtlı Araçlar</h3>
+                        <span class="badge secondary" th:text="${vehicles.size()} + ' Araç'">0 Araç</span>
+                    </div>
+                </div>
+
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                        <tr>
+                            <th>Plaka</th>
+                            <th>Araç</th>
+                            <th>Sahibi</th>
+                            <th>Daire</th>
+                            <th>Durum</th>
+                            <th>İşlem</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="car : ${vehicles}">
+                            <td><span style="font-weight: bold; background: #eee; padding: 4px 8px; border-radius: 4px; border: 1px solid #ddd;" th:text="${car.plateNumber}">34 AB 123</span></td>
+                            <td th:text="${car.getFullName()}">Fiat Egea</td>
+                            <td th:text="${car.ownerName}">Ahmet Yılmaz</td>
+                            <td style="color: #666; font-size: 0.9em;" th:text="${car.flatInfo}">A-1</td>
+                            <td><span class="badge" th:classappend="${car.getStatusClass()}" th:text="${car.getStatusText()}">Aktif</span></td>
+                            <td>
+                                <a th:href="@{/admin/vehicles/delete/{id}(id=${car.vehicleId})}"
+                                   class="btn danger" onclick="return confirm('Silinsin mi?')"
+                                   style="padding: 5px 10px; font-size: 0.8rem; background: #ffe5e5; color: #d14343;">Sil</a>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(vehicles)}">
+                            <td colspan="6" style="text-align: center; color: #999; padding: 30px;">Kayıtlı araç yok.</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </article>
+        </section>
+    </main>
+</div>
+</body>
+</html>
