@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Borçlandırma İşlemleri</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .split-layout { display: grid; grid-template-columns: 350px 1fr; gap: 20px; align-items: start; }
+        @media (max-width: 992px) { .split-layout { grid-template-columns: 1fr; } }
+        .form-control { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 6px; }
+    </style>
+</head>
+<body class="admin-body">
+<div class="admin-layout">
+
+    <aside class="admin-sidebar">
+        <div class="brand"><div class="brand-icon">🏢</div><div><div class="brand-title">Apartment</div><div class="brand-sub">Management</div></div></div>
+
+        <nav class="nav-links">
+            <a class="nav-link" th:href="@{/admin/dashboard}">Dashboard</a>
+            <a class="nav-link" th:href="@{/admin/vehicles}">Araçlar</a>
+            <a class="nav-link" th:href="@{/admin/residents}">Sakinler</a>
+            <a class="nav-link" th:href="@{/admin/staff}">Personel</a>
+            <a class="nav-link" th:href="@{/admin/parking}">Otopark</a>
+            <a class="nav-link" th:href="@{/admin/expenses}">Giderler</a>
+
+            <a class="nav-link active" th:href="@{/admin/debts}">Borçlar & Aidat</a>
+
+            <a class="nav-link" th:href="@{/admin/payments}">Ödemeler</a>
+            <a class="nav-link" th:href="@{/admin/complaints}">Bakım & Talepler</a>
+            <a class="nav-link" th:href="@{/admin/announcements}">Duyurular</a>
+            <a class="nav-link" th:href="@{/admin/users}">Kullanıcılar</a>
+        </nav>
+        <a th:href="@{/logout}" class="sidebar-logout">Çıkış Yap</a>
+    </aside>
+
+    <main class="admin-main">
+        <header class="topbar">
+            <div><h1>Borçlandırma</h1><p>Sakinlere aidat veya gider yansıtma</p></div>
+            <div class="user-chip">A</div>
+        </header>
+
+        <section class="split-layout">
+            <article class="panel">
+                <div class="panel-head"><h3>📝 Yeni Borç Ekle</h3></div>
+
+                <form th:action="@{/admin/debts/add}" method="post">
+
+                    <div class="form-group">
+                        <label>Sakin / Daire Seçimi</label>
+                        <select name="apartmentId" class="form-control" required>
+                            <option th:each="res : ${residents}"
+                                    th:value="${res.apartmentId}"
+                                    th:text="${res.flatInfo + ' - ' + res.fullName}">
+                                A Blok D:1 - Ahmet Yılmaz
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Dönem</label>
+                        <select name="periodId" class="form-control" required>
+                            <option th:each="p : ${periods}"
+                                    th:value="${p.id}"
+                                    th:text="${p.periodName}">Ocak 2025</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Borç Türü</label>
+                        <select name="debtTypeId" class="form-control" required>
+                            <option th:each="t : ${types}"
+                                    th:value="${t.id}"
+                                    th:text="${t.typeName}">Aidat</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tutar (₺)</label>
+                        <input type="number" name="amount" class="form-control" step="0.01" required placeholder="1250">
+                    </div>
+
+                    <button type="submit" class="btn primary" style="width: 100%;">Borçlandır</button>
+                </form>
+            </article>
+
+            <article class="panel">
+                <div class="panel-head"><h3>Tahakkuk Listesi</h3></div>
+                <div class="table-wrapper">
+                    <table class="data-table" style="width: 100%;">
+                        <thead>
+                        <tr>
+                            <th>Daire / Sakin</th>
+                            <th>Dönem & Tür</th>
+                            <th>Tutar</th>
+                            <th>Durum</th>
+                            <th>İşlem</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="d : ${debts}">
+                            <td>
+                                <div style="font-weight: bold;" th:text="${d.apartmentInfo}">A-1 Ahmet</div>
+                            </td>
+                            <td>
+                                <div th:text="${d.periodName}">Ocak 2025</div>
+                                <small style="color:#888;" th:text="${d.typeName}">Aidat</small>
+                            </td>
+                            <td>
+                                <div style="font-weight:bold;" th:text="'₺' + ${d.amount}">₺1250</div>
+                                <small style="color:red;" th:if="${d.remainingAmount > 0}"
+                                       th:text="'Kalan: ₺' + ${d.remainingAmount}">Kalan: 1250</small>
+                            </td>
+                            <td>
+                                <span class="badge"
+                                      th:classappend="${d.paid ? 'success' : 'warning'}"
+                                      th:text="${d.paid ? 'Ödendi' : 'Ödenmedi'}">Ödenmedi</span>
+                            </td>
+                            <td>
+                                <a th:href="@{'/admin/debts/delete/' + ${d.id}}"
+                                   class="btn ghost btn-sm" style="color:red;"
+                                   onclick="return confirm('Hatalı girilen bu borcu silmek istiyor musunuz?')">Sil</a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </article>
+        </section>
+    </main>
+</div>
+</body>
+</html>

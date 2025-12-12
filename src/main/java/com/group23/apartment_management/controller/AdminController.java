@@ -27,6 +27,9 @@ public class AdminController {
     private final ComplaintService complaintService;
     private final StaffService staffService;
     private final ParkingSpotService parkingSpotService;
+    private final DebtTypeService debtTypeService;
+    private final DuesPeriodService duesPeriodService;
+
     // --- GÜVENLİK KONTROLÜ ---
     private boolean isAdmin(HttpSession session) {
         User user = (User) session.getAttribute("loggedInUser");
@@ -56,12 +59,14 @@ public class AdminController {
 
     @GetMapping("/payments")
     public String showPayments(HttpSession session, Model model) {
-        // ... (Güvenlik kontrolü) ...
+        if (!isAdmin(session)) return "redirect:/login";
+        User user = (User) session.getAttribute("loggedInUser");
+        model.addAttribute("user", user);
 
         // List<PaymentDTO> olarak alıyoruz
-        List<
-                PaymentDTO> payments = paymentService.getRecentPaymentsForDashboard(100);
+        List<PaymentDTO> payments = paymentService.getRecentPaymentsForDashboard(100);
         model.addAttribute("payments", payments);
+        model.addAttribute("currentPage", "payments");
 
         return "admin-payments";
     }
@@ -246,7 +251,6 @@ public class AdminController {
         return "redirect:/admin/staff";
     }
 
-    // ... Sınıfın en üstüne servisi ekleyin
     private final UserService userService;
 
     // ... Diğer metodların altına ekleyin ...
@@ -349,6 +353,49 @@ public class AdminController {
         if (!isAdmin(session)) return "redirect:/login";
         parkingSpotService.deleteSpot(id);
         return "redirect:/admin/parking";
+    }
+    // Sınıfın başına servisleri eklediğinizden emin olun:
+
+    // --- BORÇ / AİDAT YÖNETİMİ ---
+    @GetMapping("/debts")
+    public String showDebts(HttpSession session, Model model) {
+        if (!isAdmin(session)) return "redirect:/login";
+        User user = (User) session.getAttribute("loggedInUser");
+        model.addAttribute("user", user);
+
+        // Tablo verisi
+        model.addAttribute("debts", debtService.getAllDebts());
+
+        // Dropdown verileri
+        model.addAttribute("residents", residentService.getAllResidentsDetailed()); // Kime borç yazılacak?
+        model.addAttribute("periods", duesPeriodService.getAllPeriods());           // Hangi dönem?
+        model.addAttribute("types", debtTypeService.getAllDebtTypes());             // Hangi tür? (Aidat/Yakıt)
+
+        model.addAttribute("currentPage", "debts"); // Menüde aktif olması için (HTML'de düzelteceğiz)
+        return "admin-debts";
+    }
+
+    @PostMapping("/debts/add")
+    public String addDebt(@ModelAttribute Debt debt,
+                          @RequestParam("residentId") int residentId,
+                          HttpSession session) {
+        if (!isAdmin(session)) return "redirect:/login";
+
+        // Seçilen Sakinin Dairesini Bul
+        Integer apartmentId = residentService.getApartmentIdByResidentId(residentId);
+        if (apartmentId != null) {
+            debt.setApartmentId(apartmentId);
+            debtService.addDebt(debt);
+        }
+
+        return "redirect:/admin/debts";
+    }
+
+    @GetMapping("/debts/delete/{id}")
+    public String deleteDebt(@PathVariable int id, HttpSession session) {
+        if (!isAdmin(session)) return "redirect:/login";
+        debtService.deleteDebt(id);
+        return "redirect:/admin/debts";
     }
 
 }

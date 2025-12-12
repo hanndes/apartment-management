@@ -46,10 +46,8 @@ public class ResidentController {
         model.addAttribute("packages", packageService.getUserPackages(user.getId()));
         model.addAttribute("complaints", complaintService.getUserComplaints(user.getId()));
 
-        // Araçları Yükle (Hata almamak için)
-        model.addAttribute("vehicles", vehicleService.getAllVehicles());
-        // Not: Normalde sadece kendi aracını getirmeli: vehicleService.getResidentVehicles(user.getId())
-        // ama şimdilik hata vermemesi için genel listeyi koydum.
+        // Kullanıcının kendi araçlarını getir
+        model.addAttribute("vehicles", vehicleService.getResidentVehicles(user.getId()));
 
         // --- AKTİF SAYFA İŞARETÇİSİ ---
         model.addAttribute("currentPage", "dashboard");
@@ -110,4 +108,5 @@ public class ResidentController {
         model.addAttribute("currentPage", "announcements"); // İşaretçi
         return "user-announcements";
     }
+
 }

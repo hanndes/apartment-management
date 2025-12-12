@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.group23.apartment_management.entities.Debts;
+import com.group23.apartment_management.entities.Debt;
 import com.group23.apartment_management.repositories.DebtRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -18,12 +18,12 @@ public class DebtService {
     private final DebtRepository debtRepository;
 
     //giriş yapan kullanıcının tüm borçlarını getir
-    public List<Debts> getUserDebts(int userId){
+    public List<Debt> getUserDebts(int userId){
         return debtRepository.findDebtsByUserId(userId);
     }
 
     //tek bir borcu id ile getir
-    public Debts getDebtById(int debtId){
+    public Debt getDebtById(int debtId){
         return debtRepository.findById(debtId);
     }
 
@@ -59,5 +59,18 @@ public class DebtService {
      */
     public int getTotalFlatCount() {
         return debtRepository.countAllApartmentsWithDebt();
+    }
+    // DebtService içine ekleyin:
+
+    public List<Debt> getAllDebts() {
+        return debtRepository.findAllWithDetails();
+    }
+
+    public void addDebt(Debt debt) {
+        debtRepository.save(debt);
+    }
+
+    public void deleteDebt(int id) {
+        debtRepository.delete(id);
     }
 }
