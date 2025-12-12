@@ -86,4 +86,41 @@ public class VehicleRepository {
             e.printStackTrace();
         }
     }
+    // VehicleRepository.java dosyasının en altına (sınıfın içine) ekleyin:
+
+// VehicleRepository.java içindeki o metodu bununla değiştirin:
+
+    // Metot ismini ve SQL'i değiştirdik: residentId değil userId alacak
+    public List<Vehicle> findVehiclesByUserId(int userId) {
+        List<Vehicle> list = new ArrayList<>();
+
+        // JOIN işlemi: Araç -> Sakin -> Kullanıcı
+        String sql = "SELECT v.* " +
+                "FROM Vehicles v " +
+                "JOIN Residents r ON v.resident_id = r.resident_id " +
+                "WHERE r.user_id = ? AND v.is_active = 1";
+
+        try (Connection con = DatabaseConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, userId); // Artık buraya User ID geliyor, sorgu doğru çalışacak
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Vehicle v = new Vehicle();
+                    v.setVehicleId(rs.getInt("vehicle_id"));
+                    v.setResidentId(rs.getInt("resident_id"));
+                    v.setPlateNumber(rs.getString("plate_number"));
+                    v.setBrand(rs.getString("brand"));
+                    v.setModel(rs.getString("model"));
+                    v.setColor(rs.getString("color"));
+                    v.setVehicleType(rs.getString("vehicle_type"));
+                    v.setActive(rs.getBoolean("is_active"));
+
+                    list.add(v);
+                }
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        return list;
+    }
 }

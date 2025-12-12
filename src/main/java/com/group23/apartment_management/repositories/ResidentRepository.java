@@ -144,6 +144,24 @@ public class ResidentRepository {
         } catch (Exception e) { e.printStackTrace(); }
         return list;
     }
+    // ResidentRepository.java içine (en alta) ekleyin:
+
+    public Integer findApartmentIdByResidentId(int residentId) {
+        String sql = "SELECT apartment_id FROM Residents WHERE resident_id = ?";
+        Integer aptId = null;
+
+        try (Connection con = DatabaseConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, residentId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    aptId = rs.getInt("apartment_id");
+                }
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        return aptId;
+    }
 
 
 }

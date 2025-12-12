@@ -1,10 +1,14 @@
 package com.group23.apartment_management.services;
 
+import com.group23.apartment_management.config.DatabaseConnection;
 import com.group23.apartment_management.entities.Vehicle;
 import com.group23.apartment_management.repositories.VehicleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.List;
 
 @Service
@@ -25,6 +29,13 @@ public class VehicleService {
         vehicleRepository.delete(id);
     }
 
-    // ResidentService'e ihtiyaç duyacağız (Kullanıcı listesini dropdown'a doldurmak için)
-    // Eğer ResidentService yoksa onu da inject etmeniz gerekebilir.
+// VehicleRepository.java dosyasının en altına (sınıfın içine) ekleyin:
+
+    // VehicleService.java dosyasının içine ekleyin:
+
+// VehicleService.java içindeki metodu güncelleyin:
+
+    public List<Vehicle> getVehiclesByUserId(int userId) {
+        return vehicleRepository.findVehiclesByUserId(userId);
+    }
 }

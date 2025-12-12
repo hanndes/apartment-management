@@ -42,4 +42,8 @@ public class ResidentService {
     public List<ApartmentDropdownDTO> getApartmentsForDropdown() {
         return residentRepository.findAllApartmentsForDropdown();
     }
+
+    public Integer getApartmentIdByResidentId(int residentId) {
+        return residentRepository.findApartmentIdByResidentId(residentId);
+    }
 }

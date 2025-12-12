@@ -46,8 +46,8 @@ public class ResidentController {
         model.addAttribute("packages", packageService.getUserPackages(user.getId()));
         model.addAttribute("complaints", complaintService.getUserComplaints(user.getId()));
 
-        // Kullanıcının kendi araçlarını getir
-        model.addAttribute("vehicles", vehicleService.getResidentVehicles(user.getId()));
+        // YENİ HALİ (Doğrusu):
+        model.addAttribute("vehicles", vehicleService.getVehiclesByUserId(user.getId()));
 
         // --- AKTİF SAYFA İŞARETÇİSİ ---
         model.addAttribute("currentPage", "dashboard");

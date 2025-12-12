@@ -86,33 +86,38 @@
 
             <article class="panel">
                 <div class="panel-head">
-                    <div>
-                        <h3>🚗 Araçlarım</h3>
-                        <p>Sisteme kayıtlı araçlarınız</p>
-                    </div>
+                    <h3>🚗 Kayıtlı Araçlarım</h3>
                 </div>
+
                 <div class="table-wrapper">
-                    <table class="data-table">
+                    <table class="data-table" style="width: 100%;">
                         <thead>
                         <tr>
                             <th>Plaka</th>
-                            <th>Araç</th>
-                            <th>Durum</th>
+                            <th>Marka & Model</th>
+                            <th>Renk</th>
                         </tr>
                         </thead>
                         <tbody>
                         <tr th:each="car : ${vehicles}">
-                            <td style="font-weight: bold;" th:text="${car.plateNumber}">34 ABC 123</td>
-                            <td th:text="${car.fullName}">Fiat Egea</td>
                             <td>
-                                <span class="badge"
-                                      th:classappend="${car.statusClass}"
-                                      th:text="${car.statusText}">Aktif</span>
+                                <span class="badge" style="background: #000; color: #fff; border: 2px solid #ccc; font-family: monospace; font-size: 1.1em;"
+                                      th:text="${car.plateNumber}">34 ABC 123</span>
+                            </td>
+                            <td>
+                                <div style="font-weight: bold;" th:text="${car.brand}">Toyota</div>
+                                <small style="color: #666;" th:text="${car.model}">Corolla</small>
+                            </td>
+                            <td>
+                                <span style="display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 5px; border: 1px solid #ddd;"
+                                      th:styleappend="'background-color:' + ${car.color == 'Beyaz' ? '#fff' : (car.color == 'Siyah' ? '#000' : (car.color == 'Kırmızı' ? 'red' : (car.color == 'Mavi' ? 'blue' : (car.color == 'Gri' ? 'gray' : '#ccc'))))}"></span>
+                                <span th:text="${car.color}">Beyaz</span>
                             </td>
                         </tr>
-                        <tr th:if="${#lists.isEmpty(vehicles)}">
-                            <td colspan="3" style="text-align: center; color: #999; padding: 20px;">
-                                Kayıtlı aracınız bulunmamaktadır.
+
+                        <tr th:if="${vehicles == null or #lists.isEmpty(vehicles)}">
+                            <td colspan="3" style="text-align: center; padding: 20px; color: #999;">
+                                Sisteme kayıtlı aracınız bulunmamaktadır.
                             </td>
                         </tr>
                         </tbody>
