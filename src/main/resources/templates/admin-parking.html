@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Otopark Yönetimi</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .split-layout { display: grid; grid-template-columns: 350px 1fr; gap: 20px; align-items: start; }
+        @media (max-width: 992px) { .split-layout { grid-template-columns: 1fr; } }
+        .form-control { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 6px; }
+    </style>
+</head>
+<body class="admin-body">
+<div class="admin-layout">
+
+    <aside class="admin-sidebar">
+        <div class="brand"><div class="brand-icon">🏢</div><div><div class="brand-title">Apartment</div><div class="brand-sub">Management</div></div></div>
+
+        <nav class="nav-links">
+            <a class="nav-link" th:href="@{/admin/dashboard}">Dashboard</a>
+            <a class="nav-link" th:href="@{/admin/vehicles}">Araçlar</a>
+            <a class="nav-link" th:href="@{/admin/residents}">Sakinler</a>
+            <a class="nav-link" th:href="@{/admin/staff}">Personel</a>
+            <a class="nav-link active" th:href="@{/admin/parking}">Otopark</a>
+            <a class="nav-link" th:href="@{/admin/expenses}">Giderler</a>
+            <a class="nav-link" th:href="@{/admin/payments}">Ödemeler</a>
+            <a class="nav-link" th:href="@{/admin/complaints}">Bakım & Talepler</a>
+            <a class="nav-link" th:href="@{/admin/announcements}">Duyurular</a>
+            <a class="nav-link" th:href="@{/admin/users}">Kullanıcılar</a>
+        </nav>
+
+        <a th:href="@{/logout}" class="sidebar-logout">Çıkış Yap</a>
+    </aside>
+
+    <main class="admin-main">
+        <header class="topbar">
+            <div><h1>Otopark Yönetimi</h1><p>Park yerleri ve blok tahsisleri</p></div>
+            <div class="user-chip">A</div>
+        </header>
+
+        <section class="split-layout">
+            <article class="panel">
+                <div class="panel-head"><h3>🅿️ Yeni Park Yeri</h3></div>
+
+                <form th:action="@{/admin/parking/add}" method="post">
+
+                    <div class="form-group">
+                        <label>Blok Seçimi</label>
+                        <select name="blockId" class="form-control" required>
+                            <option th:each="block : ${blocks}"
+                                    th:value="${block.blockId}"
+                                    th:text="${block.blockName}">A Blok</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Park Kodu</label>
+                        <input type="text" name="spotCode" class="form-control" placeholder="Örn: A-05" required>
+                        <small style="color:#888;">Blok harfi ve numara kullanın</small>
+                    </div>
+
+                    <button type="submit" class="btn primary" style="width: 100%;">Kaydet</button>
+                </form>
+            </article>
+
+            <article class="panel">
+                <div class="panel-head"><h3>Park Yerleri</h3></div>
+                <div class="table-wrapper">
+                    <table class="data-table" style="width: 100%;">
+                        <thead>
+                        <tr>
+                            <th>Blok</th>
+                            <th>Park Kodu</th>
+                            <th>Durum</th>
+                            <th>İşlem</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="spot : ${parkingSpots}">
+                            <td style="font-weight: bold;" th:text="${spot.blockName}">A Blok</td>
+                            <td th:text="${spot.spotCode}">A-01</td>
+                            <td>
+                                <span class="badge"
+                                      th:classappend="${spot.occupied ? 'danger' : 'success'}"
+                                      th:text="${spot.occupied ? 'Dolu' : 'Boş'}">Boş</span>
+                            </td>
+                            <td>
+                                <a th:href="@{'/admin/parking/delete/' + ${spot.id}}"
+                                   class="btn ghost btn-sm" style="color:red;"
+                                   onclick="return confirm('Silmek istediğinize emin misiniz?')">Sil</a>
+                            </td>
+                        </tr>
+                        <tr th:if="${parkingSpots == null or #lists.isEmpty(parkingSpots)}">
+                            <td colspan="4" style="text-align: center; padding: 20px; color: #999;">Henüz park yeri tanımlanmadı.</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </article>
+        </section>
+    </main>
+</div>
+</body>
+</html>

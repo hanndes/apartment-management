@@ -26,6 +26,7 @@ public class AdminController {
     private final ResidentService residentService; // EKLENDİ: ResidentService'i enjekte ediyoruz
     private final ComplaintService complaintService;
     private final StaffService staffService;
+    private final ParkingSpotService parkingSpotService;
     // --- GÜVENLİK KONTROLÜ ---
     private boolean isAdmin(HttpSession session) {
         User user = (User) session.getAttribute("loggedInUser");
@@ -319,6 +320,35 @@ public class AdminController {
         if (!isAdmin(session)) return "redirect:/login";
         expenseService.deleteExpense(id);
         return "redirect:/admin/expenses";
+    }
+    @GetMapping("/parking")
+    public String showParking(HttpSession session, Model model) {
+        if (!isAdmin(session)) return "redirect:/login";
+        User user = (User) session.getAttribute("loggedInUser");
+        model.addAttribute("user", user);
+
+        // Otopark Listesi
+        model.addAttribute("parkingSpots", parkingSpotService.getAllSpots());
+
+        // Blok Listesi (Dropdown için - ResidentService içinde vardı)
+        model.addAttribute("blocks", residentService.getAllBlocks());
+
+        model.addAttribute("currentPage", "parking");
+        return "admin-parking";
+    }
+
+    @PostMapping("/parking/add")
+    public String addParking(@ModelAttribute ParkingSpot spot, HttpSession session) {
+        if (!isAdmin(session)) return "redirect:/login";
+        parkingSpotService.addSpot(spot);
+        return "redirect:/admin/parking";
+    }
+
+    @GetMapping("/parking/delete/{id}")
+    public String deleteParking(@PathVariable int id, HttpSession session) {
+        if (!isAdmin(session)) return "redirect:/login";
+        parkingSpotService.deleteSpot(id);
+        return "redirect:/admin/parking";
     }
 
 }

@@ -1,5 +1,6 @@
 package com.group23.apartment_management.services;
 
+import com.group23.apartment_management.entities.Block;
 import com.group23.apartment_management.entities.Resident;
 import com.group23.apartment_management.entities.ResidentType;
 import com.group23.apartment_management.entities.dto.ApartmentDropdownDTO;
@@ -28,6 +29,11 @@ public class ResidentService {
         residentRepository.delete(id);
     }
 
+    // ResidentService.java içine ekleyin:
+
+    public List<Block> getAllBlocks() {
+        return residentRepository.findAllBlocks();
+    }
     // Dropdownlar için veriler
     public List<ResidentType> getResidentTypes() {
         return residentRepository.findAllTypes();

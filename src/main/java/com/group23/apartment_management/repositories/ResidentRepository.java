@@ -1,6 +1,7 @@
 package com.group23.apartment_management.repositories;
 
 import com.group23.apartment_management.config.DatabaseConnection;
+import com.group23.apartment_management.entities.Block;
 import com.group23.apartment_management.entities.Resident;
 import com.group23.apartment_management.entities.ResidentType; // Entity'niz olduğunu varsayıyorum
 import com.group23.apartment_management.entities.dto.ApartmentDropdownDTO;
@@ -118,5 +119,31 @@ public class ResidentRepository {
         } catch (Exception e) { e.printStackTrace(); }
         return list;
     }
+    // Blokları Listele (Tüm detaylarıyla)
+    public List<Block> findAllBlocks() {
+        List<Block> list = new ArrayList<>();
+        // Tüm sütunları çekiyoruz
+        String sql = "SELECT * FROM Blocks ORDER BY block_name";
+
+        try (Connection con = DatabaseConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                Block b = new Block();
+                b.setBlockId(rs.getInt("block_id"));
+                b.setBlockName(rs.getString("block_name"));
+
+                // Yeni alanları set ediyoruz
+                b.setTotalFloors(rs.getInt("total_floors"));
+                b.setTotalApartments(rs.getInt("total_apartments"));
+                b.setAddress(rs.getString("address"));
+
+                list.add(b);
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        return list;
+    }
+
 
 }
