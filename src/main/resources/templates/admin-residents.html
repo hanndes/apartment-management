@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Sakinler Yönetimi</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .split-layout { display: grid; grid-template-columns: 350px 1fr; gap: 20px; align-items: start; }
+        @media (max-width: 992px) { .split-layout { grid-template-columns: 1fr; } }
+        .form-control { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 6px; }
+    </style>
+</head>
+<body class="admin-body">
+<div class="admin-layout">
+
+    <aside class="admin-sidebar">
+        <div class="brand"><div class="brand-icon">🏢</div><div><div class="brand-title">Apartment</div><div class="brand-sub">Management</div></div></div>
+        <nav class="nav-links">
+            <a class="nav-link" th:href="@{/admin/dashboard}">Dashboard</a>
+            <a class="nav-link" th:href="@{/admin/vehicles}">Araçlar</a>
+            <a class="nav-link active" th:href="@{/admin/residents}">Sakinler</a>
+            <a class="nav-link" th:href="@{/admin/payments}">Ödemeler</a>
+            <a class="nav-link" th:href="@{/admin/complaints}">Bakım & Talepler</a>
+            <a class="nav-link" th:href="@{/admin/announcements}">Duyurular</a>
+            <a class="nav-link" th:href="@{/admin/users}">Kullanıcılar</a>
+        </nav>
+        <a th:href="@{/logout}" class="sidebar-logout">Çıkış Yap</a>
+    </aside>
+
+    <main class="admin-main">
+        <header class="topbar">
+            <div><h1>Sakinler</h1><p>Apartmanda yaşayan kişi kayıtları</p></div>
+            <div class="user-chip">A</div>
+        </header>
+
+        <section class="split-layout">
+            <article class="panel">
+                <div class="panel-head"><h3>👤 Yeni Sakin Ekle</h3></div>
+
+                <form th:action="@{/admin/residents/add}" method="post">
+                    <div class="form-group">
+                        <label>Ad</label>
+                        <input type="text" name="firstName" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Soyad</label>
+                        <input type="text" name="lastName" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Telefon</label>
+                        <input type="text" name="phoneNumber" class="form-control" placeholder="555..." required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>E-Posta</label>
+                        <input type="email" name="email" class="form-control">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Sakin Tipi</label>
+                        <select name="residentTypeId" class="form-control">
+                            <option th:each="type : ${residentTypes}"
+                                    th:value="${type.id}"
+                                    th:text="${type.typeName}">Ev Sahibi</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Daire Seçimi</label>
+                        <select name="apartmentId" class="form-control">
+                            <option value="">Seçiniz...</option>
+                            <option th:each="apt : ${apartments}"
+                                    th:value="${apt.id}"
+                                    th:text="${apt.label}">A Blok - D:1</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn primary" style="width: 100%;">Kaydet</button>
+                </form>
+            </article>
+
+            <article class="panel">
+                <div class="panel-head"><h3>Kayıtlı Sakinler</h3></div>
+                <div class="table-wrapper">
+                    <table class="data-table" style="width: 100%;">
+                        <thead>
+                        <tr>
+                            <th>Ad Soyad</th>
+                            <th>İletişim</th>
+                            <th>Tip</th>
+                            <th>Daire</th>
+                            <th>İşlem</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="res : ${residents}">
+                            <td>
+                                <div style="font-weight: bold;" th:text="${res.fullName}">Ali Veli</div>
+                            </td>
+                            <td>
+                                <div th:text="${res.phoneNumber}">555...</div>
+                                <small style="color:#888;" th:text="${res.email}">a@a.com</small>
+                            </td>
+                            <td>
+                                <span class="badge info" th:text="${res.typeName}">Ev Sahibi</span>
+                            </td>
+                            <td th:text="${res.flatInfo}">A-1</td>
+                            <td>
+                                <a th:href="@{'/admin/residents/delete/' + ${res.residentId}}"
+                                   class="btn ghost btn-sm" style="color:red;"
+                                   onclick="return confirm('Silmek istediğinize emin misiniz?')">Sil</a>
+                            </td>
+                        </tr>
+                        <tr th:if="${residents == null or #lists.isEmpty(residents)}">
+                            <td colspan="5" style="text-align: center; padding: 20px; color: #999;">Henüz kayıtlı sakin yok.</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </article>
+        </section>
+    </main>
+</div>
+</body>
+</html>

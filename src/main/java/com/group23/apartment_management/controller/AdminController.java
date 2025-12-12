@@ -1,9 +1,6 @@
 package com.group23.apartment_management.controller;
 
-import com.group23.apartment_management.config.DatabaseConnection;
-import com.group23.apartment_management.entities.Announcement;
-import com.group23.apartment_management.entities.User;
-import com.group23.apartment_management.entities.Vehicle;
+import com.group23.apartment_management.entities.*;
 import com.group23.apartment_management.entities.dto.ComplaintDTO;
 import com.group23.apartment_management.entities.dto.ComplaintDetailDTO;
 import com.group23.apartment_management.entities.dto.PaymentDTO;
@@ -15,8 +12,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.util.List;
 
 @Controller
@@ -30,6 +25,7 @@ public class AdminController {
     private final VehicleService vehicleService;
     private final ResidentService residentService; // EKLENDİ: ResidentService'i enjekte ediyoruz
     private final ComplaintService complaintService;
+    private final StaffService staffService;
     // --- GÜVENLİK KONTROLÜ ---
     private boolean isAdmin(HttpSession session) {
         User user = (User) session.getAttribute("loggedInUser");
@@ -83,7 +79,6 @@ public class AdminController {
         return "admin-announcements";
     }
 
-    // 4. ARAÇ YÖNETİMİ (GÜNCELLENDİ)
     @GetMapping("/vehicles")
     public String showVehicles(HttpSession session, Model model) {
         if (!isAdmin(session)) return "redirect:/login";
@@ -94,9 +89,8 @@ public class AdminController {
         // Araçları getir
         model.addAttribute("vehicles", vehicleService.getAllVehicles());
 
-        // GÜNCELLEME: Sakinleri ResidentService üzerinden çekiyoruz
-        // Bu sayede ResidentRepository'deki detaylı sorgu (isim + daire no) çalışıyor.
-        model.addAttribute("residents", residentService.getAllResidents());
+        // HATA BURADAYDI: getAllResidents() yerine getAllResidentsDetailed() kullanıyoruz
+        model.addAttribute("residents", residentService.getAllResidentsDetailed());
 
         model.addAttribute("newVehicle", new Vehicle());
         model.addAttribute("currentPage", "vehicles");
@@ -187,6 +181,68 @@ public class AdminController {
 
         // İşlem bitince detay sayfasına geri dön (Kullanıcı değişikliği görsün)
         return "redirect:/admin/complaints/detail/" + id;
+    }
+    // ... Diğer metodlar ...
+
+    // --- SAKİNLER YÖNETİMİ ---
+    @GetMapping("/residents")
+    public String showResidents(HttpSession session, Model model) {
+        if (!isAdmin(session)) return "redirect:/login";
+        User user = (User) session.getAttribute("loggedInUser");
+        model.addAttribute("user", user);
+
+        // Listeyi DTO olarak çekiyoruz
+        model.addAttribute("residents", residentService.getAllResidentsDetailed());
+
+        // Dropdownlar için veriler
+        model.addAttribute("residentTypes", residentService.getResidentTypes());
+        model.addAttribute("apartments", residentService.getApartmentsForDropdown());
+
+        model.addAttribute("currentPage", "residents");
+        return "admin-residents";
+    }
+
+    @PostMapping("/residents/add")
+    public String addResident(@ModelAttribute Resident resident, HttpSession session) {
+        if (!isAdmin(session)) return "redirect:/login";
+
+        residentService.addResident(resident);
+        return "redirect:/admin/residents";
+    }
+
+    @GetMapping("/residents/delete/{id}")
+    public String deleteResident(@PathVariable int id, HttpSession session) {
+        if (!isAdmin(session)) return "redirect:/login";
+
+        residentService.deleteResident(id);
+        return "redirect:/admin/residents";
+    }
+
+    // --- PERSONEL YÖNETİMİ ---
+    @GetMapping("/staff")
+    public String showStaff(HttpSession session, Model model) {
+        if (!isAdmin(session)) return "redirect:/login";
+        User user = (User) session.getAttribute("loggedInUser");
+        model.addAttribute("user", user);
+
+        model.addAttribute("staffList", staffService.getAllStaff());
+        model.addAttribute("currentPage", "staff");
+
+        return "admin-staff";
+    }
+
+    @PostMapping("/staff/add")
+    public String addStaff(@ModelAttribute Staff staff, HttpSession session) {
+        if (!isAdmin(session)) return "redirect:/login";
+        staffService.addStaff(staff);
+        return "redirect:/admin/staff";
+    }
+
+    @GetMapping("/staff/delete/{id}")
+    public String deleteStaff(@PathVariable int id, HttpSession session) {
+        if (!isAdmin(session)) return "redirect:/login";
+        staffService.deleteStaff(id);
+        return "redirect:/admin/staff";
     }
 
 
