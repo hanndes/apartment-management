@@ -14,12 +14,11 @@ import java.util.List;
 @Repository
 public class UserRepository {
 
-    // KULLANICI GİRİŞİ İÇİN (Role ismiyle beraber çeker)
+    // KULLANICI GİRİŞİ (Login)
     public User findByEmail(String email) {
         User user = null;
-
-        // Users, UserRoles ve Roles tablolarını birleştiriyoruz
-        String sql = "SELECT U.user_id, U.username, U.password, U.email, U.is_active, R.role_name " +
+        // phone_number eklendi
+        String sql = "SELECT U.user_id, U.username, U.password, U.email, U.phone_number, U.is_active, R.role_name " +
                 "FROM Users U " +
                 "LEFT JOIN UserRoles UR ON U.user_id = UR.user_id " +
                 "LEFT JOIN Roles R ON UR.role_id = R.role_id " +
@@ -33,12 +32,11 @@ public class UserRepository {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     user = new User();
-                    user.setId(rs.getInt("user_id")); // User.java'daki isimle aynı olmalı
+                    user.setId(rs.getInt("user_id"));
                     user.setUsername(rs.getString("username"));
                     user.setPassword(rs.getString("password"));
                     user.setEmail(rs.getString("email"));
-
-                    // Rol adını direkt String olarak set ediyoruz
+                    user.setPhoneNumber(rs.getString("phone_number")); // <-- EKLENDİ
                     user.setRole(rs.getString("role_name"));
                     user.setActive(rs.getBoolean("is_active"));
                 }
@@ -47,11 +45,11 @@ public class UserRepository {
         return user;
     }
 
-    // ADMİN PANELİNDEKİ LİSTE İÇİN
+    // LİSTELEME
     public List<User> findAll() {
         List<User> list = new ArrayList<>();
-
-        String sql = "SELECT U.user_id, U.username, U.email, U.is_active, R.role_name " +
+        // phone_number eklendi
+        String sql = "SELECT U.user_id, U.username, U.email, U.phone_number, U.is_active, R.role_name " +
                 "FROM Users U " +
                 "LEFT JOIN UserRoles UR ON U.user_id = UR.user_id " +
                 "LEFT JOIN Roles R ON UR.role_id = R.role_id " +
@@ -66,7 +64,8 @@ public class UserRepository {
                 u.setId(rs.getInt("user_id"));
                 u.setUsername(rs.getString("username"));
                 u.setEmail(rs.getString("email"));
-                u.setRole(rs.getString("role_name")); // "ADMIN" veya "RESIDENT" gelir
+                u.setPhoneNumber(rs.getString("phone_number")); // <-- EKLENDİ
+                u.setRole(rs.getString("role_name"));
                 u.setActive(rs.getBoolean("is_active"));
                 list.add(u);
             }
@@ -74,21 +73,22 @@ public class UserRepository {
         return list;
     }
 
-    // YENİ KULLANICI EKLEME (Transaction ile hem User hem Role ekler)
+    // KAYDETME
     public int save(User user) {
         Connection con = null;
         int newUserId = -1;
 
         try {
             con = DatabaseConnection.getConnection();
-            con.setAutoCommit(false); // İşlem bütünlüğü başlat
+            con.setAutoCommit(false);
 
-            // 1. Kullanıcıyı Ekle
-            String sqlUser = "INSERT INTO Users (username, password, email, is_active) VALUES (?, ?, ?, 1)";
+            // SQL'e phone_number EKLENDİ
+            String sqlUser = "INSERT INTO Users (username, password, email, phone_number, is_active) VALUES (?, ?, ?, ?, 1)";
             try (PreparedStatement ps = con.prepareStatement(sqlUser, Statement.RETURN_GENERATED_KEYS)) {
                 ps.setString(1, user.getUsername());
                 ps.setString(2, user.getPassword());
-                ps.setString(3, user.getEmail()); // Email ekledim, önemli
+                ps.setString(3, user.getEmail());
+                ps.setString(4, user.getPhoneNumber()); // <-- EKLENDİ
 
                 ps.executeUpdate();
 
@@ -97,8 +97,8 @@ public class UserRepository {
                 }
             }
 
-            // 2. Rol ID'sini bul (Gelen string role göre: 'ADMIN' -> 1 gibi)
-            int roleId = 2; // Varsayılan RESIDENT olsun
+            // ... (Rol ekleme kısmı aynı kalıyor) ...
+            int roleId = 2; // Varsayılan RESIDENT
             String sqlFindRole = "SELECT role_id FROM Roles WHERE role_name = ?";
             try (PreparedStatement ps = con.prepareStatement(sqlFindRole)) {
                 ps.setString(1, user.getRole());
@@ -107,7 +107,6 @@ public class UserRepository {
                 }
             }
 
-            // 3. UserRoles tablosuna bağla
             if (newUserId != -1) {
                 String sqlLink = "INSERT INTO UserRoles (user_id, role_id) VALUES (?, ?)";
                 try (PreparedStatement ps = con.prepareStatement(sqlLink)) {
@@ -117,7 +116,7 @@ public class UserRepository {
                 }
             }
 
-            con.commit(); // Her şey yolundaysa kaydet
+            con.commit();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -128,22 +127,18 @@ public class UserRepository {
         return newUserId;
     }
 
-    // SİLME İŞLEMİ
+    // ... (Diğer delete ve linkUserToResident metodları aynı kalıyor) ...
     public void delete(int id) {
-        // Önce UserRoles'dan sil, sonra Users'dan (FK hatası almamak için)
         String sql1 = "DELETE FROM UserRoles WHERE user_id = ?";
-        String sql2 = "UPDATE Residents SET user_id = NULL WHERE user_id = ?"; // Sakin bağını kopar
-        String sql3 = "DELETE FROM Users WHERE user_id = ?"; // Kullanıcıyı sil
-
+        String sql2 = "UPDATE Residents SET user_id = NULL WHERE user_id = ?";
+        String sql3 = "DELETE FROM Users WHERE user_id = ?";
         try (Connection con = DatabaseConnection.getConnection()) {
-            // Basitçe sırayla çalıştırıyoruz
             try (PreparedStatement ps = con.prepareStatement(sql1)) { ps.setInt(1, id); ps.executeUpdate(); }
             try (PreparedStatement ps = con.prepareStatement(sql2)) { ps.setInt(1, id); ps.executeUpdate(); }
             try (PreparedStatement ps = con.prepareStatement(sql3)) { ps.setInt(1, id); ps.executeUpdate(); }
         } catch (Exception e) { e.printStackTrace(); }
     }
 
-    // Resident Bağlantısı
     public void linkUserToResident(int userId, int residentId) {
         String sql = "UPDATE Residents SET user_id = ? WHERE resident_id = ?";
         try (Connection con = DatabaseConnection.getConnection();

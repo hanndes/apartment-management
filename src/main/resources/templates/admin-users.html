@@ -46,7 +46,12 @@
 
                     <div class="form-group">
                         <label>E-Posta</label>
-                        <input type="email" name="email" class="form-control" required placeholder="ornek@email.com">
+                        <input type="email" name="email" class="form-control" placeholder="ornek@email.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Telefon</label>
+                        <input type="text" name="phoneNumber" class="form-control" placeholder="555-123-4567">
                     </div>
 
                     <div class="form-group">
@@ -88,14 +93,18 @@
                         <thead>
                         <tr>
                             <th>Kullanıcı Adı</th>
-                            <th>E-Posta</th> <th>Rol</th>
+                            <th>İletişim</th>
+                            <th>Rol</th>
                             <th>İşlem</th>
                         </tr>
                         </thead>
                         <tbody>
                         <tr th:each="u : ${users}">
                             <td style="font-weight: bold;" th:text="${u.username}">admin</td>
-                            <td style="font-size: 0.9em; color: #555;" th:text="${u.email}">email@test.com</td>
+                            <td>
+                                <div style="font-size: 0.9em; color: #333;" th:text="${u.email}">email@test.com</div>
+                                <div style="font-size: 0.85em; color: #888;" th:text="${u.phoneNumber}">555...</div>
+                            </td>
                             <td>
                                 <span class="badge"
                                       th:classappend="${u.role == 'ADMIN' ? 'danger' : 'info'}"
