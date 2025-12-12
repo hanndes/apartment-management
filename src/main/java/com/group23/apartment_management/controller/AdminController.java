@@ -287,4 +287,38 @@ public class AdminController {
         return "redirect:/admin/users";
     }
 
+    // 1. Servisi Tanımla
+    private final ExpenseService expenseService;
+
+    // 2. Gider Sayfasını Aç
+    @GetMapping("/expenses")
+    public String showExpenses(HttpSession session, Model model) {
+        if (!isAdmin(session)) return "redirect:/login";
+        User user = (User) session.getAttribute("loggedInUser");
+        model.addAttribute("user", user);
+
+        // Listeleri Gönder
+        model.addAttribute("expenses", expenseService.getAllExpenses());
+        model.addAttribute("categories", expenseService.getCategories()); // Dropdown için şart
+
+        model.addAttribute("currentPage", "expenses");
+        return "admin-expenses";
+    }
+
+    // 3. Gider Ekle
+    @PostMapping("/expenses/add")
+    public String addExpense(@ModelAttribute Expense expense, HttpSession session) {
+        if (!isAdmin(session)) return "redirect:/login";
+        expenseService.addExpense(expense);
+        return "redirect:/admin/expenses";
+    }
+
+    // 4. Gider Sil
+    @GetMapping("/expenses/delete/{id}")
+    public String deleteExpense(@PathVariable int id, HttpSession session) {
+        if (!isAdmin(session)) return "redirect:/login";
+        expenseService.deleteExpense(id);
+        return "redirect:/admin/expenses";
+    }
+
 }
