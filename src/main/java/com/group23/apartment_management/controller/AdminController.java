@@ -245,5 +245,46 @@ public class AdminController {
         return "redirect:/admin/staff";
     }
 
+    // ... Sınıfın en üstüne servisi ekleyin
+    private final UserService userService;
+
+    // ... Diğer metodların altına ekleyin ...
+
+    // --- KULLANICILAR YÖNETİMİ ---
+    @GetMapping("/users")
+    public String showUsers(HttpSession session, Model model) {
+        if (!isAdmin(session)) return "redirect:/login";
+        User user = (User) session.getAttribute("loggedInUser");
+        model.addAttribute("user", user);
+
+        // Kullanıcı Listesi
+        model.addAttribute("users", userService.getAllUsers());
+
+        // DROPDOWN İÇİN: Sakinleri (Daire bilgileriyle beraber) getiriyoruz.
+        // Böylece "Hangi kullanıcı hangi sakine ait?" seçebileceğiz.
+        model.addAttribute("residents", residentService.getAllResidentsDetailed());
+
+        model.addAttribute("currentPage", "users");
+        return "admin-users";
+    }
+
+    @PostMapping("/users/add")
+    public String addUser(@ModelAttribute User newUser,
+                          @RequestParam(required = false) Integer residentId, // Formdan gelen seçili sakin ID'si
+                          HttpSession session) {
+        if (!isAdmin(session)) return "redirect:/login";
+
+        // Servise hem kullanıcıyı hem de bağlanacağı sakini gönderiyoruz
+        userService.addUser(newUser, residentId);
+
+        return "redirect:/admin/users";
+    }
+
+    @GetMapping("/users/delete/{id}")
+    public String deleteUser(@PathVariable int id, HttpSession session) {
+        if (!isAdmin(session)) return "redirect:/login";
+        userService.deleteUser(id);
+        return "redirect:/admin/users";
+    }
 
 }

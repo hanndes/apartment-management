@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Kullanıcı Yönetimi</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .split-layout { display: grid; grid-template-columns: 350px 1fr; gap: 20px; align-items: start; }
+        @media (max-width: 992px) { .split-layout { grid-template-columns: 1fr; } }
+        .form-control { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 6px; }
+    </style>
+</head>
+<body class="admin-body">
+<div class="admin-layout">
+
+    <aside class="admin-sidebar">
+        <div class="brand"><div class="brand-icon">🏢</div><div><div class="brand-title">Apartment</div><div class="brand-sub">Management</div></div></div>
+        <nav class="nav-links">
+            <a class="nav-link" th:href="@{/admin/dashboard}">Dashboard</a>
+            <a class="nav-link" th:href="@{/admin/vehicles}">Araçlar</a>
+            <a class="nav-link" th:href="@{/admin/residents}">Sakinler</a>
+            <a class="nav-link" th:href="@{/admin/staff}">Personel</a>
+            <a class="nav-link" th:href="@{/admin/payments}">Ödemeler</a>
+            <a class="nav-link" th:href="@{/admin/complaints}">Bakım & Talepler</a>
+            <a class="nav-link" th:href="@{/admin/announcements}">Duyurular</a>
+            <a class="nav-link active" th:href="@{/admin/users}">Kullanıcılar</a>
+        </nav>
+        <a th:href="@{/logout}" class="sidebar-logout">Çıkış Yap</a>
+    </aside>
+
+    <main class="admin-main">
+        <header class="topbar">
+            <div><h1>Kullanıcılar</h1><p>Sisteme giriş yapabilen hesaplar</p></div>
+            <div class="user-chip">A</div>
+        </header>
+
+        <section class="split-layout">
+            <article class="panel">
+                <div class="panel-head"><h3>🔐 Yeni Kullanıcı Ekle</h3></div>
+
+                <form th:action="@{/admin/users/add}" method="post">
+                    <div class="form-group">
+                        <label>Kullanıcı Adı</label>
+                        <input type="text" name="username" class="form-control" required placeholder="Örn: ahmet123">
+                    </div>
+
+                    <div class="form-group">
+                        <label>E-Posta</label>
+                        <input type="email" name="email" class="form-control" required placeholder="ornek@email.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Şifre</label>
+                        <input type="password" name="password" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Rol</label>
+                        <select name="role" class="form-control">
+                            <option value="RESIDENT">Sakin (Normal)</option>
+                            <option value="ADMIN">Yönetici</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Bağlı Olduğu Kişi (Sakin)</label>
+                        <select name="residentId" class="form-control">
+                            <option value="">Bağlantı Yok (Sadece Admin)</option>
+                            <option th:each="res : ${residents}"
+                                    th:value="${res.residentId}"
+                                    th:text="${res.flatInfo + ' - ' + res.fullName}">
+                                A Blok D:5 - Ahmet Yılmaz
+                            </option>
+                        </select>
+                        <small style="color: #888; display: block; margin-top: 5px; font-size: 0.85em;">
+                            Bu hesabı kullanan sakini seçiniz.
+                        </small>
+                    </div>
+
+                    <button type="submit" class="btn primary" style="width: 100%;">Hesap Oluştur</button>
+                </form>
+            </article>
+
+            <article class="panel">
+                <div class="panel-head"><h3>Kayıtlı Kullanıcılar</h3></div>
+                <div class="table-wrapper">
+                    <table class="data-table" style="width: 100%;">
+                        <thead>
+                        <tr>
+                            <th>Kullanıcı Adı</th>
+                            <th>E-Posta</th> <th>Rol</th>
+                            <th>İşlem</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="u : ${users}">
+                            <td style="font-weight: bold;" th:text="${u.username}">admin</td>
+                            <td style="font-size: 0.9em; color: #555;" th:text="${u.email}">email@test.com</td>
+                            <td>
+                                <span class="badge"
+                                      th:classappend="${u.role == 'ADMIN' ? 'danger' : 'info'}"
+                                      th:text="${u.role}">ADMIN</span>
+                            </td>
+                            <td>
+                                <a th:href="@{'/admin/users/delete/' + ${u.id}}"
+                                   class="btn ghost btn-sm" style="color:red;"
+                                   onclick="return confirm('Bu kullanıcıyı silmek istediğinize emin misiniz?')">Sil</a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </article>
+        </section>
+    </main>
+</div>
+</body>
+</html>

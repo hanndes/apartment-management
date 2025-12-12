@@ -5,6 +5,8 @@ import com.group23.apartment_management.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -23,5 +25,24 @@ public class UserService {
 
     public boolean hasRole(User user, String role) {
         return user.getRole() != null && user.getRole().equals(role);
+    }
+
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
+    // Kullanıcı ekle ve seçilen sakine bağla
+    public void addUser(User user, Integer residentId) {
+        // 1. Kullanıcıyı kaydet ve ID'sini al
+        int newUserId = userRepository.save(user);
+
+        // 2. Eğer formdan bir sakin seçildiyse (residentId null değilse), kullanıcıyı ona bağla
+        if (newUserId != -1 && residentId != null) {
+            userRepository.linkUserToResident(newUserId, residentId);
+        }
+    }
+
+    public void deleteUser(int id) {
+        userRepository.delete(id);
     }
 }
