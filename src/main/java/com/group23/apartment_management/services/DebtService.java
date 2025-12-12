@@ -73,4 +73,10 @@ public class DebtService {
     public void deleteDebt(int id) {
         debtRepository.delete(id);
     }
+    // DebtService.java içine ekleyin:
+
+    // Dashboard'daki "Kasa Bakiyesi" için toplam ödenen tutarı getirir
+    public BigDecimal getTotalPaidAmount() {
+        return debtRepository.getTotalPaidDebtAmount();
+    }
 }

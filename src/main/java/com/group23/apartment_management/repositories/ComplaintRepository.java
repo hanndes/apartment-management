@@ -174,4 +174,26 @@ public class ComplaintRepository {
             e.printStackTrace();
         }
     }
+
+            public int countByStatus(String status) {
+                int count = 0;
+                // Aggregation Query: Tüm satırları çekmek yerine sadece sayıyı alıyoruz
+                String sql = "SELECT COUNT(*) AS total FROM Complaints WHERE status = ?";
+
+                try (Connection con = DatabaseConnection.getConnection();
+                     PreparedStatement ps = con.prepareStatement(sql)) {
+
+                    ps.setString(1, status);
+
+                    try (ResultSet rs = ps.executeQuery()) {
+                        if (rs.next()) {
+                            count = rs.getInt("total");
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return count;
+            }
+
 }

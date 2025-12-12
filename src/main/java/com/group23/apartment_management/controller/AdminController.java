@@ -36,20 +36,31 @@ public class AdminController {
         return user != null && "ADMIN".equals(user.getRole());
     }
 
-    // 1. DASHBOARD
+// AdminController.java -> showDashboard metodu
+
     @GetMapping("/dashboard")
     public String showDashboard(HttpSession session, Model model) {
         if (!isAdmin(session)) return "redirect:/login";
         User user = (User) session.getAttribute("loggedInUser");
         model.addAttribute("user", user);
 
+        // --- Aggregation ile Hesaplanan Veriler ---
+
+        // 1. Borç/Aidat İstatistikleri (Zaten DebtRepository'de SUM/COUNT kullanmıştık)
         model.addAttribute("collectionRate", debtService.getCurrentCollectionRate());
         model.addAttribute("totalFlats", debtService.getTotalFlatCount());
         model.addAttribute("paidFlats", debtService.getPaidFlatCountForCurrentPeriod());
-        model.addAttribute("currentBalance", BigDecimal.ZERO);
-        model.addAttribute("pendingComplaints", 0);
+        model.addAttribute("currentBalance", debtService.getTotalPaidAmount()); // SUM(amount)
+
+        // 2. Bekleyen Şikayet Sayısı (YENİ EKLENEN KISIM)
+        // Veritabanından COUNT(*) ile gelen gerçek sayıyı alıyoruz
+        int pendingCount = complaintService.getPendingComplaintCount();
+        model.addAttribute("pendingComplaints", pendingCount);
+
+        // ... Diğer veriler (Duyurular, Son Ödemeler) ...
         model.addAttribute("announcements", announcementService.getRecentActiveAnnouncements(5));
         model.addAttribute("recentPayments", paymentService.getRecentPaymentsForDashboard(3));
+
         model.addAttribute("currentPage", "dashboard");
         return "admin-dashboard";
     }
@@ -397,5 +408,7 @@ public class AdminController {
         debtService.deleteDebt(id);
         return "redirect:/admin/debts";
     }
+
+
 
 }

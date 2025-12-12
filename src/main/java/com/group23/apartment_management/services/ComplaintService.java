@@ -37,6 +37,10 @@ public class ComplaintService {
     public void respondToComplaint(int id, String response, String status) {
         complaintRepository.updateResponseAndStatus(id, response, status);
     }
-    // Diğer metodlar aynı kalıyor
+
+    public int getPendingComplaintCount() {
+        // "Bekliyor" durumundaki kayıtları saydırıyoruz
+        return complaintRepository.countByStatus("Bekliyor");
+    }
 
 }
