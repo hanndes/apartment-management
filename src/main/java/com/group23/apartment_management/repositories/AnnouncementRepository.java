@@ -66,4 +66,38 @@ public class AnnouncementRepository {
         }
         return list;
     }
+
+    // AnnouncementRepository.java içine ekleyin:
+
+    // YENİ DUYURU KAYDETME
+    public boolean save(Announcement announcement) {
+        String sql = "INSERT INTO Announcements (title, content, priority, created_at, is_active) VALUES (?, ?, ?, ?, 1)";
+
+        try (Connection con = DatabaseConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, announcement.getTitle());
+            ps.setString(2, announcement.getContent());
+            ps.setString(3, announcement.getPriority());
+            ps.setTimestamp(4, announcement.getCreatedAt());
+
+            return ps.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // DUYURU SİLME (Soft Delete: is_active = 0 yapar)
+    public void delete(int id) {
+        String sql = "UPDATE Announcements SET is_active = 0 WHERE announcement_id = ?";
+        try (Connection con = DatabaseConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

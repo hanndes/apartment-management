@@ -5,9 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Apartment Management - Duyurular</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        /* Ekranı ikiye bölen stil */
+        .split-layout {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+        @media (max-width: 992px) { .split-layout { grid-template-columns: 1fr; } }
+
+        /* Form elemanları */
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        textarea.form-control { resize: vertical; min-height: 100px; }
+    </style>
 </head>
 <body class="admin-body">
 <div class="admin-layout">
+
     <aside class="admin-sidebar">
         <div class="brand">
             <div class="brand-icon">🏢</div>
@@ -25,63 +47,94 @@
             <a class="nav-link active" th:href="@{/admin/announcements}">Duyurular</a>
             <a class="nav-link" th:href="@{/admin/users}">Kullanıcılar</a>
         </nav>
-        <button class="sidebar-logout">Çıkış</button>
+        <a th:href="@{/logout}" class="sidebar-logout">Çıkış Yap</a>
     </aside>
 
     <main class="admin-main">
         <header class="topbar">
             <div>
-                <h1>Duyurular</h1>
-                <p>Tüm duyuruları yönetin</p>
+                <h1>Duyuru Yönetimi</h1>
+                <p>Apartman sakinleri için bilgilendirmeler</p>
             </div>
-            <div class="topbar-actions">
-                <button class="btn ghost">Bildirimler</button>
-                <div class="user-chip">A</div>
-            </div>
+            <div class="user-chip">A</div>
         </header>
 
-        <section class="panel-grid">
+        <section class="split-layout">
+
             <article class="panel">
                 <div class="panel-head">
-                    <div>
-                        <h3>Duyurular Listesi</h3>
-                        <p>Aktif duyurular</p>
+                    <h3>📢 Yeni Duyuru</h3>
+                </div>
+
+                <form th:action="@{/admin/announcements/add}" method="post">
+
+                    <div class="form-group">
+                        <label>Başlık</label>
+                        <input type="text" name="title" class="form-control" placeholder="Örn: Asansör Bakımı" required>
                     </div>
-                    <button class="btn secondary">+ Yeni Duyuru</button>
+
+                    <div class="form-group">
+                        <label>Öncelik</label>
+                        <select name="priority" class="form-control" style="cursor: pointer;">
+                            <option value="Normal">Normal (Yeşil)</option>
+                            <option value="Acil">Acil (Kırmızı)</option>
+                            <option value="Yüksek">Yüksek (Turuncu)</option>
+                            <option value="Bilgi">Bilgi (Mavi)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Duyuru İçeriği</label>
+                        <textarea name="content" class="form-control" placeholder="Duyuru detaylarını buraya yazınız..." required></textarea>
+                    </div>
+
+                    <button type="submit" class="btn primary" style="width: 100%;">Yayınla</button>
+                </form>
+            </article>
+
+            <article class="panel">
+                <div class="panel-head">
+                    <h3>Yayındaki Duyurular</h3>
                 </div>
                 <div class="table-wrapper">
-                    <table class="data-table">
+                    <table class="data-table" style="width: 100%;">
                         <thead>
                         <tr>
-                            <th>Başlık</th>
-                            <th>İçerik</th>
                             <th>Öncelik</th>
+                            <th>Başlık & İçerik</th>
                             <th>Tarih</th>
-                            <th>İşlemler</th>
+                            <th>İşlem</th>
                         </tr>
                         </thead>
                         <tbody>
-                        <tr th:each="announcement : ${announcements}">
-                            <td th:text="${announcement.title}">Otopark bakımı</td>
-                            <td th:text="${#strings.abbreviate(announcement.content, 50)}">Otopark bakım çalışmaları</td>
+                        <tr th:each="ann : ${announcements}">
                             <td>
-                                <span class="badge" 
-                                      th:classappend="${announcement.getBadgeClass()}"
-                                      th:text="${announcement.priority}">Normal</span>
+                                <span class="badge"
+                                      th:classappend="${ann.badgeClass}"
+                                      th:text="${ann.priority}">Normal</span>
                             </td>
-                            <td th:text="${announcement.getFormattedDate()}">09 Ara - 10:00</td>
                             <td>
-                                <button class="btn ghost" style="padding: 4px 8px; font-size: 12px;">Düzenle</button>
-                                <button class="btn ghost" style="padding: 4px 8px; font-size: 12px;">Sil</button>
+                                <div style="font-weight: bold; margin-bottom: 4px;" th:text="${ann.title}">Başlık</div>
+                                <div style="font-size: 0.9em; color: #666;"
+                                     th:text="${#strings.abbreviate(ann.content, 60)}">İçerik...</div>
+                            </td>
+                            <td style="font-size: 0.9em; white-space: nowrap;"
+                                th:text="${ann.formattedDate}">01 Ara</td>
+                            <td>
+                                <a th:href="@{'/admin/announcements/delete/' + ${ann.id}}"
+                                   class="btn ghost"
+                                   style="color: red; font-size: 12px; padding: 5px;"
+                                   onclick="return confirm('Silmek istediğinize emin misiniz?')">Sil</a>
                             </td>
                         </tr>
                         <tr th:if="${#lists.isEmpty(announcements)}">
-                            <td colspan="5" style="text-align: center; padding: 20px;">Duyuru bulunmamaktadır</td>
+                            <td colspan="4" style="text-align: center; padding: 20px;">Henüz duyuru yok.</td>
                         </tr>
                         </tbody>
                     </table>
                 </div>
             </article>
+
         </section>
     </main>
 </div>

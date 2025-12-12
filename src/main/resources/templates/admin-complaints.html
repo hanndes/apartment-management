@@ -37,7 +37,6 @@
                 <p>Sakinlerden gelen arıza ve şikayet bildirimleri</p>
             </div>
             <div class="topbar-actions">
-                <button class="btn ghost">Bildirimler</button>
                 <div class="user-chip">
                     <span th:text="${user.username != null ? #strings.substring(user.username, 0, 1) : 'A'}">A</span>
                 </div>
@@ -47,8 +46,7 @@
         <section class="stat-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 20px;">
             <article class="stat-card">
                 <div class="stat-label">Bekleyen Talepler</div>
-                <div class="stat-value">5</div>
-                <div class="stat-trend warning">İşlem gerektiriyor</div>
+                <div class="stat-value">5</div> <div class="stat-trend warning">İşlem gerektiriyor</div>
             </article>
             <article class="stat-card">
                 <div class="stat-label">İncelenenler</div>
@@ -81,7 +79,7 @@
                             <th>Durum</th>
                             <th>Öncelik</th>
                             <th>Başlık & Kategori</th>
-                            <th>Sakin / Daire</th>
+                            <th>Sakin</th>
                             <th>Tarih</th>
                             <th>İşlemler</th>
                         </tr>
@@ -112,10 +110,9 @@
                                 10 Ara 2025
                             </td>
                             <td>
-                                <div style="display: flex; gap: 5px;">
-                                    <a href="#" class="btn primary" style="padding: 5px 10px; font-size: 12px;">Detay</a>
-                                    <a href="#" class="btn success" style="padding: 5px 10px; font-size: 12px;">✔</a>
-                                </div>
+                                <a th:href="@{'/admin/complaints/detail/' + ${complaint.id}}"
+                                   class="btn primary"
+                                   style="padding: 6px 12px; font-size: 13px;">Detay</a>
                             </td>
                         </tr>
                         <tr th:if="${complaints == null or #lists.isEmpty(complaints)}">

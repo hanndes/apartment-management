@@ -2,7 +2,8 @@ package com.group23.apartment_management.repositories;
 
 import com.group23.apartment_management.config.DatabaseConnection;
 import com.group23.apartment_management.entities.Complaint;
-import com.group23.apartment_management.entities.dto.ComplaintDTO; // DTO'yu ekledik
+import com.group23.apartment_management.entities.dto.ComplaintDTO;
+import com.group23.apartment_management.entities.dto.ComplaintDetailDTO;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
@@ -14,7 +15,7 @@ import java.util.List;
 @Repository
 public class ComplaintRepository {
 
-    // Ekleme Metodu (Aynı kalıyor)
+    // Ekleme Metodu
     public boolean save(Complaint complaint) {
         String sql = "INSERT INTO Complaints (user_id, title, description, category, priority, status, created_at) VALUES (?, ?, ?, ?, ?, 'Bekliyor', GETDATE())";
         try (Connection con = DatabaseConnection.getConnection();
@@ -28,7 +29,7 @@ public class ComplaintRepository {
         } catch (Exception e) { e.printStackTrace(); return false; }
     }
 
-    // User İçin Listeleme (Aynı kalıyor)
+    // User İçin Listeleme
     public List<Complaint> findByUserId(int userId) {
         List<Complaint> list = new ArrayList<>();
         String sql = "SELECT * FROM Complaints WHERE user_id = ? ORDER BY created_at DESC";
@@ -38,7 +39,6 @@ public class ComplaintRepository {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     Complaint c = new Complaint();
-                    // ... (setleme işlemleri aynı) ...
                     c.setId(rs.getInt("complaint_id"));
                     c.setUserId(rs.getInt("user_id"));
                     c.setTitle(rs.getString("title"));
@@ -54,27 +54,21 @@ public class ComplaintRepository {
         return list;
     }
 
-    // --- ADMIN İÇİN: DTO DÖNDÜREN METOD ---
-    // List<Complaint> değil, List<ComplaintDTO> döndürüyoruz
+    // Admin Listeleme (DTO)
     public List<ComplaintDTO> findAllComplaintsWithNames() {
         List<ComplaintDTO> list = new ArrayList<>();
 
-        String sql = """
-            SELECT c.*, r.first_name, r.last_name 
-            FROM Complaints c
-            LEFT JOIN Residents r ON c.user_id = r.user_id
-            ORDER BY c.created_at DESC
-        """;
+        String sql = "SELECT c.*, r.first_name, r.last_name " +
+                "FROM Complaints c " +
+                "LEFT JOIN Residents r ON c.user_id = r.user_id " +
+                "ORDER BY c.created_at DESC";
 
         try (Connection con = DatabaseConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
-                // Burada DTO nesnesi oluşturuyoruz
                 ComplaintDTO dto = new ComplaintDTO();
-
-                // Normal alanları doldur
                 dto.setId(rs.getInt("complaint_id"));
                 dto.setTitle(rs.getString("title"));
                 dto.setDescription(rs.getString("description"));
@@ -83,23 +77,20 @@ public class ComplaintRepository {
                 dto.setPriority(rs.getString("priority"));
                 dto.setCreatedAt(rs.getTimestamp("created_at"));
 
-                // İsim alanını doldur (DTO'nun özelliği)
                 String fname = rs.getString("first_name");
                 String lname = rs.getString("last_name");
-                // YENİSİ (Doğru):
                 if (fname != null) {
-                    dto.setUserName(fname + " " + lname); // DTO'daki "userName" alanını kullanıyoruz
+                    dto.setUserName(fname + " " + lname);
                 } else {
                     dto.setUserName("Misafir");
                 }
-
                 list.add(dto);
             }
         } catch (Exception e) { e.printStackTrace(); }
         return list;
     }
 
-    // Durum Güncelleme (Aynı kalıyor)
+    // Durum Güncelleme
     public void updateStatus(int id, String status) {
         String sql = "UPDATE Complaints SET status = ? WHERE complaint_id = ?";
         try (Connection con = DatabaseConnection.getConnection();
@@ -108,5 +99,79 @@ public class ComplaintRepository {
             ps.setInt(2, id);
             ps.executeUpdate();
         } catch (Exception e) { e.printStackTrace(); }
+    }
+
+    // DETAY SAYFASI İÇİN ÖZEL METOD (ComplaintDetailDTO DÖNDÜRÜR)
+    public ComplaintDetailDTO findComplaintDetailById(int id) {
+        ComplaintDetailDTO dto = null;
+
+        String sql = "SELECT c.*, r.first_name, r.last_name, r.phone_number, " +
+                "a.door_number, b.block_name " +
+                "FROM Complaints c " +
+                "LEFT JOIN Residents r ON c.user_id = r.user_id " +
+                "LEFT JOIN Apartments a ON r.apartment_id = a.apartment_id " +
+                "LEFT JOIN Blocks b ON a.block_id = b.block_id " +
+                "WHERE c.complaint_id = ?";
+
+        try (Connection con = DatabaseConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    dto = new ComplaintDetailDTO();
+
+                    dto.setId(rs.getInt("complaint_id"));
+                    dto.setTitle(rs.getString("title"));
+                    dto.setDescription(rs.getString("description"));
+                    dto.setCategory(rs.getString("category"));
+                    dto.setPriority(rs.getString("priority"));
+                    dto.setStatus(rs.getString("status"));
+                    dto.setCreatedAt(rs.getTimestamp("created_at"));
+
+                    // --- DÜZELTME BURADA YAPILDI ---
+                    // Veritabanındaki kolon adı 'admin_response'
+                    dto.setResponse(rs.getString("admin_response"));
+
+                    String fname = rs.getString("first_name");
+                    String lname = rs.getString("last_name");
+                    dto.setUserName(fname != null ? fname + " " + lname : "Misafir");
+
+                    String block = rs.getString("block_name");
+                    String door = rs.getString("door_number");
+                    if (block != null && door != null) {
+                        dto.setFlatInfo(block + " Blok - Daire " + door);
+                    } else {
+                        dto.setFlatInfo("Daire Bilgisi Yok");
+                    }
+
+                    dto.setUserPhone(rs.getString("phone_number"));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return dto;
+    }
+
+    // --- DÜZELTME BURADA YAPILDI ---
+    // Adminin cevabını ve şikayet durumunu günceller
+    // SQL sorgusunda 'response' yerine 'admin_response' kullanıldı.
+    public void updateResponseAndStatus(int id, String response, String status) {
+        String sql = "UPDATE Complaints SET admin_response = ?, status = ? WHERE complaint_id = ?";
+
+        try (Connection con = DatabaseConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, response);
+            ps.setString(2, status);
+            ps.setInt(3, id);
+
+            ps.executeUpdate();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

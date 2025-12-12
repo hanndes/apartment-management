@@ -1,8 +1,11 @@
 package com.group23.apartment_management.controller;
 
+import com.group23.apartment_management.config.DatabaseConnection;
+import com.group23.apartment_management.entities.Announcement;
 import com.group23.apartment_management.entities.User;
 import com.group23.apartment_management.entities.Vehicle;
 import com.group23.apartment_management.entities.dto.ComplaintDTO;
+import com.group23.apartment_management.entities.dto.ComplaintDetailDTO;
 import com.group23.apartment_management.entities.dto.PaymentDTO;
 import com.group23.apartment_management.services.*;
 import jakarta.servlet.http.HttpSession;
@@ -12,6 +15,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.util.List;
 
 @Controller
@@ -127,4 +132,62 @@ public class AdminController {
         model.addAttribute("currentPage", "complaints");
         return "admin-complaints";
     }
+
+    // AdminController.java içine ekleyin:
+
+    // DUYURU EKLEME İŞLEMİ
+    @PostMapping("/announcements/add")
+    public String addAnnouncement(@ModelAttribute Announcement announcement, HttpSession session) {
+        if (!isAdmin(session)) return "redirect:/login";
+
+        // Tarihi şu anki zaman olarak ayarla
+        announcement.setCreatedAt(new java.sql.Timestamp(System.currentTimeMillis()));
+        announcement.setActive(true);
+
+        announcementService.saveAnnouncement(announcement);
+
+        return "redirect:/admin/announcements";
+    }
+
+    // DUYURU SİLME İŞLEMİ
+    @GetMapping("/announcements/delete/{id}")
+    public String deleteAnnouncement(@PathVariable int id, HttpSession session) {
+        if (!isAdmin(session)) return "redirect:/login";
+
+        announcementService.deleteAnnouncement(id);
+
+        return "redirect:/admin/announcements";
+    }
+
+    @GetMapping("/complaints/detail/{id}")
+    public String showComplaintDetail(@PathVariable int id, HttpSession session, Model model) {
+        if (!isAdmin(session)) return "redirect:/login";
+
+        // ARTIK YENİ DTO'YU KULLANIYORUZ
+        ComplaintDetailDTO complaint = complaintService.getComplaintDetail(id);
+
+        model.addAttribute("complaint", complaint);
+
+        User user = (User) session.getAttribute("loggedInUser");
+        model.addAttribute("user", user);
+
+        return "admin-complaint-detail";
+    }
+
+    @PostMapping("/complaints/respond")
+    public String respondToComplaint(@RequestParam("complaintId") int id,
+                                     @RequestParam("response") String response,
+                                     @RequestParam("status") String status,
+                                     HttpSession session) {
+
+        if (!isAdmin(session)) return "redirect:/login";
+
+        // Servis üzerinden güncelleme yap
+        complaintService.respondToComplaint(id, response, status);
+
+        // İşlem bitince detay sayfasına geri dön (Kullanıcı değişikliği görsün)
+        return "redirect:/admin/complaints/detail/" + id;
+    }
+
+
 }
