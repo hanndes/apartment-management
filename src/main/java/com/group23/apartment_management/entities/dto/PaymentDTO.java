@@ -13,7 +13,7 @@ public class PaymentDTO {
 
     // Veritabanından gelen temel bilgiler
     private int id;
-    private BigDecimal amount;      // DB'deki amount_paid buraya eşleşecek
+    private BigDecimal amount;      
     private Timestamp paymentDate;
     private String paymentMethod;
 

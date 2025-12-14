@@ -15,7 +15,7 @@ public class Apartment {
     private int typeId;          // type_id (FK - ApartmentTypes tablosuna gider)
 
     private int floorNumber;     // floor_number
-    private String doorNumber;   // door_number (String olabilir çünkü '1A', 'Zemin' gibi değerler olabilir)
+    private String doorNumber;   // door_number 
 
     private boolean isOccupied;  // is_occupied (Dolu mu boş mu?)
 }

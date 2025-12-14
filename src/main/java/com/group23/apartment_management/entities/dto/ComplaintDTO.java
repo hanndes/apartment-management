@@ -14,9 +14,9 @@ public class ComplaintDTO {
     private String status;
     private String priority;
     private Timestamp createdAt;
-    // HATANIN SEBEBİ: HTML 'user' arıyor ama burada yok.
-    // ÇÖZÜM: 'user' nesnesi yerine sadece ismini taşıyalım.
-    private String userName; // Şikayeti yapan kişinin adı
+    
+    
+    private String userName;
 
-    // Tarih vb. diğer alanlar...
+    
 }

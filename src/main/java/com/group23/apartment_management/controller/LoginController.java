@@ -18,21 +18,19 @@ public class LoginController {
 
     private final UserService userService;
 
-    // 1. Mavi Ekran (Sakin Girişi)
+    //sakin girisi
     @GetMapping("/login")
     public String showLoginPage() {
         return "login";
     }
 
-    // 2. Kırmızı Ekran (Admin Giriş)
+    //admin girisi
     @GetMapping("/admin-login")
     public String showAdminLoginPage() {
         return "admin-login";
     }
 
-    // ---------------------------------------------------------
-    // SENARYO A: MAVİ EKRANDAN GİRİŞ (Sakinler İçin)
-    // ---------------------------------------------------------
+  
     @PostMapping("/login")
     public String handleLogin(@RequestParam String email,
                               @RequestParam String password,
@@ -60,9 +58,7 @@ public class LoginController {
         return "login";
     }
 
-    // ---------------------------------------------------------
-    // SENARYO B: KIRMIZI EKRANDAN GİRİŞ (Sadece Admin İçin)
-    // ---------------------------------------------------------
+   
     @PostMapping("/login/admin-auth")
     public String handleAdminLogin(@RequestParam String email,
                                    @RequestParam String password,

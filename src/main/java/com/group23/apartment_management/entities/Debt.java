@@ -10,7 +10,7 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Debt {
-    // Veritabanı Sütunları (Görselinizle Birebir)
+    
     private int id;              // debt_id
     private int apartmentId;     // apartment_id
     private int periodId;        // period_id
@@ -22,7 +22,7 @@ public class Debt {
 
     private Timestamp createdAt; // created_at
 
-    // --- EKRANDA GÖSTERMEK İÇİN (JOIN ile doldurulacak) ---
+    
     private String apartmentInfo; // "A Blok - D:1"
     private String periodName;    // "Ocak 2025"
     private String typeName;      // "Aidat"
