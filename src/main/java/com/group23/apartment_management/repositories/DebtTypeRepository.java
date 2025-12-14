@@ -15,7 +15,7 @@ public class DebtTypeRepository {
 
     public List<DebtType> findAll() {
         List<DebtType> list = new ArrayList<>();
-        // is_active kalktı, düz listeleme yapıyoruz
+       
         String sql = "SELECT * FROM DebtTypes ORDER BY type_name";
 
         try (Connection con = DatabaseConnection.getConnection();

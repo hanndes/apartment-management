@@ -8,11 +8,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {
-    private int id;          // HTML'de ${u.id} kullanıldığı için
+    private int id;          
     private String username;
     private String password;
     private String email;
-    private String phoneNumber; // <-- YENİ EKLENEN ALAN
-    private String role; //Join ile geliyo
+    private String phoneNumber; 
+    private String role; 
     private boolean active;
 }

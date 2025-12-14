@@ -88,7 +88,7 @@ public class ComplaintRepository {
         return list;
     }
 
-    // DETAY SAYFASI İÇİN ÖZEL METOD (ComplaintDetailDTO DÖNDÜRÜR)
+    
     public ComplaintDetailDTO findComplaintDetailById(int id) {
         ComplaintDetailDTO dto = null;
 
@@ -117,8 +117,7 @@ public class ComplaintRepository {
                     dto.setStatus(rs.getString("status"));
                     dto.setCreatedAt(rs.getTimestamp("created_at"));
 
-                    // --- DÜZELTME BURADA YAPILDI ---
-                    // Veritabanındaki kolon adı 'admin_response'
+                   
                     dto.setResponse(rs.getString("admin_response"));
 
                     String fname = rs.getString("first_name");
@@ -160,7 +159,7 @@ public class ComplaintRepository {
 
             public int countByStatus(String status) {
                 int count = 0;
-                // Aggregation Query: Tüm satırları çekmek yerine sadece sayıyı alıyoruz
+                
                 String sql = "SELECT COUNT(*) AS total FROM Complaints WHERE status = ?";
 
                 try (Connection con = DatabaseConnection.getConnection();

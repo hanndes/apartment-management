@@ -13,14 +13,13 @@ import java.util.List;
 @Repository
 public class ApartmentRepository {
 
-    /**
-     * Belirli bir bloktaki (block_id) tüm dairelerin ID ve Kapı Numaralarını getirir.
-     * Bu metot, Gider Dağıtımı (Expense Distribution) sırasında kullanılır.
-     */
+    
+   
+     // Bu metot, Gider Dağıtımı (Expense Distribution) sırasında kullanılır.   
     public List<ApartmentDropdownDTO> findByBlockId(int blockId) {
         List<ApartmentDropdownDTO> list = new ArrayList<>();
 
-        // Sadece ID ve Kapı No lazım, diğer detaylara gerek yok
+        
         String sql = "SELECT apartment_id, door_number FROM Apartments WHERE block_id = ?";
 
         try (Connection con = DatabaseConnection.getConnection();
@@ -42,10 +41,10 @@ public class ApartmentRepository {
         return list;
     }
 
-    // (Opsiyonel) Eğer ileride "Tüm Siteye Dağıt" derseniz bu metodu kullanabilirsiniz:
+    
     public List<ApartmentDropdownDTO> findAll() {
         List<ApartmentDropdownDTO> list = new ArrayList<>();
-        String sql = "SELECT apartment_id, door_number FROM Apartments"; // WHERE yok, hepsi gelir
+        String sql = "SELECT apartment_id, door_number FROM Apartments"; 
 
         try (Connection con = DatabaseConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql);

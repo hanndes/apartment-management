@@ -15,7 +15,7 @@ import com.group23.apartment_management.entities.Debt;
 @Repository
 public class DebtRepository {
 
-    // 1. SAKİN İÇİN BORÇ LİSTESİ (created_at düzeltildi)
+    //sakin icin borc listesi
     public List<Debt> findDebtsByUserId(int userId) {
         List<Debt> list = new ArrayList<>();
 
@@ -50,7 +50,7 @@ public class DebtRepository {
         return list;
     }
 
-    // 2. ID İLE BORÇ GETİR
+    //id ile borc getir
     public Debt findById(int debtId) {
         String sql = "SELECT * FROM Debts WHERE debt_id = ?";
         try (Connection con = DatabaseConnection.getConnection();
@@ -65,7 +65,7 @@ public class DebtRepository {
         return null;
     }
 
-    // 3. BORÇ KAYDET (ExpenseService burayı kullanır)
+    //borc kaydet
     public void save(Debt debt) {
         String sql = "INSERT INTO Debts (apartment_id, period_id, debt_type_id, amount, remaining_amt, is_paid) VALUES (?, ?, ?, ?, ?, 0)";
         try (Connection con = DatabaseConnection.getConnection();
@@ -75,7 +75,6 @@ public class DebtRepository {
             ps.setInt(2, debt.getPeriodId());
             ps.setInt(3, debt.getDebtTypeId());
 
-            // Hem Borç Tutarını hem de Kalan Tutarı aynı kaydediyoruz
             ps.setBigDecimal(4, debt.getAmount());
             ps.setBigDecimal(5, debt.getAmount());
 
@@ -83,7 +82,7 @@ public class DebtRepository {
         } catch (Exception e) { e.printStackTrace(); }
     }
 
-    // 4. GÜNCELLEME (Ödeme sonrası)
+    //odeme sonrasi guncelleme
     public void updateRemainingAndStatus(int debtId, BigDecimal newRemaining, boolean isPaid) {
         String sql = "UPDATE Debts SET remaining_amt = ?, is_paid = ? WHERE debt_id = ?";
         try (Connection con = DatabaseConnection.getConnection();
@@ -95,7 +94,7 @@ public class DebtRepository {
         } catch (Exception e) { e.printStackTrace(); }
     }
 
-    // 5. ADMIN LİSTESİ (Detaylı)
+    //admin listesi
     public List<Debt> findAllWithDetails() {
         List<Debt> list = new ArrayList<>();
         String sql = "SELECT d.*, r.first_name, r.last_name, b.block_name, a.door_number, dp.period_name, dt.type_name " +
@@ -137,7 +136,7 @@ public class DebtRepository {
         } catch (Exception e) { e.printStackTrace(); }
     }
 
-    // --- İSTATİSTİKLER ---
+    //İSTATİSTİKLER
     public BigDecimal getTotalDebtAmount(){
         return getBigDecimalScalar("SELECT SUM(amount) FROM Debts");
     }
@@ -151,7 +150,7 @@ public class DebtRepository {
         return getIntScalar("SELECT COUNT(DISTINCT apartment_id) FROM Debts");
     }
 
-    // --- YARDIMCI METODLAR ---
+    //YARDIMCI METODLAR
     private Debt mapRowToDebt(ResultSet rs) throws java.sql.SQLException {
         Debt debt = new Debt();
         debt.setId(rs.getInt("debt_id"));

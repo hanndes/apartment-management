@@ -20,7 +20,7 @@ public class BlockRepository {
                             rs.getInt("block_id"),
                             rs.getString("block_name"),
                             rs.getInt("total_floors"),
-                            rs.getInt("total_apartments"), // Hesaplamada bunu kullanacağız
+                            rs.getInt("total_apartments"), 
                             rs.getString("address")
                     );
                 }
