@@ -8,13 +8,46 @@
         .split-layout { display: grid; grid-template-columns: 280px 1fr; gap: 20px; align-items: start; }
         @media (max-width: 992px) { .split-layout { grid-template-columns: 1fr; } }
 
+        /* Borç Kartı Tasarımı */
         .debt-card {
-            background: white; border-radius: 8px; padding: 15px; margin-bottom: 10px;
-            border-left: 5px solid #eee; display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 6px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
         }
-        .debt-card.unpaid { border-left-color: #e63946; } /* Ödenmemiş - Kırmızı */
-        .debt-card.paid { border-left-color: #2a9d8f; opacity: 0.8; } /* Ödenmiş - Yeşil */
+        .debt-card:hover { transform: translateY(-2px); }
+
+        .debt-card.unpaid { border-left-color: #e63946; } /* Kırmızı Çizgi */
+        .debt-card.paid { border-left-color: #2a9d8f; background-color: #f8fffa; opacity: 0.8; } /* Yeşil Çizgi */
+
+        /* Ödeme Butonu Tasarımı */
+        .btn-pay {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: background 0.2s;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        .btn-pay:hover { background-color: #2980b9; }
+
+        .amount-text { font-size: 1.4rem; font-weight: 700; color: #2c3e50; }
+        .status-text { font-size: 0.85rem; font-weight: 600; margin-top: 4px; }
+        .text-danger { color: #e63946; }
+        .text-success { color: #2a9d8f; }
     </style>
 </head>
 <body class="user-body" style="background-color: #f4f7f6;">
@@ -23,7 +56,7 @@
     <aside class="admin-sidebar" style="background: #2c3e50;">
         <div class="brand"><div class="brand-icon">🏠</div><div><div class="brand-title">Sakin</div><div class="brand-sub">Paneli</div></div></div>
         <nav class="nav-links">
-            <a class="nav-link" th:href="@{/user/dashboard}">Ana Sayfa</a>
+            <a class="nav-link" th:href="@{/user/dashboard}">Dashboard</a>
             <a class="nav-link active" th:href="@{/user/payments}">Ödemelerim</a>
             <a class="nav-link" th:href="@{/user/complaints}">Taleplerim</a>
             <a class="nav-link" th:href="@{/user/announcements}">Duyurular</a>
@@ -38,35 +71,54 @@
         </header>
 
         <section class="panel">
-            <div class="panel-head"><h3>Borç Dökümü</h3></div>
+            <div class="panel-head">
+                <h3>💳 Borç Dökümü</h3>
+            </div>
 
             <div style="margin-top: 20px;">
+
+                <div th:if="${#lists.isEmpty(debts)}" style="text-align: center; padding: 50px; color: #999;">
+                    <div style="font-size: 3rem; margin-bottom: 10px;">🎉</div>
+                    <p>Harika! Kayıtlı herhangi bir borcunuz bulunmuyor.</p>
+                </div>
+
                 <div th:each="debt : ${debts}"
                      class="debt-card"
                      th:classappend="${debt.paid ? 'paid' : 'unpaid'}">
 
                     <div>
-                        <div style="font-weight: bold; font-size: 1.1em;" th:text="${debt.typeName}">Aidat</div>
-                        <div style="color: #666; font-size: 0.9em;" th:text="${debt.periodName}">Ocak 2025</div>
-                        <small style="color: #999;" th:text="${#dates.format(debt.createdAt, 'dd MMM yyyy')}">Tarih</small>
+                        <div style="font-weight: bold; font-size: 1.2em; color: #333;" th:text="${debt.typeName}">Aidat</div>
+                        <div style="color: #666; margin-top: 5px;">
+                            <span th:text="${debt.periodName}">Ocak 2025</span>
+                            <span style="color: #ccc;">|</span>
+                            <small th:text="'Vade: ' + ${#dates.format(debt.createdAt, 'dd.MM.yyyy')}">15.01.2025</small>
+                        </div>
                     </div>
 
-                    <div style="text-align: right;">
-                        <div style="font-size: 1.2em; font-weight: bold;"
-                             th:text="'₺' + ${debt.amount}">₺1250.00</div>
+                    <div style="text-align: right; min-width: 150px;">
+                        <div class="amount-text" th:text="'₺' + ${debt.amount}">₺1.250,00</div>
 
-                        <div th:if="${!debt.paid}" style="color: #e63946; font-weight: 600;">
-                            Ödenmedi <span th:if="${debt.remainingAmount < debt.amount}">(Kısmi)</span>
+                        <div th:if="${!debt.paid}" style="margin-top: 8px;">
+                            <div class="status-text text-danger" style="margin-bottom: 8px;">
+                                Ödenmedi <span th:if="${debt.remainingAmount < debt.amount}">(Kısmi)</span>
+                            </div>
+
+                            <form th:action="@{/user/payments/pay}" method="post">
+                                <input type="hidden" name="debtId" th:value="${debt.id}">
+                                <button type="submit" class="btn-pay">
+                                    <span>💳</span> Hızlı Öde
+                                </button>
+                            </form>
                         </div>
-                        <div th:if="${debt.paid}" style="color: #2a9d8f; font-weight: 600;">
-                            ✅ Ödendi
+
+                        <div th:if="${debt.paid}" style="margin-top: 8px;">
+                            <div class="status-text text-success">
+                                ✅ Başarıyla Ödendi
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div th:if="${#lists.isEmpty(debts)}" style="text-align: center; padding: 40px; color: #999;">
-                    Kayıtlı borç veya ödeme bilgisi bulunamadı.
-                </div>
             </div>
         </section>
     </main>

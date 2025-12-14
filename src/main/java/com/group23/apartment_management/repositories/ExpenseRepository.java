@@ -8,19 +8,24 @@ import org.springframework.stereotype.Repository;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
 @Repository
 public class ExpenseRepository {
 
-    // 1. GİDERLERİ LİSTELE (Kategori Adıyla Beraber)
+    // 1. GİDERLERİ LİSTELE (Kategori ve Blok Adıyla Beraber)
     public List<Expense> findAll() {
         List<Expense> list = new ArrayList<>();
 
-        String sql = "SELECT e.exp_id, e.cat_id, e.amount, e.exp_date, e.description, c.cat_name " +
+        // Hem Kategori hem de Blok tablolarıyla birleştiriyoruz
+        // Blok ismini ve Kategori ismini ekranda göstermek için JOIN yapıyoruz
+        String sql = "SELECT e.exp_id, e.cat_id, e.block_id, e.amount, e.exp_date, e.description, " +
+                "c.cat_name, b.block_name " +
                 "FROM Expenses e " +
-                "LEFT JOIN ExpenseCategories c ON e.cat_id = c.cat_id " +
+                "JOIN ExpenseCategories c ON e.cat_id = c.cat_id " +
+                "JOIN Blocks b ON e.block_id = b.block_id " +
                 "ORDER BY e.exp_date DESC";
 
         try (Connection con = DatabaseConnection.getConnection();
@@ -31,12 +36,14 @@ public class ExpenseRepository {
                 Expense ex = new Expense();
                 ex.setId(rs.getInt("exp_id"));
                 ex.setCategoryId(rs.getInt("cat_id"));
+                ex.setBlockId(rs.getInt("block_id")); // Blok ID
                 ex.setAmount(rs.getBigDecimal("amount"));
                 ex.setDate(rs.getDate("exp_date"));
                 ex.setDescription(rs.getString("description"));
 
-                // JOIN ile gelen kategori adı
+                // JOIN ile gelen isimler
                 ex.setCategoryName(rs.getString("cat_name"));
+                ex.setBlockName(rs.getString("block_name")); // Blok Adı (Örn: A Blok)
 
                 list.add(ex);
             }
@@ -44,19 +51,32 @@ public class ExpenseRepository {
         return list;
     }
 
-    // 2. YENİ GİDER EKLE
-    public boolean save(Expense expense) {
-        String sql = "INSERT INTO Expenses (cat_id, amount, exp_date, description) VALUES (?, ?, ?, ?)";
+    // 2. YENİ GİDER EKLE (Blok ID Dahil)
+    // Geriye eklenen kaydın ID'sini döndürür (Service'de işimize yarayabilir)
+    public int save(Expense expense) {
+        String sql = "INSERT INTO Expenses (cat_id, block_id, amount, exp_date, description) VALUES (?, ?, ?, ?, ?)";
+
         try (Connection con = DatabaseConnection.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
+             PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setInt(1, expense.getCategoryId());
-            ps.setBigDecimal(2, expense.getAmount());
-            ps.setDate(3, expense.getDate());
-            ps.setString(4, expense.getDescription());
+            ps.setInt(2, expense.getBlockId());    // YENİ: Blok ID'yi kaydediyoruz
+            ps.setBigDecimal(3, expense.getAmount());
+            ps.setDate(4, expense.getDate());
+            ps.setString(5, expense.getDescription());
 
-            return ps.executeUpdate() > 0;
-        } catch (Exception e) { e.printStackTrace(); return false; }
+            ps.executeUpdate();
+
+            // Eklenen kaydın ID'sini döndür
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0; // Başarısızsa 0 döner
     }
 
     // 3. GİDER SİL

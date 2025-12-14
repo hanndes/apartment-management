@@ -17,6 +17,24 @@ import java.util.List;
 @Repository
 public class ResidentRepository {
 
+    public Integer findResidentIdByUserId(int userId) {
+        String sql = "SELECT resident_id FROM Residents WHERE user_id = ?";
+        Integer resId = null;
+
+        try (Connection con = DatabaseConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    resId = rs.getInt("resident_id");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return resId;
+    }
     // 1. LİSTELEME: Sakinleri Detaylı Getir
     public List<ResidentDTO> findAllResidentsWithDetails() {
         List<ResidentDTO> list = new ArrayList<>();

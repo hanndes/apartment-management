@@ -14,69 +14,68 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class DebtService {
-    
+
     private final DebtRepository debtRepository;
 
-    //giriş yapan kullanıcının tüm borçlarını getir
+    // 1. KULLANICININ BORÇLARI (Sakin Paneli)
     public List<Debt> getUserDebts(int userId){
         return debtRepository.findDebtsByUserId(userId);
     }
 
-    //tek bir borcu id ile getir
+    // 2. YENİ BORÇ EKLE (ExpenseService tarafından otomatik çağrılır)
+    public void addDebt(Debt debt) {
+        debtRepository.save(debt);
+    }
+
+    // 3. BORÇ DETAYI GETİR
     public Debt getDebtById(int debtId){
         return debtRepository.findById(debtId);
     }
 
-    //ödeme sonrası borcu güncelle
+    // 4. ÖDEME SONRASI GÜNCELLEME
     public void updateDebtAfterPayment(int debtId, BigDecimal newRemaining, Boolean isPaid){
         debtRepository.updateRemainingAndStatus(debtId, newRemaining, isPaid);
     }
 
-    //aidat tahsilat oranı (toplam ödenmiş / toplam borç) * 100
+    // 5. İSTATİSTİK: TAHSİLAT ORANI
     public double getCurrentCollectionRate(){
         BigDecimal total = debtRepository.getTotalDebtAmount();
         BigDecimal paid = debtRepository.getTotalPaidDebtAmount();
 
-            if (total.compareTo(BigDecimal.ZERO) == 0) {
+        if (total.compareTo(BigDecimal.ZERO) == 0) {
             return 0.0;
         }
+
         BigDecimal rate = paid
                 .divide(total, 4, RoundingMode.HALF_UP)
                 .multiply(BigDecimal.valueOf(100));
 
         return rate.setScale(2, RoundingMode.HALF_UP).doubleValue();
     }
-    /**
-     * Ödenen daire sayısı (en az bir borcu ödenmiş daire)
-     */
+
+    // 6. İSTATİSTİK: ÖDEME YAPAN DAİRE SAYISI
     public int getPaidFlatCountForCurrentPeriod() {
-        // şimdilik tüm dönemler üzerinden; istersen period filtresi ekleriz
         return debtRepository.countPaidApartments();
     }
 
-    /**
-     * Toplam daire sayısı (borç kaydı olan daireler)
-     */
+    // 7. İSTATİSTİK: TOPLAM BORÇLU DAİRE SAYISI
     public int getTotalFlatCount() {
         return debtRepository.countAllApartmentsWithDebt();
     }
-    // DebtService içine ekleyin:
 
+    // 8. İSTATİSTİK: KASA BAKİYESİ (TOPLAM ÖDENEN)
+    public BigDecimal getTotalPaidAmount() {
+        return debtRepository.getTotalPaidDebtAmount();
+    }
+
+    // 9. TÜM BORÇLARI LİSTELE (Admin Paneli)
     public List<Debt> getAllDebts() {
         return debtRepository.findAllWithDetails();
     }
 
-    public void addDebt(Debt debt) {
-        debtRepository.save(debt);
-    }
-
+    // 10. BORÇ SİL
     public void deleteDebt(int id) {
         debtRepository.delete(id);
     }
-    // DebtService.java içine ekleyin:
 
-    // Dashboard'daki "Kasa Bakiyesi" için toplam ödenen tutarı getirir
-    public BigDecimal getTotalPaidAmount() {
-        return debtRepository.getTotalPaidDebtAmount();
-    }
 }

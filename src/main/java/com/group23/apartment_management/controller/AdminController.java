@@ -74,14 +74,18 @@ public class AdminController {
         User user = (User) session.getAttribute("loggedInUser");
         model.addAttribute("user", user);
 
-        // List<PaymentDTO> olarak alıyoruz
+        // 1. Ödemeler Listesi
         List<PaymentDTO> payments = paymentService.getRecentPaymentsForDashboard(100);
         model.addAttribute("payments", payments);
-        model.addAttribute("currentPage", "payments");
 
+        // --- EKLENEN KISIM: SAKİNLERİ DROPDOWN İÇİN GETİR ---
+        // Bu satır eksik olduğu için dropdown boş geliyordu!
+        model.addAttribute("residents", residentService.getAllResidentsDetailed());
+        // ---------------------------------------------------
+
+        model.addAttribute("currentPage", "payments");
         return "admin-payments";
     }
-
     // Dashboard metodunda da aynı şekilde PaymentDTO kullanılır.
 
     // 3. DUYURULAR
@@ -306,29 +310,53 @@ public class AdminController {
     // 1. Servisi Tanımla
     private final ExpenseService expenseService;
 
-    // 2. Gider Sayfasını Aç
+// AdminController.java içindeki showExpenses metodunu bununla değiştirin:
+
     @GetMapping("/expenses")
     public String showExpenses(HttpSession session, Model model) {
         if (!isAdmin(session)) return "redirect:/login";
         User user = (User) session.getAttribute("loggedInUser");
         model.addAttribute("user", user);
 
-        // Listeleri Gönder
+        // 1. Mevcut Giderler ve Kategoriler
         model.addAttribute("expenses", expenseService.getAllExpenses());
-        model.addAttribute("categories", expenseService.getCategories()); // Dropdown için şart
+        model.addAttribute("categories", expenseService.getCategories());
+
+        // 2. YENİ EKLENENLER (Formun çalışması için şart)
+        model.addAttribute("blocks", residentService.getAllBlocks());       // Blok seçimi için
+        model.addAttribute("periods", duesPeriodService.getAllPeriods());   // Hangi döneme borç yazılacak?
+        model.addAttribute("debtTypes", debtTypeService.getAllDebtTypes()); // Borç türü (Ortak Gider vb.)
 
         model.addAttribute("currentPage", "expenses");
         return "admin-expenses";
     }
 
-    // 3. Gider Ekle
+// ... Diğer metodlar ...
+
+    // 3. Gider Ekle (GÜNCELLENMİŞ HALİ)
     @PostMapping("/expenses/add")
-    public String addExpense(@ModelAttribute Expense expense, HttpSession session) {
+    public String addExpense(@ModelAttribute Expense expense,
+                             @RequestParam(required = false) Integer periodId,   // Formdan gelen Dönem ID
+                             @RequestParam(required = false) Integer debtTypeId, // Formdan gelen Borç Türü ID
+                             @RequestParam(defaultValue = "false") boolean distribute, // "Dağıt" seçeneği işaretli mi?
+                             HttpSession session) {
+
         if (!isAdmin(session)) return "redirect:/login";
-        expenseService.addExpense(expense);
+
+        // Eğer kullanıcı "Dağıt" kutusunu işaretlediyse ve gerekli bilgiler varsa
+        if (distribute && periodId != null && debtTypeId != null) {
+            // Hem gideri kaydet hem de dairelere borç olarak dağıt
+            expenseService.addExpenseAndDistribute(expense, periodId, debtTypeId);
+        } else {
+            // Sadece gider olarak kaydet (Dağıtım yapma)
+            // Bu durumda periodId ve debtTypeId null gönderilir
+            expenseService.addExpenseAndDistribute(expense, null, null);
+        }
+
         return "redirect:/admin/expenses";
     }
 
+    // ... Diğer metodlar ...
     // 4. Gider Sil
     @GetMapping("/expenses/delete/{id}")
     public String deleteExpense(@PathVariable int id, HttpSession session) {

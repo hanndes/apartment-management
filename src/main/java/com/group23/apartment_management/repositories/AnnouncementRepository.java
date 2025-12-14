@@ -67,9 +67,6 @@ public class AnnouncementRepository {
         return list;
     }
 
-    // AnnouncementRepository.java içine ekleyin:
-
-    // YENİ DUYURU KAYDETME
     public boolean save(Announcement announcement) {
         String sql = "INSERT INTO Announcements (title, content, priority, created_at, is_active) VALUES (?, ?, ?, ?, 1)";
 
