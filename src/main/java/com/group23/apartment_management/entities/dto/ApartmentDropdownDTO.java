@@ -11,4 +11,7 @@ public class ApartmentDropdownDTO {
 
     private int id;            // apartment_id
     private String doorNumber; // door_number
+    public String getLabel() {
+    return this.doorNumber;
+}
 }
