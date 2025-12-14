@@ -29,8 +29,6 @@ public class ResidentService {
         residentRepository.delete(id);
     }
 
-    // ResidentService.java içine ekleyin:
-
     public List<Block> getAllBlocks() {
         return residentRepository.findAllBlocks();
     }
@@ -46,4 +44,10 @@ public class ResidentService {
     public Integer getApartmentIdByResidentId(int residentId) {
         return residentRepository.findApartmentIdByResidentId(residentId);
     }
+    // ResidentService.java dosyasının içine ekle:
+
+    public Integer getResidentIdByUserId(int userId) {
+        return residentRepository.findResidentIdByUserId(userId);
+    }
+
 }

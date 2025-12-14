@@ -1,20 +1,23 @@
 package com.group23.apartment_management.entities.dto;
 
-import com.group23.apartment_management.entities.Payment;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 
-@Getter
-@Setter
-public class PaymentDTO extends Payment {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class PaymentDTO {
 
-    // Sadece ekranda göstermek için gereken ekstra alanlar
-    private String flatNumber; // "A Blok - D:1"
-    private String userName;   // "Ahmet Yılmaz"
+    // Veritabanından gelen temel bilgiler
+    private int id;
+    private BigDecimal amount;      // DB'deki amount_paid buraya eşleşecek
+    private Timestamp paymentDate;
+    private String paymentMethod;
 
-    // HTML sayfasında 'payment.amount' dendiğinde hata vermemesi için yardımcı metod
-    public BigDecimal getAmount() {
-        return super.getAmountPaid();
-    }
+    // Ekranda göstermek için ekstra alanlar
+    private String flatNumber;      // "A Blok - D:1"
+    private String userName;        // "Ahmet Yılmaz"
 }

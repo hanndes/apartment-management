@@ -17,19 +17,11 @@
             </div>
         </div>
         <nav class="nav-links">
-            <a class="nav-link"
-               th:classappend="${currentPage == 'dashboard'} ? 'active'"
-               th:href="@{/user/dashboard}">Dashboard</a>
-
-            <a class="nav-link"
-               th:classappend="${currentPage == 'announcements'} ? 'active'"
-               th:href="@{/user/announcements}">Duyurular</a>
-
-            <a class="nav-link"
-               th:classappend="${currentPage == 'complaints'} ? 'active'"
-               th:href="@{/user/complaints}">Bakım Talebi</a>
+            <a class="nav-link" th:href="@{/user/dashboard}">Dashboard</a>
+            <a class="nav-link" th:href="@{/user/payments}">Ödemelerim</a>
+            <a class="nav-link" th:href="@{/user/complaints}">Taleplerim</a>
+            <a class="nav-link active" th:href="@{/user/announcements}">Duyurular</a>
         </nav>
-
         <a th:href="@{/logout}" class="sidebar-logout">Çıkış Yap</a>
     </aside>
 

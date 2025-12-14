@@ -13,6 +13,6 @@ public class User {
     private String password;
     private String email;
     private String phoneNumber; // <-- YENİ EKLENEN ALAN
-    private String role;
+    private String role; //Join ile geliyo
     private boolean active;
 }

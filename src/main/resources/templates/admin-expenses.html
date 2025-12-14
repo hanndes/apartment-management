@@ -8,6 +8,22 @@
         .split-layout { display: grid; grid-template-columns: 350px 1fr; gap: 20px; align-items: start; }
         @media (max-width: 992px) { .split-layout { grid-template-columns: 1fr; } }
         .form-control { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 6px; }
+
+        /* Yeni eklenen dağıtım kutusu stili */
+        .distribution-box {
+            background-color: #f0f4f8;
+            border: 1px solid #d9e2ec;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            margin-bottom: 15px;
+        }
+        .distribution-header {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            display: block;
+        }
     </style>
 </head>
 <body class="admin-body">
@@ -20,7 +36,6 @@
             <a class="nav-link" th:classappend="${currentPage == 'vehicles'} ? 'active'" th:href="@{/admin/vehicles}">Araçlar</a>
             <a class="nav-link" th:classappend="${currentPage == 'residents'} ? 'active'" th:href="@{/admin/residents}">Sakinler</a>
             <a class="nav-link" th:classappend="${currentPage == 'staff'} ? 'active'" th:href="@{/admin/staff}">Personel</a>
-
             <a class="nav-link" th:classappend="${currentPage == 'parking'} ? 'active'" th:href="@{/admin/parking}">Otopark</a>
             <a class="nav-link active" th:classappend="${currentPage == 'expenses'} ? 'active'" th:href="@{/admin/expenses}">Giderler</a>
             <a class="nav-link" th:href="@{/admin/debts}">Borçlar & Aidat</a>
@@ -39,6 +54,7 @@
         </header>
 
         <section class="split-layout">
+
             <article class="panel">
                 <div class="panel-head"><h3>💸 Yeni Gider Ekle</h3></div>
 
@@ -54,6 +70,16 @@
                     </div>
 
                     <div class="form-group">
+                        <label>Hangi Bina? <span style="color:red">*</span></label>
+                        <select name="blockId" class="form-control" required>
+                            <option value="" disabled selected>Bina Seçiniz...</option>
+                            <option th:each="b : ${blocks}"
+                                    th:value="${b.blockId}"
+                                    th:text="${b.blockName}">A Blok</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
                         <label>Tutar (₺)</label>
                         <input type="number" name="amount" class="form-control" step="0.01" required placeholder="Örn: 1500">
                     </div>
@@ -65,10 +91,31 @@
 
                     <div class="form-group">
                         <label>Açıklama</label>
-                        <textarea name="description" class="form-control" placeholder="Detay (Fatura No vb.)" style="height: 80px;"></textarea>
+                        <textarea name="description" class="form-control" placeholder="Detay (Fatura No vb.)" style="height: 60px;"></textarea>
                     </div>
 
-                    <button type="submit" class="btn primary" style="width: 100%;">Kaydet</button>
+                    <div class="distribution-box">
+                        <label class="distribution-header">
+                            <input type="checkbox" name="distribute" value="true">
+                            Tutarı Dairelere Paylaştır (Borçlandır)
+                        </label>
+
+                        <div class="form-group">
+                            <label style="font-size: 0.9em;">Hangi Döneme Eklensin?</label>
+                            <select name="periodId" class="form-control" style="font-size: 0.9em; padding: 5px;">
+                                <option th:each="p : ${periods}" th:value="${p.id}" th:text="${p.periodName}">Ocak 2025</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label style="font-size: 0.9em;">Borç Türü</label>
+                            <select name="debtTypeId" class="form-control" style="font-size: 0.9em; padding: 5px;">
+                                <option th:each="t : ${debtTypes}" th:value="${t.id}" th:text="${t.typeName}">Ortak Gider</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn primary" style="width: 100%;">Kaydet ve İşle</button>
                 </form>
             </article>
 
@@ -78,20 +125,22 @@
                     <table class="data-table" style="width: 100%;">
                         <thead>
                         <tr>
-                            <th>Kategori & Açıklama</th>
-                            <th>Tutar</th>
                             <th>Tarih</th>
+                            <th>Bina & Kategori</th>
+                            <th>Açıklama</th>
+                            <th>Tutar</th>
                             <th>İşlem</th>
                         </tr>
                         </thead>
                         <tbody>
                         <tr th:each="exp : ${expenses}">
+                            <td th:text="${exp.date}" style="white-space: nowrap;">2025-12-10</td>
                             <td>
-                                <div style="font-weight: bold;" th:text="${exp.categoryName}">Fatura</div>
-                                <small style="color:#888;" th:text="${exp.description}">CK Elektrik Faturası</small>
+                                <div style="font-weight: bold; color: #2c3e50;" th:text="${exp.blockName}">A Blok</div>
+                                <small style="color: #666; background: #eee; padding: 2px 6px; border-radius: 4px;" th:text="${exp.categoryName}">Fatura</small>
                             </td>
+                            <td th:text="${exp.description}">Açıklama</td>
                             <td style="font-weight:bold; color:#e63946;" th:text="'- ₺' + ${exp.amount}">- ₺1500</td>
-                            <td th:text="${exp.date}">2025-12-10</td>
                             <td>
                                 <a th:href="@{'/admin/expenses/delete/' + ${exp.id}}"
                                    class="btn ghost btn-sm" style="color:red;"
@@ -99,7 +148,7 @@
                             </td>
                         </tr>
                         <tr th:if="${expenses == null or #lists.isEmpty(expenses)}">
-                            <td colspan="4" style="text-align: center; padding: 20px; color: #999;">Henüz harcama kaydı yok.</td>
+                            <td colspan="5" style="text-align: center; padding: 20px; color: #999;">Henüz harcama kaydı yok.</td>
                         </tr>
                         </tbody>
                     </table>
