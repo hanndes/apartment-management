@@ -25,18 +25,23 @@ public class ExpenseService {
     public void deleteExpense(int id) { expenseRepository.delete(id); }
 
     
-     // Gideri kaydeder ve BLOKTAKİ TANIMLI DAİRE SAYISINA (total_apartments) GÖRE BÖLER 
+    /**
+     * Gideri kaydeder ve BLOKTAKİ tanımlı daire sayısına (total_apartments) göre paylaştırır.
+     * Eğer hedef daire için aynı dönemde aynı borç türünden bir borç zaten varsa:
+     *   - Mevcut borcun amount ve remaining_amt alanları artırılır (merge).
+     * Eğer yoksa:
+     *   - Yeni bir Debt kaydı oluşturulur.
+     */
     public void addExpenseAndDistribute(Expense expense, Integer periodId, Integer debtTypeId) {
 
-        
         if (expense.getDate() == null) {
             expense.setDate(new java.sql.Date(System.currentTimeMillis()));
         }
 
-        
-        expenseRepository.save(expense);
+        // Gider kaydedilir (önce expense kaydı)
+        int expenseId = expenseRepository.save(expense); // dönen id opsiyonel olarak kullanılabilir
 
-       
+        // Eğer dağıtılacaksa ve gerekli parametreler varsa işlemleri yap
         if (periodId != null && debtTypeId != null && expense.getBlockId() != null) {
 
             Block block = blockRepository.findById(expense.getBlockId());
@@ -44,20 +49,33 @@ public class ExpenseService {
             if (block != null && block.getTotalApartments() > 0) {
 
                 BigDecimal totalAmount = expense.getAmount();
-                BigDecimal totalFlatCount = new BigDecimal(block.getTotalApartments()); 
+                BigDecimal totalFlatCount = new BigDecimal(block.getTotalApartments());
 
+                // Daire başına düşen pay
                 BigDecimal sharePerFlat = totalAmount.divide(totalFlatCount, 2, RoundingMode.HALF_UP);
 
                 List<ApartmentDropdownDTO> targets = apartmentService.getApartmentsByBlockId(expense.getBlockId());
 
-                for (ApartmentDropdownDTO apt : targets) {
-                    Debt debt = new Debt();
-                    debt.setApartmentId(apt.getId());
-                    debt.setPeriodId(periodId);
-                    debt.setDebtTypeId(debtTypeId);
-                    debt.setAmount(sharePerFlat); 
+                // Debug: toplam pay ile totalAmount uyumlu mu diye kontrol (isteğe bağlı/log)
+                // BigDecimal checkTotal = sharePerFlat.multiply(totalFlatCount).setScale(2, RoundingMode.HALF_UP);
 
-                    debtService.addDebt(debt);
+                for (ApartmentDropdownDTO apt : targets) {
+                    // Önce mevcut borcu ara (aynı apartmentId, periodId, debtTypeId)
+                    Debt existingDebt = debtService.findByApartmentPeriodAndType(apt.getId(), periodId, debtTypeId);
+
+                    if (existingDebt != null) {
+                        // Eğer mevcut varsa: amount ve remaining_amt'ı arttır
+                        debtService.incrementDebtAmountAndRemaining(existingDebt.getId(), sharePerFlat);
+                    } else {
+                        // Yoksa yeni borç oluştur
+                        Debt debt = new Debt();
+                        debt.setApartmentId(apt.getId());
+                        debt.setPeriodId(periodId);
+                        debt.setDebtTypeId(debtTypeId);
+                        debt.setAmount(sharePerFlat);
+                        // remaining_amt default olarak amount ile set edilsin (save metodu buna göre ayarlanmıştır)
+                        debtService.addDebt(debt);
+                    }
                 }
             }
         }

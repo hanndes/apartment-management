@@ -184,4 +184,31 @@ public class DebtRepository {
         } catch (Exception e) { e.printStackTrace(); }
         return 0;
     }
+    //  Var olan borcu bul: apartmentId + periodId + debtTypeId
+    public Debt findByApartmentPeriodType(int apartmentId, int periodId, int debtTypeId) {
+        String sql = "SELECT * FROM Debts WHERE apartment_id = ? AND period_id = ? AND debt_type_id = ?";
+        try (Connection con = DatabaseConnection.getConnection();
+            PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, apartmentId);
+            ps.setInt(2, periodId);
+            ps.setInt(3, debtTypeId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return mapRowToDebt(rs);
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        return null;
+    }
+
+    //  Mevcut borca ekleme yap: amount += addAmount, remaining_amt += addAmount
+    public void incrementAmountAndRemaining(int debtId, BigDecimal addAmount) {
+        String sql = "UPDATE Debts SET amount = amount + ?, remaining_amt = remaining_amt + ? WHERE debt_id = ?";
+        try (Connection con = DatabaseConnection.getConnection();
+            PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setBigDecimal(1, addAmount);
+            ps.setBigDecimal(2, addAmount);
+            ps.setInt(3, debtId);
+            ps.executeUpdate();
+        } catch (Exception e) { e.printStackTrace(); }
+    }
+
 }
