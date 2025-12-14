@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Resident {
     private int residentId;       // PK
-    private Integer userId;       // Users tablosuyla bağlantı (Nullable olabilir)
+    private Integer userId;       // Users tablosuyla bağlantı 
     private int residentTypeId;   // 1: Ev Sahibi, 2: Kiracı
     private int apartmentId;      // Hangi daire?
 
@@ -20,7 +20,7 @@ public class Resident {
 
     private boolean isActive = true; // Varsayılan olarak aktif
 
-    // --- Ekranda göstermek için yardımcı alanlar (Veritabanında yok) ---
+    //Ekranda göstermek için yardımcı alanlar
     private String flatInfo;    // "A Blok - D:1" gibi göstermek için
     private String typeName;    // "Kiracı" yazısı için
 }

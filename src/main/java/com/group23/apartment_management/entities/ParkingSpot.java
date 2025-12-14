@@ -13,6 +13,6 @@ public class ParkingSpot {
     private String spotCode;
     private boolean isOccupied;
 
-    // Ekranda blok ismini göstermek için (Join ile gelecek)
+    // Ekranda blok ismini göstermek için 
     private String blockName;
 }

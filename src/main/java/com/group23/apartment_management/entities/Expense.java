@@ -21,5 +21,5 @@ public class Expense {
 
     // Ekranda Göstermek İçin
     private String categoryName;
-    private String blockName; // "A Blok" yazabilmek için
+    private String blockName; 
 }
