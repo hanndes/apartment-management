@@ -22,24 +22,24 @@ public class ComplaintService {
     public List<Complaint> getUserComplaints(int userId) {
         return complaintRepository.findByUserId(userId);
     }
-    // Service içine yeni metodu ekle
+
     public List<ComplaintDTO> getAllComplaintsWithNames() {
         return complaintRepository.findAllComplaintsWithNames();
     }
 
-    // Service içine ekleyin:
+
     public ComplaintDetailDTO getComplaintDetail(int id) {
         return complaintRepository.findComplaintDetailById(id);
     }
 
-    // ComplaintService.java dosyasının içine ekle:
+   
 
     public void respondToComplaint(int id, String response, String status) {
         complaintRepository.updateResponseAndStatus(id, response, status);
     }
 
     public int getPendingComplaintCount() {
-        // "Bekliyor" durumundaki kayıtları saydırıyoruz
+        // "Bekliyor" durumundaki kayıtları saydır
         return complaintRepository.countByStatus("Bekliyor");
     }
 

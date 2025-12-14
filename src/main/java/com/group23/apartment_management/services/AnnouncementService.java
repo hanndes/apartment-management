@@ -31,7 +31,7 @@ public class AnnouncementService {
         }
         return all.subList(0, limit);
     }
-    // AnnouncementService.java içine ekleyin:
+   
 
     public boolean saveAnnouncement(Announcement announcement) {
         return announcementRepository.save(announcement);

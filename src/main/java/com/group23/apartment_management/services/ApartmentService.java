@@ -13,10 +13,7 @@ public class ApartmentService {
 
     private final ApartmentRepository apartmentRepository;
 
-    /**
-     * Verilen Blok ID'sine ait tüm daireleri getirir.
-     * Gider dağıtımı (Expense Distribution) için kullanılır.
-     */
+ 
     public List<ApartmentDropdownDTO> getApartmentsByBlockId(int blockId) {
         return apartmentRepository.findByBlockId(blockId);
     }
