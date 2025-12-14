@@ -9,7 +9,6 @@
 
 <div class="admin-layout">
 
-    <!-- SIDEBAR (AYNI) -->
     <aside class="admin-sidebar">
         <div class="brand">
             <div class="brand-icon">🏢</div>
@@ -28,7 +27,7 @@
         <a th:href="@{/logout}" class="sidebar-logout">Çıkış Yap</a>
     </aside>
 
-    <!-- MAIN -->
+   
     <main class="admin-main">
 
         <header class="topbar">
@@ -45,7 +44,7 @@
                     <h3>💳 Aidatlar</h3>
                 </div>
 
-                <!-- BORÇ VAR -->
+                
                 <div th:if="${not #lists.isEmpty(debts)}" class="table-wrapper">
                     <table class="data-table">
                         <thead>
@@ -72,7 +71,7 @@
                     </table>
                 </div>
 
-                <!-- BORÇ YOK -->
+                
                 <div th:if="${#lists.isEmpty(debts)}"
                      style="text-align:center; padding:30px; color:#999;">
                     🎉 Şu an ödenecek aidatınız bulunmamaktadır.

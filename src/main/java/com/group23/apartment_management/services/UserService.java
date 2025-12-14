@@ -33,10 +33,8 @@ public class UserService {
 
     // Kullanıcı ekle ve seçilen sakine bağla
     public void addUser(User user, Integer residentId) {
-        // 1. Kullanıcıyı kaydet ve ID'sini al
         int newUserId = userRepository.save(user);
 
-        // 2. Eğer formdan bir sakin seçildiyse (residentId null değilse), kullanıcıyı ona bağla
         if (newUserId != -1 && residentId != null) {
             userRepository.linkUserToResident(newUserId, residentId);
         }

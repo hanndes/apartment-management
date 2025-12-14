@@ -29,11 +29,6 @@ public class VehicleService {
         vehicleRepository.delete(id);
     }
 
-// VehicleRepository.java dosyasının en altına (sınıfın içine) ekleyin:
-
-    // VehicleService.java dosyasının içine ekleyin:
-
-// VehicleService.java içindeki metodu güncelleyin:
 
     public List<Vehicle> getVehiclesByUserId(int userId) {
         return vehicleRepository.findVehiclesByUserId(userId);
