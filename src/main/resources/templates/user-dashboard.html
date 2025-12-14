@@ -18,17 +18,10 @@
             </div>
         </div>
         <nav class="nav-links">
-            <a class="nav-link"
-               th:classappend="${currentPage == 'dashboard'} ? 'active'"
-               th:href="@{/user/dashboard}">Dashboard</a>
-
-            <a class="nav-link"
-               th:classappend="${currentPage == 'announcements'} ? 'active'"
-               th:href="@{/user/announcements}">Duyurular</a>
-
-            <a class="nav-link"
-               th:classappend="${currentPage == 'complaints'} ? 'active'"
-               th:href="@{/user/complaints}">Bakım Talebi</a>
+            <a class="nav-link active" th:href="@{/user/dashboard}">Dashboard</a>
+            <a class="nav-link" th:href="@{/user/payments}">Ödemelerim</a>
+            <a class="nav-link" th:href="@{/user/complaints}">Taleplerim</a>
+            <a class="nav-link" th:href="@{/user/announcements}">Duyurular</a>
         </nav>
 
         <a th:href="@{/logout}" class="sidebar-logout">Çıkış Yap</a>
@@ -54,13 +47,13 @@
         <section class="stat-grid">
             <article class="stat-card">
                 <div class="stat-label">Bu Ayki Aidat</div>
-                <div class="stat-value">Ödendi</div>
-                <div class="stat-trend positive">Teşekkürler</div>
+                <div class="stat-value">Durum</div>
+                <div class="stat-trend positive">Kontrol Ediniz</div>
             </article>
             <article class="stat-card">
-                <div class="stat-label">Toplam Borç</div>
-                <div class="stat-value">₺0</div>
-                <div class="stat-trend positive">Borcunuz yok</div>
+                <div class="stat-label">Araç Sayısı</div>
+                <div class="stat-value" th:text="${vehicles != null ? #lists.size(vehicles) : 0}">0</div>
+                <div class="stat-trend positive">Kayıtlı Araç</div>
             </article>
             <article class="stat-card">
                 <div class="stat-label">Aktif Talepler</div>
@@ -79,7 +72,7 @@
                     </div>
                 </div>
                 <div class="quick-actions">
-                    <a th:href="@{/user/payments}" class="btn primary" style="text-decoration: none; display: inline-block; text-align: center;">💳 Aidat Öde</a>
+                    <a th:href="@{/user/aidat-ode}" class="btn primary" style="text-decoration: none; display: inline-block; text-align: center;">💳 Aidat Öde</a>
                     <a th:href="@{/user/complaints}" class="btn secondary" style="text-decoration: none; display: inline-block; text-align: center;">🔧 Arıza Bildir</a>
                 </div>
             </article>
@@ -245,17 +238,20 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr>
-                            <td>Kasım 2024</td>
-                            <td>₺1.250</td>
+                        <tr th:each="pay : ${recentPayments}">
+                            <td th:text="${pay.paymentDate != null ? #dates.format(pay.paymentDate, 'MMMM yyyy') : '-'}">Dönem</td>
+
+                            <td style="font-weight: bold; color: #1e7e34;" th:text="'₺' + ${pay.amountPaid}">₺0</td>
+
                             <td><span class="badge success">Ödendi</span></td>
-                            <td>05.11.2024</td>
+
+                            <td style="color: #666;" th:text="${#dates.format(pay.paymentDate, 'dd.MM.yyyy HH:mm')}">01.01.2025</td>
                         </tr>
-                        <tr>
-                            <td>Ekim 2024</td>
-                            <td>₺1.250</td>
-                            <td><span class="badge success">Ödendi</span></td>
-                            <td>03.10.2024</td>
+
+                        <tr th:if="${recentPayments == null or #lists.isEmpty(recentPayments)}">
+                            <td colspan="4" style="text-align: center; color: #999; padding: 20px;">
+                                Henüz ödeme geçmişi bulunmamaktadır.
+                            </td>
                         </tr>
                         </tbody>
                     </table>
