@@ -4,23 +4,18 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 
-// Orijinal DTO ismini kullanıyoruz
-import com.group23.apartment_management.entities.dto.ApartmentDropdownDTO;
-import com.group23.apartment_management.entities.dto.ApartmentDuesDTO;
-import com.group23.apartment_management.repositories.ApartmentRepository;
-import org.springframework.stereotype.Service;
-
 import com.group23.apartment_management.entities.Debt;
 import com.group23.apartment_management.repositories.DebtRepository;
-
+import com.group23.apartment_management.repositories.ApartmentRepository; // Gerekli olabilir ancak artık kullanılmayacak
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class DebtService {
 
     private final DebtRepository debtRepository;
-    private final ApartmentRepository apartmentRepository;
+    private final ApartmentRepository apartmentRepository; // DuesService'e ait çağrılar buradan kaldırıldı.
 
     // 1. KULLANICININ BORÇLARI (Sakin Paneli)
     public List<Debt> getUserDebts(int userId){
@@ -29,6 +24,9 @@ public class DebtService {
 
     // 2. YENİ BORÇ EKLE
     public void addDebt(Debt debt) {
+        // Yeni eklenen borç için kalan miktarı ayarlama mantığı DebtService'de olmalıdır
+        debt.setRemainingAmount(debt.getAmount());
+        debt.setPaid(false);
         debtRepository.save(debt);
     }
 
@@ -84,6 +82,16 @@ public class DebtService {
     }
 
     // YARDIMCI METODLAR
+
+    // --- YENİ EKLENEN/DÜZELTİLEN METOTLAR ---
+
+    // AdminController'da hata veren ÖDEME İÇİN EN ESKİ BORCU GETİREN METOT (EKLENDİ)
+    public Debt getFirstUnpaidDebtByApartmentId(Integer apartmentId) {
+        // Bu metot, DebtRepository'de tanımlı olmalıdır.
+        return debtRepository.findFirstUnpaidDebtByApartmentId(apartmentId);
+    }
+
+    // DuesService'deki tahakkuk için mükerrer kontrol metodu
     public Debt findByApartmentPeriodAndType(int apartmentId, int periodId, int debtTypeId) {
         return debtRepository.findByApartmentPeriodType(apartmentId, periodId, debtTypeId);
     }
@@ -92,17 +100,7 @@ public class DebtService {
         debtRepository.incrementAmountAndRemaining(debtId, addAmount);
     }
 
-
-// DebtService.java içindeki assignDuesByApartmentType metodunun düzeltilmiş hali:
-
-    public void assignDuesByApartmentType(Integer blockId, Integer periodId, Integer debtTypeId) {
-        // ...
-        // HATA VEREN SATIR:
-        // List<ApartmentDuesDTO> targets = apartmentRepository.findApartmentsByBlockId(blockId);
-
-        // DOĞRU ÇAĞRI (Sadece bu satırı değiştirin):
-        List<ApartmentDuesDTO> targets = apartmentRepository.findApartmentsForDuesByBlockId(blockId);
-
-        // ... metotun geri kalanı ...
-    }
+    // *** DİKKAT: assignDuesByApartmentType metodunu bu servisten SİLDİM. ***
+    // Borç atama mantığı sadece DuesService'te olmalıdır.
+    // Eğer başka bir yerde çağrılıyorsa, lütfen onu DuesService'e yönlendirin.
 }

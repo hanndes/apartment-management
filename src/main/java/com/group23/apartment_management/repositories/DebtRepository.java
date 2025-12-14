@@ -205,4 +205,33 @@ public class DebtRepository {
         } catch (Exception e) { e.printStackTrace(); }
         return 0;
     }
+    // --- YENİ EKLENEN METODLAR --- (Devamı)
+
+    /**
+     * Belirli bir daireye ait, kalan borcu (remaining_amt) sıfırdan büyük olan
+     * en eski (period_id veya created_at'e göre) borç kaydını getirir.
+     * AdminController'daki manuel ödeme işlemi için gereklidir.
+     */
+    public Debt findFirstUnpaidDebtByApartmentId(int apartmentId) {
+        Debt debt = null;
+        // TOP 1 (veya LIMIT 1) kullanarak en eski ödenmemiş borcu bulur.
+        String sql = "SELECT TOP 1 * FROM Debts " +
+                "WHERE apartment_id = ? AND remaining_amt > 0 " +
+                "ORDER BY period_id ASC, created_at ASC";
+
+        try (Connection con = DatabaseConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, apartmentId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    debt = mapRowToDebt(rs);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return debt;
+    }
 }
