@@ -376,13 +376,18 @@ public class AdminController {
         // Blok Listesi (Dropdown için - ResidentService içinde vardı)
         model.addAttribute("blocks", residentService.getAllBlocks());
 
+        model.addAttribute("newSpot", new ParkingSpot());
+
         model.addAttribute("currentPage", "parking");
         return "admin-parking";
     }
 
     @PostMapping("/parking/add")
-    public String addParking(@ModelAttribute ParkingSpot spot, HttpSession session) {
+    public String addParking(@ModelAttribute("newSpot") ParkingSpot spot, HttpSession session) {
         if (!isAdmin(session)) return "redirect:/login";
+        // HATA AYIKLAMA İÇİN: Konsolda gelen veriyi kontrol edebilirsiniz
+        System.out.println("DEBUG: Gelen Blok ID: " + spot.getBlockId());
+        System.out.println("DEBUG: Gelen Park Kodu: " + spot.getSpotCode());
         parkingSpotService.addSpot(spot);
         return "redirect:/admin/parking";
     }
