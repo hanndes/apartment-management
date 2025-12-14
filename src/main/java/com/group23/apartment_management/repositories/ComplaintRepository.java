@@ -89,18 +89,7 @@ public class ComplaintRepository {
         } catch (Exception e) { e.printStackTrace(); }
         return list;
     }
-
-    // Durum Güncelleme
-    public void updateStatus(int id, String status) {
-        String sql = "UPDATE Complaints SET status = ? WHERE complaint_id = ?";
-        try (Connection con = DatabaseConnection.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setString(1, status);
-            ps.setInt(2, id);
-            ps.executeUpdate();
-        } catch (Exception e) { e.printStackTrace(); }
-    }
-
+    
     // DETAY SAYFASI İÇİN ÖZEL METOD (ComplaintDetailDTO DÖNDÜRÜR)
     public ComplaintDetailDTO findComplaintDetailById(int id) {
         ComplaintDetailDTO dto = null;
