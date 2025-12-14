@@ -33,7 +33,7 @@ public class AdminController {
     private final ParkingSpotService parkingSpotService;
     private final DebtTypeService debtTypeService;
     private final DuesPeriodService duesPeriodService;
-
+    private final DuesService duesService;
     //guvenlik kontrolu
     private boolean isAdmin(HttpSession session) {
         User user = (User) session.getAttribute("loggedInUser");
@@ -327,23 +327,24 @@ public class AdminController {
         return "admin-expenses";
     }
 
-    //Gider Ekle 
+    // AdminController içinde bu kısmı güncelle:
+
     @PostMapping("/expenses/add")
     public String addExpense(@ModelAttribute Expense expense,
-                             @RequestParam(required = false) Integer periodId,   // Formdan gelen Dönem ID
-                             @RequestParam(required = false) Integer debtTypeId, // Formdan gelen Borç Türü ID
-                             @RequestParam(defaultValue = "false") boolean distribute, // "Dağıt" seçeneği işaretli mi?
+                             @RequestParam(required = false) Integer periodId,   // Formdan gelen Dönem
+                             @RequestParam(required = false) Integer debtTypeId, // Formdan gelen Borç Türü
+                             @RequestParam(defaultValue = "false") boolean distribute, // "Dağıt" kutusu seçili mi?
                              HttpSession session) {
 
         if (!isAdmin(session)) return "redirect:/login";
 
-        // Eğer kullanıcı "Dağıt" kutusunu işaretlediyse ve gerekli bilgiler varsa
-        if (distribute && periodId != null && debtTypeId != null) {
-            // Hem gideri kaydet hem de dairelere borç olarak dağıt
+        // Eğer kullanıcı "Bunu dairelere paylaştır" dediyse
+        if (distribute) {
             expenseService.addExpenseAndDistribute(expense, periodId, debtTypeId);
         } else {
-            // Sadece gider olarak kaydet (Dağıtım yapma)
-            // Bu durumda periodId ve debtTypeId null gönderilir
+            // Sadece gider olarak kaydet, kimseye borç yazma
+            // (blockId null gönderilerek sadece harcama kaydı yapılır)
+            expense.setBlockId(null);
             expenseService.addExpenseAndDistribute(expense, null, null);
         }
 
@@ -438,6 +439,42 @@ public class AdminController {
         return "redirect:/admin/debts";
     }
 
+    // AdminController.java içine ekle:
+
+    // 1. TOPLU AİDAT SAYFASINI GÖSTER
+    @GetMapping("/debts/bulk-add")
+    public String showBulkDuesPage(HttpSession session, Model model) {
+        if (!isAdmin(session)) return "redirect:/login";
+        User user = (User) session.getAttribute("loggedInUser");
+        model.addAttribute("user", user);
+
+        // Dropdownlar için veriler
+        model.addAttribute("blocks", residentService.getAllBlocks());       // Hangi Blok?
+        model.addAttribute("periods", duesPeriodService.getAllPeriods());   // Hangi Ay?
+        model.addAttribute("debtTypes", debtTypeService.getAllDebtTypes()); // Borç Türü (Aidat)
+
+        model.addAttribute("currentPage", "debts");
+        return "admin-debts-bulk"; // Yeni oluşturacağımız HTML
+    }
+
+    // AdminController.java
+
+    // --- TİP BAZLI AİDAT KAYDETME İŞLEMİ (POST) ---
+    @PostMapping("/debts/bulk-add")
+    public String processBulkDues(@RequestParam Integer blockId,
+                                  @RequestParam Integer periodId,
+                                  @RequestParam Integer debtTypeId,
+                                  HttpSession session) {
+        if (!isAdmin(session)) return "redirect:/login";
+
+        // DuesService'i çağır
+        duesService.applyDefinedDuesToDebts(blockId, periodId, debtTypeId);
+        // Veya önceki isim: duesService.assignDuesByApartmentType(blockId, periodId, debtTypeId);
+
+        return "redirect:/admin/debts";
+    }
+
+// NOT: Controller'ın DuesService'i private final olarak almayı unutmayın.
 
 
 }

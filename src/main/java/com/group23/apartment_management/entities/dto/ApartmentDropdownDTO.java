@@ -4,10 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Data // Setter ve Getter'ları sağlar (setDoorNumber hatasını çözer)
+@NoArgsConstructor // Parametresiz constructor'ı sağlar (new ApartmentDropdownDTO() hatasını çözer)
+@AllArgsConstructor // 2 parametreli constructor'ı sağlar
 public class ApartmentDropdownDTO {
-    private int id;
-    private String label; // "A Blok - D:1" gibi görünecek
+
+    private int id;            // apartment_id
+    private String doorNumber; // door_number
 }

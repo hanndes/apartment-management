@@ -2,12 +2,27 @@
 <html lang="tr" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Borçlandırma İşlemleri</title>
+    <title>Borç Takibi & Tahakkuk</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
     <style>
-        .split-layout { display: grid; grid-template-columns: 350px 1fr; gap: 20px; align-items: start; }
-        @media (max-width: 992px) { .split-layout { grid-template-columns: 1fr; } }
-        .form-control { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 6px; }
+        /* Tabloyu tam ekran yapmak için panel stili */
+        .full-panel {
+            width: 100%;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            padding: 20px;
+        }
+
+        /* Başlık ve Butonun yan yana durması için */
+        .panel-head-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
     </style>
 </head>
 <body class="admin-body">
@@ -36,96 +51,70 @@
 
     <main class="admin-main">
         <header class="topbar">
-            <div><h1>Borçlandırma</h1><p>Sakinlere aidat veya gider yansıtma</p></div>
+            <div>
+                <h1>Borçlar ve Aidat Takibi</h1>
+                <p>Sakinlere yansıtılan tüm borçların listesi ve yönetimi</p>
+            </div>
             <div class="user-chip">A</div>
         </header>
 
-        <section class="split-layout">
-            <article class="panel">
-                <div class="panel-head"><h3>📝 Yeni Borç Ekle</h3></div>
+        <section class="full-panel">
 
-                <form th:action="@{/admin/debts/add}" method="post">
+            <div class="panel-head-row">
+                <h3>📋 Tahakkuk Listesi</h3>
 
-                    <div class="form-group">
-                        <label>Sakin / Daire Seçimi</label>
-                        <select name="apartmentId" class="form-control" required>
-                            <option th:each="res : ${residents}"
-                                    th:value="${res.apartmentId}"
-                                    th:text="${res.flatInfo + ' - ' + res.fullName}">
-                                A Blok D:1 - Ahmet Yılmaz
-                            </option>
-                        </select>
-                    </div>
+                <a th:href="@{/admin/debts/bulk-add}" class="btn primary" style="text-decoration: none; display: flex; align-items: center; gap: 5px;">
+                    <span style="font-size: 1.2em;">+</span> Toplu Aidat Ekle
+                </a>
+            </div>
 
-                    <div class="form-group">
-                        <label>Dönem</label>
-                        <select name="periodId" class="form-control" required>
-                            <option th:each="p : ${periods}"
-                                    th:value="${p.id}"
-                                    th:text="${p.periodName}">Ocak 2025</option>
-                        </select>
-                    </div>
+            <div class="table-wrapper">
+                <table class="data-table" style="width: 100%;">
+                    <thead>
+                    <tr>
+                        <th>Daire / Sakin</th>
+                        <th>Dönem & Tür</th>
+                        <th>Tutar</th>
+                        <th>Durum</th>
+                        <th>İşlem</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="d : ${debts}">
+                        <td>
+                            <div style="font-weight: bold; color: #2c3e50;" th:text="${d.apartmentInfo}">A Blok - D:1</div>
+                        </td>
+                        <td>
+                            <div style="font-weight: 500;" th:text="${d.periodName}">Ocak 2025</div>
+                            <small style="color:#666; background: #f1f2f6; padding: 2px 8px; border-radius: 4px;" th:text="${d.typeName}">Aidat</small>
+                        </td>
+                        <td>
+                            <div style="font-weight:bold; font-size: 1.1em;" th:text="'₺' + ${d.amount}">₺1250</div>
+                            <div style="color: #e63946; font-size: 0.85em;" th:if="${d.remainingAmount > 0}"
+                                 th:text="'Kalan: ₺' + ${d.remainingAmount}">Kalan: 1250</div>
+                        </td>
+                        <td>
+                            <span class="badge"
+                                  th:classappend="${d.paid ? 'success' : 'warning'}"
+                                  th:text="${d.paid ? 'Ödendi' : 'Ödenmedi'}">Ödenmedi</span>
+                        </td>
+                        <td>
+                            <a th:href="@{'/admin/debts/delete/' + ${d.id}}"
+                               class="btn ghost btn-sm" style="color: #e74c3c; border: 1px solid #e74c3c;"
+                               onclick="return confirm('Dikkat: Bu borç kaydını silmek üzeresiniz. Onaylıyor musunuz?')">Sil</a>
+                        </td>
+                    </tr>
 
-                    <div class="form-group">
-                        <label>Borç Türü</label>
-                        <select name="debtTypeId" class="form-control" required>
-                            <option th:each="t : ${types}"
-                                    th:value="${t.id}"
-                                    th:text="${t.typeName}">Aidat</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Tutar (₺)</label>
-                        <input type="number" name="amount" class="form-control" step="0.01" required placeholder="1250">
-                    </div>
-
-                    <button type="submit" class="btn primary" style="width: 100%;">Borçlandır</button>
-                </form>
-            </article>
-
-            <article class="panel">
-                <div class="panel-head"><h3>Tahakkuk Listesi</h3></div>
-                <div class="table-wrapper">
-                    <table class="data-table" style="width: 100%;">
-                        <thead>
-                        <tr>
-                            <th>Daire / Sakin</th>
-                            <th>Dönem & Tür</th>
-                            <th>Tutar</th>
-                            <th>Durum</th>
-                            <th>İşlem</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr th:each="d : ${debts}">
-                            <td>
-                                <div style="font-weight: bold;" th:text="${d.apartmentInfo}">A-1 Ahmet</div>
-                            </td>
-                            <td>
-                                <div th:text="${d.periodName}">Ocak 2025</div>
-                                <small style="color:#888;" th:text="${d.typeName}">Aidat</small>
-                            </td>
-                            <td>
-                                <div style="font-weight:bold;" th:text="'₺' + ${d.amount}">₺1250</div>
-                                <small style="color:red;" th:if="${d.remainingAmount > 0}"
-                                       th:text="'Kalan: ₺' + ${d.remainingAmount}">Kalan: 1250</small>
-                            </td>
-                            <td>
-                                <span class="badge"
-                                      th:classappend="${d.paid ? 'success' : 'warning'}"
-                                      th:text="${d.paid ? 'Ödendi' : 'Ödenmedi'}">Ödenmedi</span>
-                            </td>
-                            <td>
-                                <a th:href="@{'/admin/debts/delete/' + ${d.id}}"
-                                   class="btn ghost btn-sm" style="color:red;"
-                                   onclick="return confirm('Hatalı girilen bu borcu silmek istiyor musunuz?')">Sil</a>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </article>
+                    <tr th:if="${debts == null or #lists.isEmpty(debts)}">
+                        <td colspan="5" style="text-align: center; padding: 40px; color: #999;">
+                            Henüz kayıtlı bir borç bulunmamaktadır.
+                            <br>
+                            <small>Yeni aidat eklemek için sağ üstteki butonu kullanabilirsiniz.</small>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
         </section>
     </main>
 </div>

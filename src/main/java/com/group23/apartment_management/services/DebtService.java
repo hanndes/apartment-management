@@ -4,6 +4,10 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 
+// Orijinal DTO ismini kullanıyoruz
+import com.group23.apartment_management.entities.dto.ApartmentDropdownDTO;
+import com.group23.apartment_management.entities.dto.ApartmentDuesDTO;
+import com.group23.apartment_management.repositories.ApartmentRepository;
 import org.springframework.stereotype.Service;
 
 import com.group23.apartment_management.entities.Debt;
@@ -16,13 +20,14 @@ import lombok.RequiredArgsConstructor;
 public class DebtService {
 
     private final DebtRepository debtRepository;
+    private final ApartmentRepository apartmentRepository;
 
     // 1. KULLANICININ BORÇLARI (Sakin Paneli)
     public List<Debt> getUserDebts(int userId){
         return debtRepository.findDebtsByUserId(userId);
     }
 
-    // 2. YENİ BORÇ EKLE (ExpenseService tarafından otomatik çağrılır)
+    // 2. YENİ BORÇ EKLE
     public void addDebt(Debt debt) {
         debtRepository.save(debt);
     }
@@ -78,6 +83,7 @@ public class DebtService {
         debtRepository.delete(id);
     }
 
+    // YARDIMCI METODLAR
     public Debt findByApartmentPeriodAndType(int apartmentId, int periodId, int debtTypeId) {
         return debtRepository.findByApartmentPeriodType(apartmentId, periodId, debtTypeId);
     }
@@ -86,4 +92,17 @@ public class DebtService {
         debtRepository.incrementAmountAndRemaining(debtId, addAmount);
     }
 
+
+// DebtService.java içindeki assignDuesByApartmentType metodunun düzeltilmiş hali:
+
+    public void assignDuesByApartmentType(Integer blockId, Integer periodId, Integer debtTypeId) {
+        // ...
+        // HATA VEREN SATIR:
+        // List<ApartmentDuesDTO> targets = apartmentRepository.findApartmentsByBlockId(blockId);
+
+        // DOĞRU ÇAĞRI (Sadece bu satırı değiştirin):
+        List<ApartmentDuesDTO> targets = apartmentRepository.findApartmentsForDuesByBlockId(blockId);
+
+        // ... metotun geri kalanı ...
+    }
 }

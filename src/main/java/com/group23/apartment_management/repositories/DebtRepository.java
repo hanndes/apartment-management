@@ -15,7 +15,7 @@ import com.group23.apartment_management.entities.Debt;
 @Repository
 public class DebtRepository {
 
-    //sakin icin borc listesi
+    // 1. SAKİN PANELİ: Giriş yapan kullanıcının (User) oturduğu dairenin borçlarını getirir
     public List<Debt> findDebtsByUserId(int userId) {
         List<Debt> list = new ArrayList<>();
 
@@ -37,20 +37,16 @@ public class DebtRepository {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     Debt debt = mapRowToDebt(rs);
-
-                    // Ekstra Bilgiler (JOIN'den gelen)
                     debt.setPeriodName(rs.getString("period_name"));
                     debt.setTypeName(rs.getString("type_name"));
-
                     list.add(debt);
                 }
             }
-
         } catch (Exception e) { e.printStackTrace(); }
         return list;
     }
 
-    //id ile borc getir
+    // 2. ID İLE BORÇ GETİR
     public Debt findById(int debtId) {
         String sql = "SELECT * FROM Debts WHERE debt_id = ?";
         try (Connection con = DatabaseConnection.getConnection();
@@ -65,7 +61,7 @@ public class DebtRepository {
         return null;
     }
 
-    //borc kaydet
+    // 3. YENİ BORÇ KAYDET
     public void save(Debt debt) {
         String sql = "INSERT INTO Debts (apartment_id, period_id, debt_type_id, amount, remaining_amt, is_paid) VALUES (?, ?, ?, ?, ?, 0)";
         try (Connection con = DatabaseConnection.getConnection();
@@ -74,7 +70,6 @@ public class DebtRepository {
             ps.setInt(1, debt.getApartmentId());
             ps.setInt(2, debt.getPeriodId());
             ps.setInt(3, debt.getDebtTypeId());
-
             ps.setBigDecimal(4, debt.getAmount());
             ps.setBigDecimal(5, debt.getAmount());
 
@@ -82,7 +77,7 @@ public class DebtRepository {
         } catch (Exception e) { e.printStackTrace(); }
     }
 
-    //odeme sonrasi guncelleme
+    // 4. ÖDEME DURUMU GÜNCELLEME (Standart - Tekli İşlem)
     public void updateRemainingAndStatus(int debtId, BigDecimal newRemaining, boolean isPaid) {
         String sql = "UPDATE Debts SET remaining_amt = ?, is_paid = ? WHERE debt_id = ?";
         try (Connection con = DatabaseConnection.getConnection();
@@ -94,7 +89,19 @@ public class DebtRepository {
         } catch (Exception e) { e.printStackTrace(); }
     }
 
-    //admin listesi
+    // 4.1. ÖDEME DURUMU GÜNCELLEME (TRANSACTION İÇİN - Connection Parametreli)
+    public void updateRemainingAndStatus(Connection con, int debtId, BigDecimal newRemaining, boolean isPaid) throws Exception {
+        String sql = "UPDATE Debts SET remaining_amt = ?, is_paid = ? WHERE debt_id = ?";
+        // Dikkat: Connection kapatılmaz, dışarıdan gelir.
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setBigDecimal(1, newRemaining);
+            ps.setBoolean(2, isPaid);
+            ps.setInt(3, debtId);
+            ps.executeUpdate();
+        }
+    }
+
+    // 5. ADMIN PANELİ LİSTESİ
     public List<Debt> findAllWithDetails() {
         List<Debt> list = new ArrayList<>();
         String sql = "SELECT d.*, r.first_name, r.last_name, b.block_name, a.door_number, dp.period_name, dt.type_name " +
@@ -112,15 +119,11 @@ public class DebtRepository {
 
             while (rs.next()) {
                 Debt debt = mapRowToDebt(rs);
-
-                // Sakin Adı (Boşsa "Boş Daire" yaz)
                 String residentName = (rs.getString("first_name") != null) ?
                         rs.getString("first_name") + " " + rs.getString("last_name") : "Boş Daire";
-
                 debt.setApartmentInfo(rs.getString("block_name") + " - D:" + rs.getString("door_number") + " (" + residentName + ")");
                 debt.setPeriodName(rs.getString("period_name"));
                 debt.setTypeName(rs.getString("type_name"));
-
                 list.add(debt);
             }
         } catch (Exception e) { e.printStackTrace(); }
@@ -136,21 +139,39 @@ public class DebtRepository {
         } catch (Exception e) { e.printStackTrace(); }
     }
 
-    //İSTATİSTİKLER
-    public BigDecimal getTotalDebtAmount(){
-        return getBigDecimalScalar("SELECT SUM(amount) FROM Debts");
-    }
-    public BigDecimal getTotalPaidDebtAmount(){
-        return getBigDecimalScalar("SELECT SUM(amount) FROM Debts WHERE is_paid = 1");
-    }
-    public int countPaidApartments(){
-        return getIntScalar("SELECT COUNT(DISTINCT apartment_id) FROM Debts WHERE is_paid = 1");
-    }
-    public int countAllApartmentsWithDebt(){
-        return getIntScalar("SELECT COUNT(DISTINCT apartment_id) FROM Debts");
+    // --- İSTATİSTİKLER ---
+    public BigDecimal getTotalDebtAmount(){ return getBigDecimalScalar("SELECT SUM(amount) FROM Debts"); }
+    public BigDecimal getTotalPaidDebtAmount(){ return getBigDecimalScalar("SELECT SUM(amount) FROM Debts WHERE is_paid = 1"); }
+    public int countPaidApartments(){ return getIntScalar("SELECT COUNT(DISTINCT apartment_id) FROM Debts WHERE is_paid = 1"); }
+    public int countAllApartmentsWithDebt(){ return getIntScalar("SELECT COUNT(DISTINCT apartment_id) FROM Debts"); }
+
+    // --- YENİ EKLENEN METODLAR ---
+    public Debt findByApartmentPeriodType(int apartmentId, int periodId, int debtTypeId) {
+        String sql = "SELECT * FROM Debts WHERE apartment_id = ? AND period_id = ? AND debt_type_id = ?";
+        try (Connection con = DatabaseConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, apartmentId);
+            ps.setInt(2, periodId);
+            ps.setInt(3, debtTypeId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return mapRowToDebt(rs);
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        return null;
     }
 
-    //YARDIMCI METODLAR
+    public void incrementAmountAndRemaining(int debtId, BigDecimal addAmount) {
+        String sql = "UPDATE Debts SET amount = amount + ?, remaining_amt = remaining_amt + ? WHERE debt_id = ?";
+        try (Connection con = DatabaseConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setBigDecimal(1, addAmount);
+            ps.setBigDecimal(2, addAmount);
+            ps.setInt(3, debtId);
+            ps.executeUpdate();
+        } catch (Exception e) { e.printStackTrace(); }
+    }
+
+    // --- YARDIMCI METODLAR ---
     private Debt mapRowToDebt(ResultSet rs) throws java.sql.SQLException {
         Debt debt = new Debt();
         debt.setId(rs.getInt("debt_id"));
@@ -184,31 +205,4 @@ public class DebtRepository {
         } catch (Exception e) { e.printStackTrace(); }
         return 0;
     }
-    //  Var olan borcu bul: apartmentId + periodId + debtTypeId
-    public Debt findByApartmentPeriodType(int apartmentId, int periodId, int debtTypeId) {
-        String sql = "SELECT * FROM Debts WHERE apartment_id = ? AND period_id = ? AND debt_type_id = ?";
-        try (Connection con = DatabaseConnection.getConnection();
-            PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setInt(1, apartmentId);
-            ps.setInt(2, periodId);
-            ps.setInt(3, debtTypeId);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) return mapRowToDebt(rs);
-            }
-        } catch (Exception e) { e.printStackTrace(); }
-        return null;
-    }
-
-    //  Mevcut borca ekleme yap: amount += addAmount, remaining_amt += addAmount
-    public void incrementAmountAndRemaining(int debtId, BigDecimal addAmount) {
-        String sql = "UPDATE Debts SET amount = amount + ?, remaining_amt = remaining_amt + ? WHERE debt_id = ?";
-        try (Connection con = DatabaseConnection.getConnection();
-            PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setBigDecimal(1, addAmount);
-            ps.setBigDecimal(2, addAmount);
-            ps.setInt(3, debtId);
-            ps.executeUpdate();
-        } catch (Exception e) { e.printStackTrace(); }
-    }
-
 }

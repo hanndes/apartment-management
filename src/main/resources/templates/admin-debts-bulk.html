@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Toplu Aidat Girişi</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .form-container { max-width: 600px; margin: 0 auto; }
+        .warning-text { color: #e67e22; display: block; margin-top: 15px; padding: 10px; border: 1px solid #f39c12; background: #fff3e0; border-radius: 4px; }
+    </style>
+</head>
+<body class="admin-body">
+<div class="admin-layout">
+
+    <aside class="admin-sidebar">
+        <div class="brand"><div class="brand-icon">🏢</div><div><div class="brand-title">Apartment</div><div class="brand-sub">Management</div></div></div>
+        <nav class="nav-links">
+            <a class="nav-link" th:href="@{/admin/dashboard}">Dashboard</a>
+            <a class="nav-link active" th:href="@{/admin/debts}">Borçlar & Aidat</a>
+        </nav>
+    </aside>
+
+    <main class="admin-main">
+        <header class="topbar">
+            <div><h1>Toplu Aidat Tahakkuku</h1><p>Daire tipine göre aidatları borçlara yansıtma</p></div>
+            <div class="user-chip">A</div>
+        </header>
+
+        <section class="panel form-container">
+            <div class="panel-head"><h3>📝 Daire Tipine Göre Tahakkuk</h3></div>
+
+            <form th:action="@{/admin/debts/bulk-add}" method="post">
+
+                <div class="form-group">
+                    <label>Hangi Bloktaki Dairelere Yansıtılacak?</label>
+                    <select name="blockId" class="form-control" required>
+                        <option value="" disabled selected>Blok Seçiniz...</option>
+                        <option th:each="b : ${blocks}" th:value="${b.blockId}" th:text="${b.blockName}">A Blok</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Dönem (Ay/Yıl)</label>
+                    <select name="periodId" class="form-control" required>
+                        <option th:each="p : ${periods}" th:value="${p.id}" th:text="${p.periodName}">Ocak 2026</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Borç Türü</label>
+                    <select name="debtTypeId" class="form-control" required>
+                        <option th:each="t : ${debtTypes}" th:value="${t.id}" th:text="${t.typeName}">Aidat</option>
+                    </select>
+                </div>
+
+                <div class="warning-text">
+                    ⚠️ Dikkat: Aidat tutarları daire tipine göre otomatik belirlenecektir:
+                    <br>1+1: 1000₺, 2+1: 2000₺, 3+1: 3000₺
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <a th:href="@{/admin/debts}" class="btn ghost" style="flex:1; text-align: center; text-decoration: none; line-height: 35px;">İptal</a>
+                    <button type="submit" class="btn primary" style="flex:2;">Aidatları Yansıt ve Oluştur</button>
+                </div>
+
+            </form>
+        </section>
+    </main>
+</div>
+</body>
+</html>
