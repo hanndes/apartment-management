@@ -141,41 +141,72 @@ public class ComplaintRepository {
         return dto;
     }
     public void updateResponseAndStatus(int id, String response, String status) {
-        String sql = "UPDATE Complaints SET admin_response = ?, status = ? WHERE complaint_id = ?";
+        String sql =
+            "UPDATE Complaints " +
+            "SET admin_response = ?, " +
+            "    status = ?, " +
+            "    resolved_at = CASE WHEN ? = 'Çözüldü' THEN GETDATE() ELSE resolved_at END " +
+            "WHERE complaint_id = ?";
 
         try (Connection con = DatabaseConnection.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
+            PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setString(1, response);
             ps.setString(2, status);
-            ps.setInt(3, id);
+            ps.setString(3, status);
+            ps.setInt(4, id);
 
             ps.executeUpdate();
 
+        } catch (Exception e) { e.printStackTrace(); }
+    }
+
+    public int countByStatus(String status) {
+        int count = 0;
+                
+        String sql = "SELECT COUNT(*) AS total FROM Complaints WHERE status = ?";
+
+        try (Connection con = DatabaseConnection.getConnection();
+            PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, status);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    count = rs.getInt("total");
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return count;
+    }
+    /**
+     * Bu ay çözülenler:
+     * 1) status = 'Çözüldü'
+     * 2) resolved_at bu ayın içinde
+     */
+    public int countResolvedThisMonth() {
+        int count = 0;
+
+        // SQL Server için: bu ayın başlangıcı -> DATEFROMPARTS(YEAR(GETDATE()), MONTH(GETDATE()), 1)
+        // sonraki ayın başlangıcı -> DATEADD(MONTH, 1, ...)
+        String sql =
+            "SELECT COUNT(*) AS total " +
+            "FROM Complaints " +
+            "WHERE status = 'Çözüldü' " +
+            "AND resolved_at >= DATEFROMPARTS(YEAR(GETDATE()), MONTH(GETDATE()), 1) " +
+            "AND resolved_at <  DATEADD(MONTH, 1, DATEFROMPARTS(YEAR(GETDATE()), MONTH(GETDATE()), 1))";
+
+        try (Connection con = DatabaseConnection.getConnection();
+            PreparedStatement ps = con.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery()) {
+
+            if (rs.next()) count = rs.getInt("total");
+
+        } catch (Exception e) { e.printStackTrace(); }
+        return count;
     }
 
-            public int countByStatus(String status) {
-                int count = 0;
-                
-                String sql = "SELECT COUNT(*) AS total FROM Complaints WHERE status = ?";
-
-                try (Connection con = DatabaseConnection.getConnection();
-                     PreparedStatement ps = con.prepareStatement(sql)) {
-
-                    ps.setString(1, status);
-
-                    try (ResultSet rs = ps.executeQuery()) {
-                        if (rs.next()) {
-                            count = rs.getInt("total");
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                return count;
-            }
 
 }

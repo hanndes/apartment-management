@@ -139,6 +139,11 @@ public class AdminController {
 
         List<ComplaintDTO> complaints = complaintService.getAllComplaintsWithNames();
         model.addAttribute("complaints", complaints);
+        // kartlar (DİNAMİK)
+        model.addAttribute("pendingCount", complaintService.getPendingComplaintCount());        // Bekliyor
+        model.addAttribute("inReviewCount", complaintService.getInReviewComplaintCount());      // İnceleniyor
+        model.addAttribute("resolvedThisMonthCount", complaintService.getResolvedThisMonthCount()); // Bu ay çözülen
+
 
         model.addAttribute("currentPage", "complaints");
         return "admin-complaints";

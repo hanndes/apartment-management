@@ -51,17 +51,20 @@
         <section class="stat-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 20px;">
             <article class="stat-card">
                 <div class="stat-label">Bekleyen Talepler</div>
-                <div class="stat-value">5</div> <div class="stat-trend warning">İşlem gerektiriyor</div>
+                <div class="stat-value" th:text="${pendingCount}">0</div>
+                <div class="stat-trend warning" th:if="${pendingCount > 0}" th:text="'İşlem gerektiriyor'">İşlem gerektiriyor</div>
             </article>
+
             <article class="stat-card">
                 <div class="stat-label">İncelenenler</div>
-                <div class="stat-value">2</div>
-                <div class="stat-trend">Usta yönlendirildi</div>
+                <div class="stat-value" th:text="${inProgressCount}">0</div>
+                <div class="stat-trend" th:if="${inProgressCount > 0}" th:text="'Usta yönlendirildi'">Usta yönlendirildi</div>
             </article>
+
             <article class="stat-card">
                 <div class="stat-label">Bu Ay Çözülen</div>
-                <div class="stat-value">12</div>
-                <div class="stat-trend positive">Başarıyla tamamlandı</div>
+                <div class="stat-value" th:text="${resolvedThisMonth}">0</div>
+                <div class="stat-trend positive" th:if="${resolvedThisMonth > 0}" th:text="'Başarıyla tamamlandı'">Başarıyla tamamlandı</div>
             </article>
         </section>
 
