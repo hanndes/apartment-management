@@ -39,15 +39,18 @@
             <div class="user-chip">A</div>
         </header>
 
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+
         <section class="split-layout">
             <article class="panel">
                 <div class="panel-head"><h3>🅿️ Yeni Park Yeri</h3></div>
 
-                <form th:action="@{/admin/parking/add}" method="post">
+                <form th:action="@{/admin/parking/add}" method="post" th:object="${newSpot}">
 
                     <div class="form-group">
                         <label>Blok Seçimi</label>
-                        <select name="blockId" class="form-control" required>
+                        <select th:field="*{blockId}" class="form-control" required>
                             <option th:each="block : ${blocks}"
                                     th:value="${block.blockId}"
                                     th:text="${block.blockName}">A Blok</option>
@@ -56,7 +59,7 @@
 
                     <div class="form-group">
                         <label>Park Kodu</label>
-                        <input type="text" name="spotCode" class="form-control" placeholder="Örn: A-05" required>
+                        <input type="text" th:field="*{spotCode}" class="form-control" placeholder="Örn: A-05" required>
                         <small style="color:#888;">Blok harfi ve numara kullanın</small>
                     </div>
 
