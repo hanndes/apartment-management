@@ -76,17 +76,6 @@ public class ResidentController {
         return "redirect:/user/payments";
     }
 
-    // AİDAT ÖDE SAYFASI
-    @GetMapping("/aidat-ode")
-    public String aidatOdePage(HttpSession session, Model model) {
-        if (!isResident(session)) return "redirect:/login";
-
-        User user = (User) session.getAttribute("loggedInUser");
-        model.addAttribute("debts", debtService.getUserDebts(user.getId()));
-
-        model.addAttribute("currentPage", "aidat");
-        return "user-aidatOde";
-    }
 
     // ŞİKAYETLER
     @GetMapping("/complaints")
