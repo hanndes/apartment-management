@@ -97,7 +97,7 @@
 <div class="admin-layout">
 
     <aside class="admin-sidebar" style="background: #2c3e50;">
-        <div class="brand"><div class="brand-icon">🏠</div><div><div class="brand-title">Sakin</div><div class="brand-sub">Paneli</div></div></div>
+        <div class="brand"><div class="brand-icon">🏢</div><div><div class="brand-title">Apartment</div><div class="brand-sub">Management</div></div></div>
         <nav class="nav-links">
             <a class="nav-link" th:href="@{/user/dashboard}">Dashboard</a>
             <a class="nav-link active" th:href="@{/user/payments}">Ödemelerim</a>
@@ -122,11 +122,6 @@
                          th:text="'₺' + ${walletBalance != null ? #numbers.formatDecimal(walletBalance, 1, 'POINT', 2, 'COMMA') : '0,00'}">
                         ₺0,00
                     </div>
-                </div>
-                <div>
-                    <button class="btn-deposit" onclick="alert('Bakiye yükleme modülü yönetici tarafından yapılmaktadır.')">
-                        + Bakiye Yükle
-                    </button>
                 </div>
             </div>
 
