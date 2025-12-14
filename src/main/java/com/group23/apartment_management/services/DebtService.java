@@ -78,4 +78,12 @@ public class DebtService {
         debtRepository.delete(id);
     }
 
+    public Debt findByApartmentPeriodAndType(int apartmentId, int periodId, int debtTypeId) {
+        return debtRepository.findByApartmentPeriodType(apartmentId, periodId, debtTypeId);
+    }
+
+    public void incrementDebtAmountAndRemaining(int debtId, BigDecimal addAmount) {
+        debtRepository.incrementAmountAndRemaining(debtId, addAmount);
+    }
+
 }
