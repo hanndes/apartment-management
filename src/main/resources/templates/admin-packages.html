@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Kargolar - Yönetim</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        /* Küçük stil iyileştirmeleri (isteğe göre kaldırabilirsiniz) */
+        .panel-head { display:flex; justify-content:space-between; align-items:center; gap:12px; }
+        .flash-success { background:#e6ffed;border:1px solid #1e7e34;padding:10px;margin-bottom:12px;color:#1e7e34;border-radius:4px; }
+        .flash-error   { background:#ffecec;border:1px solid #c82333;padding:10px;margin-bottom:12px;color:#c82333;border-radius:4px; }
+    </style>
+</head>
+<body class="admin-body">
+<div class="admin-layout">
+
+    <aside class="admin-sidebar">
+        <div class="brand">
+            <div class="brand-icon">🏢</div>
+            <div>
+                <div class="brand-title">Apartment</div>
+                <div class="brand-sub">Management</div>
+            </div>
+        </div>
+
+        <nav class="nav-links">
+            <a class="nav-link" th:classappend="${currentPage == 'dashboard'} ? 'active'" th:href="@{/admin/dashboard}">Dashboard</a>
+            <a class="nav-link" th:classappend="${currentPage == 'vehicles'} ? 'active'" th:href="@{/admin/vehicles}">Araçlar</a>
+            <a class="nav-link" th:classappend="${currentPage == 'residents'} ? 'active'" th:href="@{/admin/residents}">Sakinler</a>
+            <a class="nav-link" th:classappend="${currentPage == 'staff'} ? 'active'" th:href="@{/admin/staff}">Personel</a>
+
+            <a class="nav-link" th:classappend="${currentPage == 'parking'} ? 'active'" th:href="@{/admin/parking}">Otopark</a>
+            <a class="nav-link" th:classappend="${currentPage == 'expenses'} ? 'active'" th:href="@{/admin/expenses}">Giderler</a>
+            <a class="nav-link" th:classappend="${currentPage == 'packages'} ? 'active'" th:href="@{/admin/packages}">Kargolar</a>
+            <a class="nav-link" th:href="@{/admin/debts}">Borçlar & Aidat</a>
+
+            <a class="nav-link" th:classappend="${currentPage == 'payments'} ? 'active'" th:href="@{/admin/payments}">Ödemeler</a>
+            <a class="nav-link" th:classappend="${currentPage == 'complaints'} ? 'active'" th:href="@{/admin/complaints}">Bakım & Talepler</a>
+            <a class="nav-link" th:classappend="${currentPage == 'announcements'} ? 'active'" th:href="@{/admin/announcements}">Duyurular</a>
+            <a class="nav-link" th:classappend="${currentPage == 'users'} ? 'active'" th:href="@{/admin/users}">Kullanıcılar</a>
+        </nav>
+
+        <a th:href="@{/logout}" class="sidebar-logout">Çıkış Yap</a>
+    </aside>
+
+    <main class="admin-main">
+        <header class="topbar">
+            <div>
+                <h1>Kargolar</h1>
+                <p>Gelen paketler ve teslimat durumları</p>
+            </div>
+            <div class="user-chip" th:text="${user.username != null ? #strings.substring(user.username, 0, 1) : 'A'}">A</div>
+        </header>
+
+        <section class="panel">
+            <div class="panel-head">
+                <div>
+                    <h3>📦 Kargolar Listesi</h3>
+                    <p style="margin:0; color:#666;">Alıcı, Daire, Kargo Şirketi, Durum ve Tarih</p>
+                </div>
+                <div>
+                    <!-- İsterseniz filtre / yenile butonu ekleyebilirsiniz -->
+                </div>
+            </div>
+
+            <!-- Flash mesajlar -->
+            <div th:if="${success}" class="flash-success" th:text="${success}">İşlem başarılı.</div>
+            <div th:if="${error}" class="flash-error" th:text="${error}">Hata oluştu.</div>
+
+            <table style="width:100%; border-collapse: collapse; margin-top:10px;">
+                <thead>
+                <tr style="text-align:left; color:#666;">
+                    <th style="padding:10px;">Alıcı</th>
+                    <th style="padding:10px;">Daire</th>
+                    <th style="padding:10px;">Kargo Şirketi</th>
+                    <th style="padding:10px;">Durum</th>
+                    <th style="padding:10px;">Geliş Tarihi</th>
+                    <th style="padding:10px;">İşlem</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="pkg : ${packages}" style="border-bottom:1px solid #eee;">
+                    <td style="padding:10px;" th:text="${pkg.recipientName}">Alıcı İsmi</td>
+                    <td style="padding:10px;" th:text="${pkg.apartmentInfo}">A-1</td>
+                    <td style="padding:10px;" th:text="${pkg.companyName}">UPS</td>
+                    <td style="padding:10px;">
+                        <span class="badge" th:classappend="${pkg.statusClass}" th:text="${pkg.statusText}">Bekliyor</span>
+                        <div th:if="${pkg.delivered}" style="font-size:0.85em; color:#666; margin-top:4px;" th:text="${pkg.formattedDeliveryDate}">12 Ara 14:00</div>
+                    </td>
+                    <td style="padding:10px;" th:text="${pkg.formattedArrivalDate}">12 Ara 13:45</td>
+                    <td style="padding:10px; white-space:nowrap;">
+                        <a th:if="${!pkg.delivered}" th:href="@{'/admin/packages/deliver/' + ${pkg.id}}"
+                           th:attr="onclick=|return confirm('Paket (ID: ' + ${pkg.id} + ') teslim edilsin mi?')|" class="btn small">Teslim Et</a>
+                        <span th:if="${pkg.delivered}" style="color:#888;">Tamamlandı</span>
+                    </td>
+                </tr>
+
+                <tr th:if="${packages == null or #lists.isEmpty(packages)}">
+                    <td colspan="6" style="text-align:center; padding:20px; color:#999;">Kayıt bulunamadı.</td>
+                </tr>
+                </tbody>
+            </table>
+        </section>
+    </main>
+</div>
+
+<!-- Opsiyonel: küçük script (onay zaten inline ekledik) -->
+</body>
+</html>

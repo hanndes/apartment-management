@@ -33,7 +33,8 @@ public class AdminController {
     private final ParkingSpotService parkingSpotService;
     private final DebtTypeService debtTypeService;
     private final DuesPeriodService duesPeriodService;
-    private final DuesService duesService;
+    private final PackageService packageService;
+
     //guvenlik kontrolu
     private boolean isAdmin(HttpSession session) {
         User user = (User) session.getAttribute("loggedInUser");
@@ -82,6 +83,40 @@ public class AdminController {
 
         model.addAttribute("currentPage", "payments");
         return "admin-payments";
+    }
+
+    // AdminController.java (ekleme)
+    @PostMapping("/payments/add")
+    public String addPayment(@RequestParam("residentId") int residentId,
+                            @RequestParam("amountPaid") java.math.BigDecimal amountPaid,
+                            @RequestParam("paymentMethod") String paymentMethod,
+                            @RequestParam(required = false) String referenceNo,
+                            HttpSession session,
+                            RedirectAttributes ra) {
+        if (!isAdmin(session)) return "redirect:/login";
+
+        Integer apartmentId = residentService.getApartmentIdByResidentId(residentId);
+        if (apartmentId == null) {
+            ra.addFlashAttribute("error", "Sakinin dairesi bulunamadı.");
+            return "redirect:/admin/payments";
+        }
+
+        Debt debt = debtService.getFirstUnpaidDebtByApartmentId(apartmentId);
+        if (debt == null) {
+            ra.addFlashAttribute("error", "Bu sakin için ödenmemiş borç bulunamadı.");
+            return "redirect:/admin/payments";
+        }
+
+        try {
+            paymentService.processPaymentAmount(debt.getId(), residentId, amountPaid, paymentMethod, referenceNo);
+            ra.addFlashAttribute("success", "Ödeme başarıyla kaydedildi.");
+        } catch (IllegalArgumentException e) {
+            ra.addFlashAttribute("error", e.getMessage());
+        } catch (Exception e) {
+            ra.addFlashAttribute("error", "Ödeme kaydedilirken hata oluştu.");
+        }
+
+        return "redirect:/admin/payments";
     }
     
 
@@ -327,24 +362,23 @@ public class AdminController {
         return "admin-expenses";
     }
 
-    // AdminController içinde bu kısmı güncelle:
-
+    //Gider Ekle 
     @PostMapping("/expenses/add")
     public String addExpense(@ModelAttribute Expense expense,
-                             @RequestParam(required = false) Integer periodId,   // Formdan gelen Dönem
-                             @RequestParam(required = false) Integer debtTypeId, // Formdan gelen Borç Türü
-                             @RequestParam(defaultValue = "false") boolean distribute, // "Dağıt" kutusu seçili mi?
+                             @RequestParam(required = false) Integer periodId,   // Formdan gelen Dönem ID
+                             @RequestParam(required = false) Integer debtTypeId, // Formdan gelen Borç Türü ID
+                             @RequestParam(defaultValue = "false") boolean distribute, // "Dağıt" seçeneği işaretli mi?
                              HttpSession session) {
 
         if (!isAdmin(session)) return "redirect:/login";
 
-        // Eğer kullanıcı "Bunu dairelere paylaştır" dediyse
-        if (distribute) {
+        // Eğer kullanıcı "Dağıt" kutusunu işaretlediyse ve gerekli bilgiler varsa
+        if (distribute && periodId != null && debtTypeId != null) {
+            // Hem gideri kaydet hem de dairelere borç olarak dağıt
             expenseService.addExpenseAndDistribute(expense, periodId, debtTypeId);
         } else {
-            // Sadece gider olarak kaydet, kimseye borç yazma
-            // (blockId null gönderilerek sadece harcama kaydı yapılır)
-            expense.setBlockId(null);
+            // Sadece gider olarak kaydet (Dağıtım yapma)
+            // Bu durumda periodId ve debtTypeId null gönderilir
             expenseService.addExpenseAndDistribute(expense, null, null);
         }
 
@@ -439,42 +473,41 @@ public class AdminController {
         return "redirect:/admin/debts";
     }
 
-    // AdminController.java içine ekle:
+    // Admin: kargolar sayfası
 
-    // 1. TOPLU AİDAT SAYFASINI GÖSTER
-    @GetMapping("/debts/bulk-add")
-    public String showBulkDuesPage(HttpSession session, Model model) {
+    @GetMapping("/packages")
+    public String showPackages(HttpSession session, Model model) {
         if (!isAdmin(session)) return "redirect:/login";
+
         User user = (User) session.getAttribute("loggedInUser");
         model.addAttribute("user", user);
 
-        // Dropdownlar için veriler
-        model.addAttribute("blocks", residentService.getAllBlocks());       // Hangi Blok?
-        model.addAttribute("periods", duesPeriodService.getAllPeriods());   // Hangi Ay?
-        model.addAttribute("debtTypes", debtTypeService.getAllDebtTypes()); // Borç Türü (Aidat)
+        try {
+            model.addAttribute("packages", packageService.getAllPackages());
+        } catch (Exception e) {
+            // Hata olup olmadığını konsolda görebilmek için log (veya System.err)
+            e.printStackTrace();
+            model.addAttribute("packages", new java.util.ArrayList<>());
+            model.addAttribute("error", "Kargolar listelenirken hata oluştu. Konsolu kontrol edin.");
+        }
 
-        model.addAttribute("currentPage", "debts");
-        return "admin-debts-bulk"; // Yeni oluşturacağımız HTML
+        model.addAttribute("currentPage", "packages");
+        return "admin-packages";
     }
 
-    // AdminController.java
-
-    // --- TİP BAZLI AİDAT KAYDETME İŞLEMİ (POST) ---
-    @PostMapping("/debts/bulk-add")
-    public String processBulkDues(@RequestParam Integer blockId,
-                                  @RequestParam Integer periodId,
-                                  @RequestParam Integer debtTypeId,
-                                  HttpSession session) {
+    //admin : paket teslim edildi olarak işaretle
+    @GetMapping("/packages/deliver/{id}")
+    public String deliverPackage(@PathVariable int id, HttpSession session, RedirectAttributes ra) {
         if (!isAdmin(session)) return "redirect:/login";
-
-        // DuesService'i çağır
-        duesService.applyDefinedDuesToDebts(blockId, periodId, debtTypeId);
-        // Veya önceki isim: duesService.assignDuesByApartmentType(blockId, periodId, debtTypeId);
-
-        return "redirect:/admin/debts";
+        try {
+            packageService.markAsDelivered(id);
+            ra.addFlashAttribute("success", "Paket başarıyla teslim edildi.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            ra.addFlashAttribute("error", "Paket teslim edilirken hata oluştu. Konsolu kontrol edin.");
+        }
+        return "redirect:/admin/packages";
     }
-
-// NOT: Controller'ın DuesService'i private final olarak almayı unutmayın.
 
 
 }

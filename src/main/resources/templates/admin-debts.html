@@ -38,7 +38,7 @@
             <a class="nav-link" th:href="@{/admin/staff}">Personel</a>
             <a class="nav-link" th:href="@{/admin/parking}">Otopark</a>
             <a class="nav-link" th:href="@{/admin/expenses}">Giderler</a>
-
+            <a class="nav-link" th:classappend="${currentPage == 'packages'} ? 'active'" th:href="@{/admin/packages}">Kargolar</a>
             <a class="nav-link active" th:href="@{/admin/debts}">Borçlar & Aidat</a>
 
             <a class="nav-link" th:href="@{/admin/payments}">Ödemeler</a>
