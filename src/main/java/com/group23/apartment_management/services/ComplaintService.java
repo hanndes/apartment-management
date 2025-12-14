@@ -1,13 +1,15 @@
 package com.group23.apartment_management.services;
 
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
 import com.group23.apartment_management.entities.Complaint;
+import com.group23.apartment_management.entities.dto.ComplaintDTO;
 import com.group23.apartment_management.entities.dto.ComplaintDetailDTO;
 import com.group23.apartment_management.repositories.ComplaintRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import com.group23.apartment_management.entities.dto.ComplaintDTO;
 
-import java.util.List;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +34,6 @@ public class ComplaintService {
         return complaintRepository.findComplaintDetailById(id);
     }
 
-   
 
     public void respondToComplaint(int id, String response, String status) {
         complaintRepository.updateResponseAndStatus(id, response, status);
@@ -42,5 +43,15 @@ public class ComplaintService {
         // "Bekliyor" durumundaki kayıtları saydır
         return complaintRepository.countByStatus("Bekliyor");
     }
+
+
+    public int getInReviewComplaintCount() {
+        return complaintRepository.countByStatus("İnceleniyor");
+    }
+
+    public int getResolvedThisMonthCount() {
+        return complaintRepository.countResolvedThisMonth();
+    }
+
 
 }
