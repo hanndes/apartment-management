@@ -86,11 +86,10 @@ public class VehicleRepository {
             e.printStackTrace();
         }
     }
-    // VehicleRepository.java dosyasının en altına (sınıfın içine) ekleyin:
+    
 
-// VehicleRepository.java içindeki o metodu bununla değiştirin:
 
-    // Metot ismini ve SQL'i değiştirdik: residentId değil userId alacak
+
     public List<Vehicle> findVehiclesByUserId(int userId) {
         List<Vehicle> list = new ArrayList<>();
 
@@ -103,7 +102,7 @@ public class VehicleRepository {
         try (Connection con = DatabaseConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
-            ps.setInt(1, userId); // Artık buraya User ID geliyor, sorgu doğru çalışacak
+            ps.setInt(1, userId); 
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {

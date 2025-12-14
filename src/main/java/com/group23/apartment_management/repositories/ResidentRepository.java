@@ -3,7 +3,7 @@ package com.group23.apartment_management.repositories;
 import com.group23.apartment_management.config.DatabaseConnection;
 import com.group23.apartment_management.entities.Block;
 import com.group23.apartment_management.entities.Resident;
-import com.group23.apartment_management.entities.ResidentType; // Entity'niz olduğunu varsayıyorum
+import com.group23.apartment_management.entities.ResidentType; 
 import com.group23.apartment_management.entities.dto.ApartmentDropdownDTO;
 import com.group23.apartment_management.entities.dto.ResidentDTO;
 import org.springframework.stereotype.Repository;
@@ -114,7 +114,7 @@ public class ResidentRepository {
             while(rs.next()){
                 ResidentType rt = new ResidentType();
                 rt.setId(rs.getInt("resident_type_id"));
-                rt.setTypeName(rs.getString("type_name")); // SQL tablonuzda 'type_name'
+                rt.setTypeName(rs.getString("type_name"));
                 list.add(rt);
             }
         } catch (Exception e) { e.printStackTrace(); }
@@ -137,10 +137,10 @@ public class ResidentRepository {
         } catch (Exception e) { e.printStackTrace(); }
         return list;
     }
-    // Blokları Listele (Tüm detaylarıyla)
+    // Blokları Listele 
     public List<Block> findAllBlocks() {
         List<Block> list = new ArrayList<>();
-        // Tüm sütunları çekiyoruz
+        
         String sql = "SELECT * FROM Blocks ORDER BY block_name";
 
         try (Connection con = DatabaseConnection.getConnection();
@@ -152,7 +152,7 @@ public class ResidentRepository {
                 b.setBlockId(rs.getInt("block_id"));
                 b.setBlockName(rs.getString("block_name"));
 
-                // Yeni alanları set ediyoruz
+               
                 b.setTotalFloors(rs.getInt("total_floors"));
                 b.setTotalApartments(rs.getInt("total_apartments"));
                 b.setAddress(rs.getString("address"));
@@ -162,7 +162,7 @@ public class ResidentRepository {
         } catch (Exception e) { e.printStackTrace(); }
         return list;
     }
-    // ResidentRepository.java içine (en alta) ekleyin:
+    
 
     public Integer findApartmentIdByResidentId(int residentId) {
         String sql = "SELECT apartment_id FROM Residents WHERE resident_id = ?";

@@ -15,7 +15,7 @@ public class DuesPeriodRepository {
 
     public List<DuesPeriod> findAll(){
         List<DuesPeriod> list = new ArrayList<>();
-        // SQL Server'da year ve month rezerve kelime olabilir, [ ] içine aldık.
+    
         String sql = "SELECT * FROM DuesPeriods ORDER BY [year] DESC, [month] DESC";
 
         try (Connection con = DatabaseConnection.getConnection();

@@ -14,11 +14,10 @@ import java.util.List;
 @Repository
 public class PaymentRepository {
 
-    // KULLANICININ ÖDEMELERİ (Düzeltildi: apartment_id yerine resident_id kullanılıyor)
+    // KULLANICININ ÖDEMELERİ
     public List<Payment> findPaymentsByUserId(int userId) {
         List<Payment> list = new ArrayList<>();
 
-        // Kullanıcının Resident ID'sine ulaşarak ödemeleri çekiyoruz
         String sql = "SELECT p.* " +
                 "FROM Payments p " +
                 "JOIN Residents r ON p.resident_id = r.resident_id " +
@@ -41,11 +40,11 @@ public class PaymentRepository {
                     p.setPaymentMethod(rs.getString("payment_method"));
                     p.setReferenceNo(rs.getString("reference_no"));
 
-                    // TIMESTAMP DÜZELTMESİ: created_at
+                    
                     try {
                         p.setCreatedAt(rs.getTimestamp("created_at"));
                     } catch (Exception e) {
-                        // Eğer sütun yoksa null geç, hata patlatma
+                        
                     }
 
                     list.add(p);
@@ -76,7 +75,7 @@ public class PaymentRepository {
                     p.setPaymentDate(rs.getTimestamp("payment_date"));
                     p.setPaymentMethod(rs.getString("payment_method"));
                     p.setReferenceNo(rs.getString("reference_no"));
-                    p.setCreatedAt(rs.getTimestamp("created_at")); // Düzeltildi
+                    p.setCreatedAt(rs.getTimestamp("created_at")); 
                     list.add(p);
                 }
             }
@@ -111,11 +110,7 @@ public class PaymentRepository {
     }
 
 
-
-        // ... (Diğer metodlar: findPaymentsByUserId, findByDebtId, save AYNEN KALIYOR) ...
-        // ... Onlar Payment entity kullandığı için değiştirmeye gerek yok ...
-
-        // DASHBOARD İÇİN SON ÖDEMELER (DTO KULLANIMI - GÜNCELLENDİ)
+        // DASHBOARD İÇİN SON ÖDEMELER
         public List<PaymentDTO> findRecentPayments(int limit) {
             List<PaymentDTO> list = new ArrayList<>();
 
@@ -138,13 +133,11 @@ public class PaymentRepository {
                     PaymentDTO dto = new PaymentDTO();
                     dto.setId(rs.getInt("payment_id"));
 
-                    // DÜZELTME: Artık DTO bağımsız olduğu için direkt kendi alanını kullanıyoruz
                     dto.setAmount(rs.getBigDecimal("amount_paid"));
 
                     dto.setPaymentDate(rs.getTimestamp("payment_date"));
                     dto.setPaymentMethod(rs.getString("payment_method"));
 
-                    // Ekstra alanlar
                     dto.setUserName(rs.getString("first_name") + " " + rs.getString("last_name"));
                     dto.setFlatNumber(rs.getString("block_name") + " D:" + rs.getString("door_number"));
 

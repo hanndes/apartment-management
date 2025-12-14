@@ -15,12 +15,11 @@ import java.util.List;
 @Repository
 public class ExpenseRepository {
 
-    // 1. GİDERLERİ LİSTELE (Kategori ve Blok Adıyla Beraber)
+    //GİDERLERİ LİSTELE (Kategori ve Blok Adıyla Beraber)
     public List<Expense> findAll() {
         List<Expense> list = new ArrayList<>();
 
-        // Hem Kategori hem de Blok tablolarıyla birleştiriyoruz
-        // Blok ismini ve Kategori ismini ekranda göstermek için JOIN yapıyoruz
+  
         String sql = "SELECT e.exp_id, e.cat_id, e.block_id, e.amount, e.exp_date, e.description, " +
                 "c.cat_name, b.block_name " +
                 "FROM Expenses e " +
@@ -51,8 +50,7 @@ public class ExpenseRepository {
         return list;
     }
 
-    // 2. YENİ GİDER EKLE (Blok ID Dahil)
-    // Geriye eklenen kaydın ID'sini döndürür (Service'de işimize yarayabilir)
+    //YENİ GİDER EKLE (Blok ID Dahil)
     public int save(Expense expense) {
         String sql = "INSERT INTO Expenses (cat_id, block_id, amount, exp_date, description) VALUES (?, ?, ?, ?, ?)";
 
@@ -60,14 +58,14 @@ public class ExpenseRepository {
              PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setInt(1, expense.getCategoryId());
-            ps.setInt(2, expense.getBlockId());    // YENİ: Blok ID'yi kaydediyoruz
+            ps.setInt(2, expense.getBlockId());    
             ps.setBigDecimal(3, expense.getAmount());
             ps.setDate(4, expense.getDate());
             ps.setString(5, expense.getDescription());
 
             ps.executeUpdate();
 
-            // Eklenen kaydın ID'sini döndür
+           
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) {
                     return rs.getInt(1);
@@ -76,10 +74,10 @@ public class ExpenseRepository {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return 0; // Başarısızsa 0 döner
+        return 0; 
     }
 
-    // 3. GİDER SİL
+    //GİDER SİL
     public void delete(int id) {
         String sql = "DELETE FROM Expenses WHERE exp_id = ?";
         try (Connection con = DatabaseConnection.getConnection();
@@ -89,7 +87,7 @@ public class ExpenseRepository {
         } catch (Exception e) { e.printStackTrace(); }
     }
 
-    // 4. KATEGORİLERİ GETİR (Dropdown İçin)
+    //KATEGORİLERİ GETİR (Dropdown İçin)
     public List<ExpenseCategory> findAllCategories() {
         List<ExpenseCategory> list = new ArrayList<>();
         String sql = "SELECT cat_id, cat_name FROM ExpenseCategories";
