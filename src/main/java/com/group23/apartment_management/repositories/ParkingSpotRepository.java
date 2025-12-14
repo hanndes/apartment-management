@@ -27,7 +27,7 @@ public class ParkingSpotRepository {
 
             while (rs.next()) {
                 ParkingSpot p = new ParkingSpot();
-                p.setId(rs.getInt("parking_id"));
+                p.setId(rs.getInt("parking_spot_id"));
                 p.setBlockId(rs.getInt("block_id"));
                 p.setSpotCode(rs.getString("spot_code"));
                 p.setOccupied(rs.getBoolean("is_occupied"));
@@ -40,7 +40,11 @@ public class ParkingSpotRepository {
 
     // EKLEME
     public boolean save(ParkingSpot spot) {
-        String sql = "INSERT INTO ParkingSpots (block_id, spot_code, is_occupied) VALUES (?, ?, 0)";
+        String sql = """
+            INSERT INTO ParkingSpots (block_id, spot_code, is_guest, is_occupied)
+            VALUES (?, ?, 0, 0)
+        """;
+
         try (Connection con = DatabaseConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
@@ -48,12 +52,15 @@ public class ParkingSpotRepository {
             ps.setString(2, spot.getSpotCode());
 
             return ps.executeUpdate() > 0;
-        } catch (Exception e) { e.printStackTrace(); return false; }
+        } catch (Exception e) { 
+            System.out.println("PARKING INSERT ERROR: " + e.getMessage());
+            e.printStackTrace(); 
+            return false; }
     }
 
     // SİLME
     public void delete(int id) {
-        String sql = "DELETE FROM ParkingSpots WHERE parking_id = ?";
+        String sql = "DELETE FROM ParkingSpots WHERE parking_spot_id = ?";
         try (Connection con = DatabaseConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, id);

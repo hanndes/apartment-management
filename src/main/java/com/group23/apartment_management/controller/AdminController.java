@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -383,12 +385,17 @@ public class AdminController {
     }
 
     @PostMapping("/parking/add")
-    public String addParking(@ModelAttribute("newSpot") ParkingSpot spot, HttpSession session) {
+    public String addParking(@ModelAttribute("newSpot") ParkingSpot spot, HttpSession session, RedirectAttributes ra) {
         if (!isAdmin(session)) return "redirect:/login";
         // HATA AYIKLAMA İÇİN: Konsolda gelen veriyi kontrol edebilirsiniz
         System.out.println("DEBUG: Gelen Blok ID: " + spot.getBlockId());
         System.out.println("DEBUG: Gelen Park Kodu: " + spot.getSpotCode());
-        parkingSpotService.addSpot(spot);
+        try {
+            parkingSpotService.addSpot(spot);
+            ra.addFlashAttribute("success", "Park yeri eklendi.");
+        } catch (Exception e) {
+            ra.addFlashAttribute("error", "Eklenemedi: " + e.getMessage());
+        }
         return "redirect:/admin/parking";
     }
 
