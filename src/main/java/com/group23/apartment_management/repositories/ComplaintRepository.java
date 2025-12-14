@@ -15,7 +15,6 @@ import java.util.List;
 @Repository
 public class ComplaintRepository {
 
-    // Ekleme Metodu
     public boolean save(Complaint complaint) {
         String sql = "INSERT INTO Complaints (user_id, title, description, category, priority, status, created_at) VALUES (?, ?, ?, ?, ?, 'Bekliyor', GETDATE())";
         try (Connection con = DatabaseConnection.getConnection();
@@ -29,7 +28,6 @@ public class ComplaintRepository {
         } catch (Exception e) { e.printStackTrace(); return false; }
     }
 
-    // User İçin Listeleme
     public List<Complaint> findByUserId(int userId) {
         List<Complaint> list = new ArrayList<>();
         String sql = "SELECT * FROM Complaints WHERE user_id = ? ORDER BY created_at DESC";
@@ -89,7 +87,7 @@ public class ComplaintRepository {
         } catch (Exception e) { e.printStackTrace(); }
         return list;
     }
-    
+
     // DETAY SAYFASI İÇİN ÖZEL METOD (ComplaintDetailDTO DÖNDÜRÜR)
     public ComplaintDetailDTO findComplaintDetailById(int id) {
         ComplaintDetailDTO dto = null;
@@ -143,10 +141,6 @@ public class ComplaintRepository {
         }
         return dto;
     }
-
-    // --- DÜZELTME BURADA YAPILDI ---
-    // Adminin cevabını ve şikayet durumunu günceller
-    // SQL sorgusunda 'response' yerine 'admin_response' kullanıldı.
     public void updateResponseAndStatus(int id, String response, String status) {
         String sql = "UPDATE Complaints SET admin_response = ?, status = ? WHERE complaint_id = ?";
 
