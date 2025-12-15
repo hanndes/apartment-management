@@ -2,13 +2,53 @@
 <html lang="tr" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Ödemelerim & Borçlar</title>
+    <title>Ödemelerim & Cüzdan</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
     <style>
-        .split-layout { display: grid; grid-template-columns: 280px 1fr; gap: 20px; align-items: start; }
-        @media (max-width: 992px) { .split-layout { grid-template-columns: 1fr; } }
+        /* CÜZDAN KARTI İÇİN ÖZEL STİL */
+        .wallet-card {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 20px rgba(52, 152, 219, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Arka plan süslemesi */
+        .wallet-card::after {
+            content: '👛';
+            position: absolute;
+            right: -20px;
+            bottom: -20px;
+            font-size: 150px;
+            opacity: 0.1;
+            transform: rotate(-15deg);
+        }
 
-       
+        .balance-label { font-size: 0.9rem; opacity: 0.9; text-transform: uppercase; letter-spacing: 1px; }
+        .balance-amount { font-size: 2.5rem; font-weight: 800; margin-top: 5px; }
+        
+        .btn-deposit {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.4);
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            text-decoration: none;
+            z-index: 2; /* Süslemenin üstünde kalsın */
+        }
+        .btn-deposit:hover { background: white; color: #2c3e50; }
+
+        /* BORÇ KARTLARI */
         .debt-card {
             background: white;
             border-radius: 12px;
@@ -22,39 +62,42 @@
             transition: transform 0.2s;
         }
         .debt-card:hover { transform: translateY(-2px); }
-
         .debt-card.unpaid { border-left-color: #e63946; } 
         .debt-card.paid { border-left-color: #2a9d8f; background-color: #f8fffa; opacity: 0.8; } 
 
-        
+        /* ÖDEME BUTONU (YEŞİL) */
         .btn-pay {
-            background-color: #3498db;
+            background-color: #27ae60; 
             color: white;
             border: none;
-            padding: 8px 16px;
+            padding: 10px 20px;
             border-radius: 6px;
             font-weight: 600;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
-            gap: 5px;
+            gap: 8px;
             transition: background 0.2s;
-            text-decoration: none;
             font-size: 0.9rem;
         }
-        .btn-pay:hover { background-color: #2980b9; }
+        .btn-pay:hover { background-color: #219150; }
 
         .amount-text { font-size: 1.4rem; font-weight: 700; color: #2c3e50; }
         .status-text { font-size: 0.85rem; font-weight: 600; margin-top: 4px; }
         .text-danger { color: #e63946; }
         .text-success { color: #2a9d8f; }
+
+        /* UYARI KUTUCUKLARI */
+        .alert { padding: 15px; border-radius: 8px; margin-bottom: 20px; font-weight: 500; }
+        .alert-success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .alert-error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
     </style>
 </head>
 <body class="user-body" style="background-color: #f4f7f6;">
 <div class="admin-layout">
 
     <aside class="admin-sidebar" style="background: #2c3e50;">
-        <div class="brand"><div class="brand-icon">🏠</div><div><div class="brand-title">Sakin</div><div class="brand-sub">Paneli</div></div></div>
+        <div class="brand"><div class="brand-icon">🏢</div><div><div class="brand-title">Apartment</div><div class="brand-sub">Management</div></div></div>
         <nav class="nav-links">
             <a class="nav-link" th:href="@{/user/dashboard}">Dashboard</a>
             <a class="nav-link active" th:href="@{/user/payments}">Ödemelerim</a>
@@ -66,16 +109,33 @@
 
     <main class="admin-main">
         <header class="topbar">
-            <div><h1>Ödemelerim</h1><p>Aidat ve gider borçlarınızın durumu</p></div>
+            <div><h1>Cüzdan ve Ödemeler</h1><p>Bakiye yönetimi ve borç ödeme işlemleri</p></div>
             <div class="user-chip" th:text="${#strings.substring(user.username, 0, 1)}">U</div>
         </header>
 
-        <section class="panel">
-            <div class="panel-head">
-                <h3>💳 Borç Dökümü</h3>
+        <section class="panel" style="background: transparent; box-shadow: none; padding: 0;">
+
+            <div class="wallet-card">
+                <div>
+                    <div class="balance-label">Mevcut Cüzdan Bakiyeniz</div>
+                    <div class="balance-amount"
+                         th:text="'₺' + ${walletBalance != null ? #numbers.formatDecimal(walletBalance, 1, 'POINT', 2, 'COMMA') : '0,00'}">
+                        ₺0,00
+                    </div>
+                </div>
             </div>
 
-            <div style="margin-top: 20px;">
+            <div th:if="${successMessage}" class="alert alert-success">
+                ✅ <span th:text="${successMessage}">İşlem Başarılı</span>
+            </div>
+            <div th:if="${errorMessage}" class="alert alert-error">
+                ⚠️ <span th:text="${errorMessage}">Hata oluştu</span>
+            </div>
+
+            <div class="panel" style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                <div class="panel-head" style="margin-bottom: 20px;">
+                    <h3>💳 Borç Dökümü</h3>
+                </div>
 
                 <div th:if="${#lists.isEmpty(debts)}" style="text-align: center; padding: 50px; color: #999;">
                     <div style="font-size: 3rem; margin-bottom: 10px;">🎉</div>
@@ -90,23 +150,24 @@
                         <div style="font-weight: bold; font-size: 1.2em; color: #333;" th:text="${debt.typeName}">Aidat</div>
                         <div style="color: #666; margin-top: 5px;">
                             <span th:text="${debt.periodName}">Ocak 2025</span>
-                            <span style="color: #ccc;">|</span>
+                            <span style="color: #ccc; margin: 0 5px;">|</span>
                             <small th:text="'Vade: ' + ${#dates.format(debt.createdAt, 'dd.MM.yyyy')}">15.01.2025</small>
                         </div>
                     </div>
 
-                    <div style="text-align: right; min-width: 150px;">
-                        <div class="amount-text" th:text="'₺' + ${debt.amount}">₺1.250,00</div>
+                    <div style="text-align: right; min-width: 180px;">
+                        <div class="amount-text"
+                             th:text="'₺' + ${#numbers.formatDecimal(debt.amount, 1, 'POINT', 2, 'COMMA')}">₺1.250,00</div>
 
-                        <div th:if="${!debt.paid}" style="margin-top: 8px;">
+                        <div th:if="${!debt.paid}" style="margin-top: 10px;">
                             <div class="status-text text-danger" style="margin-bottom: 8px;">
                                 Ödenmedi <span th:if="${debt.remainingAmount < debt.amount}">(Kısmi)</span>
                             </div>
 
-                            <form th:action="@{/user/payments/pay}" method="post">
+                            <form th:action="@{/user/payments/pay-wallet}" method="post">
                                 <input type="hidden" name="debtId" th:value="${debt.id}">
-                                <button type="submit" class="btn-pay">
-                                    <span>💳</span> Hızlı Öde
+                                <button type="submit" class="btn-pay" onclick="return confirm('Bu tutar cüzdan bakiyenizden düşülecektir. Onaylıyor musunuz?')">
+                                    <span>👛</span> Cüzdandan Öde
                                 </button>
                             </form>
                         </div>

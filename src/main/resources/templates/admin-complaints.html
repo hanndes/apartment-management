@@ -25,9 +25,11 @@
 
             <a class="nav-link" th:classappend="${currentPage == 'parking'} ? 'active'" th:href="@{/admin/parking}">Otopark</a>
             <a class="nav-link" th:classappend="${currentPage == 'expenses'} ? 'active'" th:href="@{/admin/expenses}">Giderler</a>
+            <a class="nav-link" th:classappend="${currentPage == 'packages'} ? 'active'" th:href="@{/admin/packages}">Kargolar</a>
             <a class="nav-link" th:href="@{/admin/debts}">Borçlar & Aidat</a>
+
             <a class="nav-link" th:classappend="${currentPage == 'payments'} ? 'active'" th:href="@{/admin/payments}">Ödemeler</a>
-            <a class="nav-link active" th:classappend="${currentPage == 'complaints'} ? 'active'" th:href="@{/admin/complaints}">Bakım & Talepler</a>
+            <a class="nav-link" th:classappend="${currentPage == 'complaints'} ? 'active'" th:href="@{/admin/complaints}">Bakım & Talepler</a>
             <a class="nav-link" th:classappend="${currentPage == 'announcements'} ? 'active'" th:href="@{/admin/announcements}">Duyurular</a>
             <a class="nav-link" th:classappend="${currentPage == 'users'} ? 'active'" th:href="@{/admin/users}">Kullanıcılar</a>
         </nav>
@@ -57,14 +59,14 @@
 
             <article class="stat-card">
                 <div class="stat-label">İncelenenler</div>
-                <div class="stat-value" th:text="${inProgressCount}">0</div>
-                <div class="stat-trend" th:if="${inProgressCount > 0}" th:text="'Usta yönlendirildi'">Usta yönlendirildi</div>
+                <div class="stat-value" th:text="${inReviewCount}">0</div>
+                <div class="stat-trend" th:if="${inReviewCount > 0}" th:text="'Usta yönlendirildi'">Usta yönlendirildi</div>
             </article>
 
             <article class="stat-card">
                 <div class="stat-label">Bu Ay Çözülen</div>
-                <div class="stat-value" th:text="${resolvedThisMonth}">0</div>
-                <div class="stat-trend positive" th:if="${resolvedThisMonth > 0}" th:text="'Başarıyla tamamlandı'">Başarıyla tamamlandı</div>
+                <div class="stat-value" th:text="${resolvedThisMonthCount}">0</div>
+                <div class="stat-trend positive" th:if="${resolvedThisMonthCount > 0}" th:text="'Başarıyla tamamlandı'">Başarıyla tamamlandı</div>
             </article>
         </section>
 

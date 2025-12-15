@@ -46,10 +46,12 @@
 
             <a class="nav-link" th:classappend="${currentPage == 'parking'} ? 'active'" th:href="@{/admin/parking}">Otopark</a>
             <a class="nav-link" th:classappend="${currentPage == 'expenses'} ? 'active'" th:href="@{/admin/expenses}">Giderler</a>
+            <a class="nav-link" th:classappend="${currentPage == 'packages'} ? 'active'" th:href="@{/admin/packages}">Kargolar</a>
             <a class="nav-link" th:href="@{/admin/debts}">Borçlar & Aidat</a>
+
             <a class="nav-link" th:classappend="${currentPage == 'payments'} ? 'active'" th:href="@{/admin/payments}">Ödemeler</a>
             <a class="nav-link" th:classappend="${currentPage == 'complaints'} ? 'active'" th:href="@{/admin/complaints}">Bakım & Talepler</a>
-            <a class="nav-link active" th:classappend="${currentPage == 'announcements'} ? 'active'" th:href="@{/admin/announcements}">Duyurular</a>
+            <a class="nav-link" th:classappend="${currentPage == 'announcements'} ? 'active'" th:href="@{/admin/announcements}">Duyurular</a>
             <a class="nav-link" th:classappend="${currentPage == 'users'} ? 'active'" th:href="@{/admin/users}">Kullanıcılar</a>
         </nav>
         <a th:href="@{/logout}" class="sidebar-logout">Çıkış Yap</a>

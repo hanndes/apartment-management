@@ -13,8 +13,8 @@ public class ApartmentService {
 
     private final ApartmentRepository apartmentRepository;
 
- 
+    // Dropdown listeleri için doğru metodu çağırır
     public List<ApartmentDropdownDTO> getApartmentsByBlockId(int blockId) {
-        return apartmentRepository.findByBlockId(blockId);
+        return apartmentRepository.findApartmentsForDropdownByBlockId(blockId);
     }
 }

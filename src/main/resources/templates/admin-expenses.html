@@ -9,20 +9,12 @@
         @media (max-width: 992px) { .split-layout { grid-template-columns: 1fr; } }
         .form-control { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 6px; }
 
-        /* Yeni eklenen dağıtım kutusu stili */
         .distribution-box {
             background-color: #f0f4f8;
             border: 1px solid #d9e2ec;
             padding: 15px;
             border-radius: 8px;
-            margin-top: 10px;
             margin-bottom: 15px;
-        }
-        .distribution-header {
-            font-weight: bold;
-            color: #2c3e50;
-            margin-bottom: 10px;
-            display: block;
         }
     </style>
 </head>
@@ -32,17 +24,19 @@
     <aside class="admin-sidebar">
         <div class="brand"><div class="brand-icon">🏢</div><div><div class="brand-title">Apartment</div><div class="brand-sub">Management</div></div></div>
         <nav class="nav-links">
-            <a class="nav-link" th:classappend="${currentPage == 'dashboard'} ? 'active'" th:href="@{/admin/dashboard}">Dashboard</a>
-            <a class="nav-link" th:classappend="${currentPage == 'vehicles'} ? 'active'" th:href="@{/admin/vehicles}">Araçlar</a>
-            <a class="nav-link" th:classappend="${currentPage == 'residents'} ? 'active'" th:href="@{/admin/residents}">Sakinler</a>
-            <a class="nav-link" th:classappend="${currentPage == 'staff'} ? 'active'" th:href="@{/admin/staff}">Personel</a>
-            <a class="nav-link" th:classappend="${currentPage == 'parking'} ? 'active'" th:href="@{/admin/parking}">Otopark</a>
-            <a class="nav-link active" th:classappend="${currentPage == 'expenses'} ? 'active'" th:href="@{/admin/expenses}">Giderler</a>
+            <a class="nav-link" th:href="@{/admin/dashboard}">Dashboard</a>
+            <a class="nav-link" th:href="@{/admin/vehicles}">Araçlar</a>
+            <a class="nav-link" th:href="@{/admin/residents}">Sakinler</a>
+            <a class="nav-link" th:href="@{/admin/staff}">Personel</a>
+            <a class="nav-link" th:href="@{/admin/parking}">Otopark</a>
+
+            <a class="nav-link active" th:href="@{/admin/expenses}">Giderler</a>
+            <a class="nav-link" th:classappend="${currentPage == 'packages'} ? 'active'" th:href="@{/admin/packages}">Kargolar</a>
             <a class="nav-link" th:href="@{/admin/debts}">Borçlar & Aidat</a>
-            <a class="nav-link" th:classappend="${currentPage == 'payments'} ? 'active'" th:href="@{/admin/payments}">Ödemeler</a>
-            <a class="nav-link" th:classappend="${currentPage == 'complaints'} ? 'active'" th:href="@{/admin/complaints}">Bakım & Talepler</a>
-            <a class="nav-link" th:classappend="${currentPage == 'announcements'} ? 'active'" th:href="@{/admin/announcements}">Duyurular</a>
-            <a class="nav-link" th:classappend="${currentPage == 'users'} ? 'active'" th:href="@{/admin/users}">Kullanıcılar</a>
+            <a class="nav-link" th:href="@{/admin/payments}">Ödemeler</a>
+            <a class="nav-link" th:href="@{/admin/complaints}">Bakım & Talepler</a>
+            <a class="nav-link" th:href="@{/admin/announcements}">Duyurular</a>
+            <a class="nav-link" th:href="@{/admin/users}">Kullanıcılar</a>
         </nav>
         <a th:href="@{/logout}" class="sidebar-logout">Çıkış Yap</a>
     </aside>
@@ -62,42 +56,42 @@
 
                     <div class="form-group">
                         <label>Kategori</label>
-                        <select name="categoryId" class="form-control" required>
+                        <select name="categoryId" class="form-control">
                             <option th:each="cat : ${categories}"
                                     th:value="${cat.id}"
-                                    th:text="${cat.name}">Fatura</option>
+                                    th:text="${cat.name}">Elektrik</option>
                         </select>
                     </div>
 
                     <div class="form-group">
-                        <label>Hangi Bina? <span style="color:red">*</span></label>
+                        <label>Hangi Bina İçin?</label>
                         <select name="blockId" class="form-control" required>
                             <option value="" disabled selected>Bina Seçiniz...</option>
-                            <option th:each="b : ${blocks}"
-                                    th:value="${b.blockId}"
-                                    th:text="${b.blockName}">A Blok</option>
+                            <option th:each="block : ${blocks}"
+                                    th:value="${block.blockId}"
+                                    th:text="${block.blockName}">A Blok</option>
                         </select>
                     </div>
 
                     <div class="form-group">
-                        <label>Tutar (₺)</label>
-                        <input type="number" name="amount" class="form-control" step="0.01" required placeholder="Örn: 1500">
+                        <label>Toplam Tutar (₺)</label>
+                        <input type="number" name="amount" class="form-control" step="0.01" placeholder="Örn: 1000">
                     </div>
 
                     <div class="form-group">
                         <label>Tarih</label>
-                        <input type="date" name="date" class="form-control" required>
+                        <input type="date" name="date" class="form-control">
                     </div>
 
                     <div class="form-group">
                         <label>Açıklama</label>
-                        <textarea name="description" class="form-control" placeholder="Detay (Fatura No vb.)" style="height: 60px;"></textarea>
+                        <textarea name="description" class="form-control" style="height: 80px;" placeholder="Fatura No vb."></textarea>
                     </div>
 
                     <div class="distribution-box">
-                        <label class="distribution-header">
+                        <label style="display: flex; align-items: center; gap: 8px; font-weight: bold; color: #2980b9; margin-bottom: 10px; cursor: pointer;">
                             <input type="checkbox" name="distribute" value="true">
-                            Tutarı Dairelere Paylaştır (Borçlandır)
+                            Bu tutarı dairelere paylaştır (Borçlandır)
                         </label>
 
                         <div class="form-group">
