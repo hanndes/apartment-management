@@ -5,7 +5,9 @@ import com.group23.apartment_management.entities.Resident;
 import com.group23.apartment_management.entities.ResidentType;
 import com.group23.apartment_management.entities.dto.ApartmentDropdownDTO;
 import com.group23.apartment_management.entities.dto.ResidentDTO;
+import com.group23.apartment_management.repositories.ApartmentRepository;
 import com.group23.apartment_management.repositories.ResidentRepository;
+import com.group23.apartment_management.repositories.WalletRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +18,9 @@ import java.util.List;
 public class ResidentService {
 
     private final ResidentRepository residentRepository;
-
+    // YENİ EKLENECEKLER:
+    private final ApartmentRepository apartmentRepository; // Daire işlemleri için
+    private final WalletRepository walletRepository;      // Cüzdan işlemleri için
     public List<ResidentDTO> getAllResidentsDetailed() {
         return residentRepository.findAllResidentsWithDetails();
     }

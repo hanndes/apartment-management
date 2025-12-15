@@ -76,24 +76,49 @@ public class ResidentRepository {
         } catch (Exception e) { e.printStackTrace(); }
         return list;
     }
+// ResidentRepository.java
 
-    // 2. KAYDETME
-    public boolean save(Resident resident) {
-        String sql = "INSERT INTO Residents (resident_type_id, apartment_id, first_name, last_name, phone_number, email) VALUES (?, ?, ?, ?, ?, ?)";
+    // 2. KAYDETME (Güncellenmiş: Yeni ID'yi döndürür ve UNIQUE KEY hatasını önler)
+    public int save(Resident resident) {
+
+        // Güvenli E-posta Değeri: NULL yerine boş string ("") gönderilerek
+        // UNIQUE kısıtlamasının NULL değerlerde çakışması önlenir.
+        String emailValue = resident.getEmail();
+        if (emailValue == null || emailValue.trim().isEmpty()) {
+            emailValue = "";
+        }
+
+        // SQL Sorgusu: Tüm alanları dahil ediyoruz, E-postayı yukarıda kontrol ettik.
+        // DİKKAT: user_id bu sorguda yoktur, tabloda NULL'a izin verildiği varsayılır.
+        String sql = "INSERT INTO Residents (resident_type_id, apartment_id, first_name, last_name, phone_number, email) " +
+                "VALUES (?, ?, ?, ?, ?, ?)";
+
+        // Yeni oluşturulan anahtarı (ID) geri almak için Statement.RETURN_GENERATED_KEYS kullanılır.
         try (Connection con = DatabaseConnection.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
+             PreparedStatement ps = con.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
 
             ps.setInt(1, resident.getResidentTypeId());
             ps.setInt(2, resident.getApartmentId());
             ps.setString(3, resident.getFirstName());
             ps.setString(4, resident.getLastName());
             ps.setString(5, resident.getPhoneNumber());
-            ps.setString(6, resident.getEmail());
+            ps.setString(6, emailValue); // Kontrol edilmiş e-posta değerini gönder
 
-            return ps.executeUpdate() > 0;
-        } catch (Exception e) { e.printStackTrace(); return false; }
+            ps.executeUpdate();
+
+            // Otomatik oluşturulan resident_id'yi geri al
+            try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    // Yeni oluşturulan ID'yi döndür
+                    return generatedKeys.getInt(1);
+                }
+            }
+        } catch (Exception e) {
+            // Hata durumunda konsola yazdır ve -1 döndür.
+            e.printStackTrace();
+        }
+        return -1; // Kayıt başarısız olursa -1 döndür
     }
-
     // 3. SİLME
     public void delete(int id) {
         String sql = "DELETE FROM Residents WHERE resident_id = ?";
