@@ -1,16 +1,17 @@
 package com.group23.apartment_management.repositories;
 
-import com.group23.apartment_management.config.DatabaseConnection;
-import com.group23.apartment_management.entities.Complaint;
-import com.group23.apartment_management.entities.dto.ComplaintDTO;
-import com.group23.apartment_management.entities.dto.ComplaintDetailDTO;
-import org.springframework.stereotype.Repository;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.springframework.stereotype.Repository;
+
+import com.group23.apartment_management.config.DatabaseConnection;
+import com.group23.apartment_management.entities.Complaint;
+import com.group23.apartment_management.entities.dto.ComplaintDTO;
+import com.group23.apartment_management.entities.dto.ComplaintDetailDTO;
 
 @Repository
 public class ComplaintRepository {
@@ -45,6 +46,7 @@ public class ComplaintRepository {
                     c.setStatus(rs.getString("status"));
                     c.setPriority(rs.getString("priority"));
                     c.setCreatedAt(rs.getTimestamp("created_at"));
+                    c.setAdminResponse(rs.getString("admin_response"));
                     list.add(c);
                 }
             }

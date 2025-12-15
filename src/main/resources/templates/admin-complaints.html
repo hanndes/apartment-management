@@ -50,6 +50,8 @@
             </div>
         </header>
 
+        <div th:if="${successMessage}" class="alert success" th:text="${successMessage}"></div>
+
         <section class="stat-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 20px;">
             <article class="stat-card">
                 <div class="stat-label">Bekleyen Talepler</div>
