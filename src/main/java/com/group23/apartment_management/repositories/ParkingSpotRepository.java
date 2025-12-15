@@ -13,7 +13,6 @@ import java.util.List;
 @Repository
 public class ParkingSpotRepository {
 
-    // LİSTELEME (Blok Adıyla Beraber)
     public List<ParkingSpot> findAll() {
         List<ParkingSpot> list = new ArrayList<>();
         String sql = "SELECT p.*, b.block_name " +
@@ -30,8 +29,13 @@ public class ParkingSpotRepository {
                 p.setId(rs.getInt("parking_spot_id"));
                 p.setBlockId(rs.getInt("block_id"));
                 p.setSpotCode(rs.getString("spot_code"));
-                p.setOccupied(rs.getBoolean("is_occupied"));
-                p.setBlockName(rs.getString("block_name")); // Blok adı
+                // is_guest sütununu okuyoruz
+                boolean isGuest = rs.getBoolean("is_guest");
+
+// DİKKAT: is_guest true ise, spot.occupied de true (dolu) olsun.
+                p.setOccupied(isGuest);
+                p.setOccupied(rs.getBoolean("is_guest"));
+                p.setBlockName(rs.getString("block_name"));
                 list.add(p);
             }
         } catch (Exception e) { e.printStackTrace(); }
@@ -57,7 +61,6 @@ public class ParkingSpotRepository {
             return false; }
     }
 
-    // SİLME
     public void delete(int id) {
         String sql = "DELETE FROM ParkingSpots WHERE parking_spot_id = ?";
         try (Connection con = DatabaseConnection.getConnection();
