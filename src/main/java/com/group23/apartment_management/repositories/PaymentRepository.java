@@ -84,7 +84,6 @@ public class PaymentRepository {
         } catch (Exception e) { e.printStackTrace(); return false; }
     }
 
-    // --- TRANSACTION İÇİN ÖZEL METOT (Dışarıdan Connection alır) ---
     public boolean save(Connection con, Payment payment) throws java.sql.SQLException {
         String sql = "INSERT INTO Payments (debt_id, resident_id, amount_paid, payment_method, reference_no, payment_date) VALUES (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement ps = con.prepareStatement(sql)) {

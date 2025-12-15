@@ -15,7 +15,6 @@ import java.util.List;
 @Repository
 public class ExpenseRepository {
 
-    //GİDERLERİ LİSTELE (Kategori ve Blok Adıyla Beraber)
     public List<Expense> findAll() {
         List<Expense> list = new ArrayList<>();
 
@@ -50,7 +49,6 @@ public class ExpenseRepository {
         return list;
     }
 
-    //YENİ GİDER EKLE (Blok ID Dahil)
     public int save(Expense expense) {
         String sql = "INSERT INTO Expenses (cat_id, block_id, amount, exp_date, description) VALUES (?, ?, ?, ?, ?)";
 
@@ -77,7 +75,6 @@ public class ExpenseRepository {
         return 0; 
     }
 
-    //GİDER SİL
     public void delete(int id) {
         String sql = "DELETE FROM Expenses WHERE exp_id = ?";
         try (Connection con = DatabaseConnection.getConnection();
@@ -87,7 +84,6 @@ public class ExpenseRepository {
         } catch (Exception e) { e.printStackTrace(); }
     }
 
-    //KATEGORİLERİ GETİR (Dropdown İçin)
     public List<ExpenseCategory> findAllCategories() {
         List<ExpenseCategory> list = new ArrayList<>();
         String sql = "SELECT cat_id, cat_name FROM ExpenseCategories";

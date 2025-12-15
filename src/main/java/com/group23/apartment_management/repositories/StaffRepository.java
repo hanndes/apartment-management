@@ -13,7 +13,6 @@ import java.util.List;
 @Repository
 public class StaffRepository {
 
-    // Aktif Personelleri Listele
     public List<Staff> findAllActive() {
         List<Staff> list = new ArrayList<>();
         String sql = "SELECT * FROM Staff WHERE is_active = 1 ORDER BY first_name";
@@ -38,7 +37,6 @@ public class StaffRepository {
         return list;
     }
 
-    // Yeni Personel Ekle
     public boolean save(Staff staff) {
         String sql = "INSERT INTO Staff (first_name, last_name, role, phone_number, salary, start_date, is_active) VALUES (?, ?, ?, ?, ?, GETDATE(), 1)";
         try (Connection con = DatabaseConnection.getConnection();
@@ -54,7 +52,6 @@ public class StaffRepository {
         } catch (Exception e) { e.printStackTrace(); return false; }
     }
 
-    // Personel Sil (Soft Delete)
     public void delete(int id) {
         String sql = "UPDATE Staff SET is_active = 0 WHERE staff_id = ?";
         try (Connection con = DatabaseConnection.getConnection();

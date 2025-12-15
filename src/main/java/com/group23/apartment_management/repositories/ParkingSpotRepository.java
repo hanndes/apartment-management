@@ -38,7 +38,6 @@ public class ParkingSpotRepository {
         return list;
     }
 
-    // EKLEME
     public boolean save(ParkingSpot spot) {
         String sql = """
             INSERT INTO ParkingSpots (block_id, spot_code, is_guest, is_occupied)

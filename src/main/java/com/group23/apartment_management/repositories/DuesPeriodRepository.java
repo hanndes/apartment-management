@@ -59,7 +59,6 @@ public class DuesPeriodRepository {
         return p;
     }
 
-    // YENİ DÖNEM EKLEME
     public void save(DuesPeriod period) {
         String sql = "INSERT INTO DuesPeriods (period_name, [year], [month], due_date, is_closed) VALUES (?, ?, ?, ?, 0)";
         try (Connection con = DatabaseConnection.getConnection();

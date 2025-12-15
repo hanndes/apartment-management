@@ -58,12 +58,7 @@ public class PaymentService {
 
         debtRepository.updateRemainingAndStatus(debtId, BigDecimal.ZERO, true);
     }
-    // PaymentService.java içine ekleyin
 
-    /**
-     * Admin panelinden gelen manuel ödeme işlemini kaydeder ve borç bakiyesini günceller.
-     * Kısmi ödemeyi destekler.
-     */
     public void processPaymentAmount(int debtId, int residentId, BigDecimal amountPaid, String paymentMethod, String referenceNo) {
 
         Debt debt = debtRepository.findById(debtId);
@@ -79,15 +74,13 @@ public class PaymentService {
         BigDecimal newRemaining = remaining.subtract(amountPaid);
 
         if (newRemaining.compareTo(BigDecimal.ZERO) < 0) {
-            // Fazla ödeme yapıldıysa, sadece kalan miktarı düş ve uyar
-            // Ya da bu durumda kalan borç 0 olarak set edilmeli.
+
             newRemaining = BigDecimal.ZERO;
-            // İleride, fazla ödemenin cüzdana iadesi gibi bir mantık eklenebilir.
         }
 
         boolean isPaid = newRemaining.compareTo(BigDecimal.ZERO) == 0;
 
-        // 1. Payment (Ödeme) Kaydını Oluştur
+
         Payment payment = new Payment();
         payment.setDebtId(debtId);
         payment.setResidentId(residentId);
@@ -98,7 +91,6 @@ public class PaymentService {
 
         paymentRepository.save(payment);
 
-        // 2. Debt (Borç) Bakiyesini Güncelle
         debtRepository.updateRemainingAndStatus(debtId, newRemaining, isPaid);
     }
 }

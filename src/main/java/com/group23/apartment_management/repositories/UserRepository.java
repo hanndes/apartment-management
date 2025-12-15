@@ -14,7 +14,6 @@ import java.util.List;
 @Repository
 public class UserRepository {
 
-    // KULLANICI GİRİŞİ (Login)
     public User findByEmail(String email) {
         User user = null;
 
@@ -73,7 +72,6 @@ public class UserRepository {
         return list;
     }
 
-    // KAYDETME
     public int save(User user) {
         Connection con = null;
         int newUserId = -1;

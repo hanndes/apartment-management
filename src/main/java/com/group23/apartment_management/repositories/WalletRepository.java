@@ -12,7 +12,6 @@ import java.sql.ResultSet;
 @Repository
 public class WalletRepository {
 
-    // Login olan User ID'sinden Cüzdanı Bul (JOIN işlemi ile)
     public Wallet findByUserId(int userId) {
         String sql = "SELECT w.* FROM Wallets w " +
                 "JOIN Residents r ON w.resident_id = r.resident_id " +
@@ -34,7 +33,6 @@ public class WalletRepository {
         return null;
     }
 
-    // Bakiyeyi Güncelle
     public void updateBalance(int walletId, BigDecimal newBalance) {
         String sql = "UPDATE Wallets SET balance = ?, last_updated = GETDATE() WHERE wallet_id = ?";
         try (Connection con = DatabaseConnection.getConnection();
@@ -45,7 +43,6 @@ public class WalletRepository {
         } catch (Exception e) { e.printStackTrace(); }
     }
 
-    // İşlem Kaydı At (Log)
     public void logTransaction(int walletId, BigDecimal amount, String type, String desc) {
         String sql = "INSERT INTO WalletTransactions (wallet_id, amount, trx_type, description) VALUES (?, ?, ?, ?)";
         try (Connection con = DatabaseConnection.getConnection();

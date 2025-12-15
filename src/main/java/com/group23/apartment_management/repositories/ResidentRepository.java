@@ -35,7 +35,7 @@ public class ResidentRepository {
         }
         return resId;
     }
-    // 1. LİSTELEME: Sakinleri Detaylı Getir
+
     public List<ResidentDTO> findAllResidentsWithDetails() {
         List<ResidentDTO> list = new ArrayList<>();
 
@@ -76,9 +76,7 @@ public class ResidentRepository {
         } catch (Exception e) { e.printStackTrace(); }
         return list;
     }
-// ResidentRepository.java
-
-    // 2. KAYDETME (Güncellenmiş: Yeni ID'yi döndürür ve UNIQUE KEY hatasını önler)
+    // 2. KAYDETME (Yeni ID'yi döndürür ve UNIQUE KEY hatasını önler)
     public int save(Resident resident) {
 
         // Güvenli E-posta Değeri: NULL yerine boş string ("") gönderilerek
@@ -109,15 +107,14 @@ public class ResidentRepository {
             // Otomatik oluşturulan resident_id'yi geri al
             try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
-                    // Yeni oluşturulan ID'yi döndür
+                    // yeni oluşturulan idyi döndür
                     return generatedKeys.getInt(1);
                 }
             }
         } catch (Exception e) {
-            // Hata durumunda konsola yazdır ve -1 döndür.
             e.printStackTrace();
         }
-        return -1; // Kayıt başarısız olursa -1 döndür
+        return -1;
     }
     // 3. SİLME
     public void delete(int id) {
@@ -129,7 +126,6 @@ public class ResidentRepository {
         } catch (Exception e) { e.printStackTrace(); }
     }
 
-    // 4. DROPDOWN: Sakin Tiplerini Getir
     public List<ResidentType> findAllTypes() {
         List<ResidentType> list = new ArrayList<>();
         String sql = "SELECT * FROM ResidentTypes";
@@ -146,7 +142,6 @@ public class ResidentRepository {
         return list;
     }
 
-    // 5. DROPDOWN: Daireleri Getir
     public List<ApartmentDropdownDTO> findAllApartmentsForDropdown() {
         List<ApartmentDropdownDTO> list = new ArrayList<>();
         String sql = "SELECT a.apartment_id, b.block_name, a.door_number " +
@@ -162,7 +157,7 @@ public class ResidentRepository {
         } catch (Exception e) { e.printStackTrace(); }
         return list;
     }
-    // Blokları Listele 
+
     public List<Block> findAllBlocks() {
         List<Block> list = new ArrayList<>();
         

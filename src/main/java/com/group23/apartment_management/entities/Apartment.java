@@ -8,8 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Apartment {
-    // Tablo: Apartments
-
     private int apartmentId;     // apartment_id (PK)
     private int blockId;         // block_id (FK - Blocks tablosuna gider)
     private int typeId;          // type_id (FK - ApartmentTypes tablosuna gider)

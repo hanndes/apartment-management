@@ -32,7 +32,6 @@ public class AdminController {
     private final PackageService packageService;
     private final DuesService duesService;
 
-    //guvenlik kontrolu
     private boolean isAdmin(HttpSession session) {
         User user = (User) session.getAttribute("loggedInUser");
         return user != null && "ADMIN".equals(user.getRole());
@@ -46,18 +45,14 @@ public class AdminController {
         User user = (User) session.getAttribute("loggedInUser");
         model.addAttribute("user", user);
 
-        //aggregation ile hesaplanan veriler
-        // 1. Borç/Aidat İstatistikleri
         model.addAttribute("collectionRate", debtService.getCurrentCollectionRate());
         model.addAttribute("totalFlats", debtService.getTotalFlatCount());
         model.addAttribute("paidFlats", debtService.getPaidFlatCountForCurrentPeriod());
         model.addAttribute("currentBalance", debtService.getTotalPaidAmount()); // SUM(amount)
 
-        // 2. Bekleyen Şikayet Sayısı 
         int pendingCount = complaintService.getPendingComplaintCount();
         model.addAttribute("pendingComplaints", pendingCount);
 
-        //Diğer veriler (Duyurular, Son Ödemeler)
         model.addAttribute("announcements", announcementService.getRecentActiveAnnouncements(5));
         model.addAttribute("recentPayments", paymentService.getRecentPaymentsForDashboard(3));
 
@@ -72,7 +67,6 @@ public class AdminController {
         User user = (User) session.getAttribute("loggedInUser");
         model.addAttribute("user", user);
 
-        // 1. Ödemeler Listesi
         List<PaymentDTO> payments = paymentService.getRecentPaymentsForDashboard(100);
         model.addAttribute("payments", payments);
 
@@ -82,7 +76,6 @@ public class AdminController {
         return "admin-payments";
     }
 
-    // AdminController.java (ekleme)
     @PostMapping("/payments/add")
     public String addPayment(@RequestParam("residentId") int residentId,
                             @RequestParam("amountPaid") java.math.BigDecimal amountPaid,
@@ -117,7 +110,6 @@ public class AdminController {
     }
     
 
-    //duyurular
     @GetMapping("/announcements")
     public String showAnnouncements(HttpSession session, Model model) {
         if (!isAdmin(session)) return "redirect:/login";
@@ -129,7 +121,6 @@ public class AdminController {
         return "admin-announcements";
     }
 
-    //araclar
     @GetMapping("/vehicles")
     public String showVehicles(HttpSession session, Model model) {
         if (!isAdmin(session)) return "redirect:/login";
@@ -161,7 +152,6 @@ public class AdminController {
         return "redirect:/admin/vehicles";
     }
 
-    //sikayetler
     @GetMapping("/complaints")
     public String showComplaints(HttpSession session, Model model) {
         if (!isAdmin(session)) return "redirect:/login";
@@ -171,10 +161,9 @@ public class AdminController {
 
         List<ComplaintDTO> complaints = complaintService.getAllComplaintsWithNames();
         model.addAttribute("complaints", complaints);
-        // kartlar (DİNAMİK)
-        model.addAttribute("pendingCount", complaintService.getPendingComplaintCount());        // Bekliyor
-        model.addAttribute("inReviewCount", complaintService.getInReviewComplaintCount());      // İnceleniyor
-        model.addAttribute("resolvedThisMonthCount", complaintService.getResolvedThisMonthCount()); // Bu ay çözülen
+        model.addAttribute("pendingCount", complaintService.getPendingComplaintCount());
+        model.addAttribute("inReviewCount", complaintService.getInReviewComplaintCount());
+        model.addAttribute("resolvedThisMonthCount", complaintService.getResolvedThisMonthCount());
 
 
         model.addAttribute("currentPage", "complaints");
@@ -183,7 +172,6 @@ public class AdminController {
 
 
 
-    //duyuru ekleme islemi
     @PostMapping("/announcements/add")
     public String addAnnouncement(@ModelAttribute Announcement announcement, HttpSession session) {
         if (!isAdmin(session)) return "redirect:/login";
@@ -197,7 +185,6 @@ public class AdminController {
         return "redirect:/admin/announcements";
     }
 
-    //duyuru silme islemi 
     @GetMapping("/announcements/delete/{id}")
     public String deleteAnnouncement(@PathVariable int id, HttpSession session) {
         if (!isAdmin(session)) return "redirect:/login";
@@ -238,7 +225,6 @@ public class AdminController {
     }
    
 
-    //sakinler yonetimi
     @GetMapping("/residents")
     public String showResidents(HttpSession session, Model model) {
         if (!isAdmin(session)) return "redirect:/login";
@@ -272,7 +258,6 @@ public class AdminController {
         return "redirect:/admin/residents";
     }
 
-    //personel yonetimi
     @GetMapping("/staff")
     public String showStaff(HttpSession session, Model model) {
         if (!isAdmin(session)) return "redirect:/login";
@@ -303,7 +288,6 @@ public class AdminController {
 
 
 
-    //kullanicilar yonetimi
     @GetMapping("/users")
     public String showUsers(HttpSession session, Model model) {
         if (!isAdmin(session)) return "redirect:/login";
@@ -346,43 +330,35 @@ public class AdminController {
         User user = (User) session.getAttribute("loggedInUser");
         model.addAttribute("user", user);
 
-        //Mevcut Giderler ve Kategoriler
         model.addAttribute("expenses", expenseService.getAllExpenses());
         model.addAttribute("categories", expenseService.getCategories());
 
-        //yeni eklenenler
-        model.addAttribute("blocks", residentService.getAllBlocks());       // Blok seçimi için
-        model.addAttribute("periods", duesPeriodService.getAllPeriods());   // Hangi döneme borç yazılacak?
-        model.addAttribute("debtTypes", debtTypeService.getAllDebtTypes()); // Borç türü (Ortak Gider vb.)
+        model.addAttribute("blocks", residentService.getAllBlocks());
+        model.addAttribute("periods", duesPeriodService.getAllPeriods());
+        model.addAttribute("debtTypes", debtTypeService.getAllDebtTypes());
 
         model.addAttribute("currentPage", "expenses");
         return "admin-expenses";
     }
 
-    //Gider Ekle 
     @PostMapping("/expenses/add")
     public String addExpense(@ModelAttribute Expense expense,
-                             @RequestParam(required = false) Integer periodId,   // Formdan gelen Dönem ID
-                             @RequestParam(required = false) Integer debtTypeId, // Formdan gelen Borç Türü ID
-                             @RequestParam(defaultValue = "false") boolean distribute, // "Dağıt" seçeneği işaretli mi?
+                             @RequestParam(required = false) Integer periodId,
+                             @RequestParam(required = false) Integer debtTypeId,
+                             @RequestParam(defaultValue = "false") boolean distribute,
                              HttpSession session) {
 
         if (!isAdmin(session)) return "redirect:/login";
 
-        // Eğer kullanıcı "Dağıt" kutusunu işaretlediyse ve gerekli bilgiler varsa
         if (distribute && periodId != null && debtTypeId != null) {
-            // Hem gideri kaydet hem de dairelere borç olarak dağıt
             expenseService.addExpenseAndDistribute(expense, periodId, debtTypeId);
         } else {
-            // Sadece gider olarak kaydet (Dağıtım yapma)
-            // Bu durumda periodId ve debtTypeId null gönderilir
             expenseService.addExpenseAndDistribute(expense, null, null);
         }
 
         return "redirect:/admin/expenses";
     }
 
-    // Gider Sil
     @GetMapping("/expenses/delete/{id}")
     public String deleteExpense(@PathVariable int id, HttpSession session) {
         if (!isAdmin(session)) return "redirect:/login";
@@ -408,7 +384,6 @@ public class AdminController {
     @PostMapping("/parking/add")
     public String addParking(@ModelAttribute("newSpot") ParkingSpot spot, HttpSession session, RedirectAttributes ra) {
         if (!isAdmin(session)) return "redirect:/login";
-        // HATA AYIKLAMA İÇİN: Konsolda gelen veriyi kontrol edebilirsiniz
         System.out.println("DEBUG: Gelen Blok ID: " + spot.getBlockId());
         System.out.println("DEBUG: Gelen Park Kodu: " + spot.getSpotCode());
         try {
@@ -428,17 +403,14 @@ public class AdminController {
     }
 
 
-    //borc/aidat yonetimi
     @GetMapping("/debts")
     public String showDebts(HttpSession session, Model model) {
         if (!isAdmin(session)) return "redirect:/login";
         User user = (User) session.getAttribute("loggedInUser");
         model.addAttribute("user", user);
 
-        // Tablo verisi
         model.addAttribute("debts", debtService.getAllDebts());
 
-        // Dropdown verileri
         model.addAttribute("residents", residentService.getAllResidentsDetailed()); // Kime borç yazılacak?
         model.addAttribute("periods", duesPeriodService.getAllPeriods());           // Hangi dönem?
         model.addAttribute("types", debtTypeService.getAllDebtTypes());             // Hangi tür? (Aidat/Yakıt)
@@ -453,7 +425,6 @@ public class AdminController {
                           HttpSession session) {
         if (!isAdmin(session)) return "redirect:/login";
 
-        // Seçilen Sakinin Dairesini Bul
         Integer apartmentId = residentService.getApartmentIdByResidentId(residentId);
         if (apartmentId != null) {
             debt.setApartmentId(apartmentId);
@@ -470,7 +441,6 @@ public class AdminController {
         return "redirect:/admin/debts";
     }
 
-    // Admin: kargolar sayfası
 
     @GetMapping("/packages")
     public String showPackages(HttpSession session, Model model) {
@@ -482,7 +452,6 @@ public class AdminController {
         try {
             model.addAttribute("packages", packageService.getAllPackages());
         } catch (Exception e) {
-            // Hata olup olmadığını konsolda görebilmek için log (veya System.err)
             e.printStackTrace();
             model.addAttribute("packages", new java.util.ArrayList<>());
             model.addAttribute("error", "Kargolar listelenirken hata oluştu. Konsolu kontrol edin.");
@@ -492,7 +461,6 @@ public class AdminController {
         return "admin-packages";
     }
 
-    //admin : paket teslim edildi olarak işaretle
     @GetMapping("/packages/deliver/{id}")
     public String deliverPackage(@PathVariable int id, HttpSession session, RedirectAttributes ra) {
         if (!isAdmin(session)) return "redirect:/login";
@@ -506,25 +474,20 @@ public class AdminController {
         return "redirect:/admin/packages";
     }
 
-    // AdminController.java içine ekle:
-
-    // 1. TOPLU AİDAT SAYFASINI GÖSTER (GET)
     @GetMapping("/debts/bulk-add")
     public String showBulkDuesPage(HttpSession session, Model model) {
         if (!isAdmin(session)) return "redirect:/login";
         User user = (User) session.getAttribute("loggedInUser");
         model.addAttribute("user", user);
 
-        // Dropdownlar için veriler
-        model.addAttribute("blocks", residentService.getAllBlocks());       // Hangi Blok?
-        model.addAttribute("periods", duesPeriodService.getAllPeriods());   // Hangi Ay?
-        model.addAttribute("debtTypes", debtTypeService.getAllDebtTypes()); // Borç Türü (Aidat)
+        model.addAttribute("blocks", residentService.getAllBlocks());
+        model.addAttribute("periods", duesPeriodService.getAllPeriods());
+        model.addAttribute("debtTypes", debtTypeService.getAllDebtTypes());
 
         model.addAttribute("currentPage", "debts");
-        return "admin-debts-bulk"; // HTML'iniz mevcut
+        return "admin-debts-bulk";
     }
 
-    // 2. TİP BAZLI AİDAT KAYDETME İŞLEMİ (POST)
     @PostMapping("/debts/bulk-add")
     public String processBulkDues(@RequestParam Integer blockId,
                                   @RequestParam Integer periodId,
@@ -532,8 +495,6 @@ public class AdminController {
                                   HttpSession session) {
         if (!isAdmin(session)) return "redirect:/login";
 
-        // DuesService'i çağır
-        // Bu çağrı artık DuesService'te, DebtService'te DEĞİL.
         duesService.applyDefinedDuesToDebts(blockId, periodId, debtTypeId);
 
         return "redirect:/admin/debts";

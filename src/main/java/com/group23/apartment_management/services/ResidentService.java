@@ -18,9 +18,8 @@ import java.util.List;
 public class ResidentService {
 
     private final ResidentRepository residentRepository;
-    // YENİ EKLENECEKLER:
-    private final ApartmentRepository apartmentRepository; // Daire işlemleri için
-    private final WalletRepository walletRepository;      // Cüzdan işlemleri için
+    private final ApartmentRepository apartmentRepository;
+    private final WalletRepository walletRepository;
     public List<ResidentDTO> getAllResidentsDetailed() {
         return residentRepository.findAllResidentsWithDetails();
     }
@@ -36,7 +35,6 @@ public class ResidentService {
     public List<Block> getAllBlocks() {
         return residentRepository.findAllBlocks();
     }
-    // Dropdownlar için veriler
     public List<ResidentType> getResidentTypes() {
         return residentRepository.findAllTypes();
     }

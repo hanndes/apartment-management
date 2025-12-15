@@ -14,7 +14,7 @@ public class Announcement {
     private int id;
     private String title;
     private String content;
-    private String priority; // 'Acil', 'Normal', 'Bilgi'
+    private String priority;
     private Timestamp createdAt;
     private boolean active;
 

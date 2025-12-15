@@ -1,16 +1,14 @@
 package com.group23.apartment_management.controller;
 
+import com.group23.apartment_management.entities.User;
+import com.group23.apartment_management.services.UserService;
+import jakarta.servlet.http.HttpSession;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-
-import com.group23.apartment_management.entities.User;
-import com.group23.apartment_management.services.UserService;
-
-import jakarta.servlet.http.HttpSession;
-import lombok.RequiredArgsConstructor;
 
 @Controller
 @RequiredArgsConstructor
@@ -40,20 +38,20 @@ public class LoginController {
         User user = userService.authenticate(email, password);
 
         if (user != null) {
-            // KONTROL: Eğer giren kişi ADMIN ise Mavi Ekranda HATA ver!
+
             if ("ADMIN".equals(user.getRole())) {
                 model.addAttribute("error", "Yöneticiler bu ekrandan giriş yapamaz! Lütfen Yönetici Panelini kullanın.");
                 return "login"; // Tekrar mavi ekrana döner
             }
 
-            // Eğer Sakin ise (RESIDENT), içeri al
+
             if ("RESIDENT".equals(user.getRole())) {
                 session.setAttribute("loggedInUser", user);
                 return "redirect:/user/dashboard";
             }
         }
 
-        // Kullanıcı yoksa veya şifre yanlışsa
+
         model.addAttribute("error", "Email veya şifre hatalı!");
         return "login";
     }

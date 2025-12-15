@@ -44,21 +44,17 @@ public class DueAmountRepository {
         return list;
     }
 
-    // --- YARDIMCI METOT: ResultSet'i DueAmount objesine dönüştürür ---
     private DueAmount mapRowToDueAmount(ResultSet rs) throws java.sql.SQLException {
         DueAmount da = new DueAmount();
 
-        // ResultSet'ten verileri çek ve Entity'ye set et
         da.setDueId(rs.getInt("due_id"));
         da.setApartmentTypeId(rs.getInt("apartment_type_id"));
         da.setPeriodId(rs.getInt("period_id"));
         da.setDebtTypeId(rs.getInt("debt_type_id"));
 
-        // Tutar tipi DECIMAL olduğu için BigDecimal olarak çekilmeli
         da.setAmount(rs.getBigDecimal("amount"));
 
         return da;
     }
 
-    // NOT: Save, findAll gibi metotlar da buraya eklenebilir, ancak tahakkuk için şimdilik sadece findByPeriodId yeterlidir.
 }

@@ -55,7 +55,6 @@ public class VehicleRepository {
         return list;
     }
 
-    // Yeni Araç Ekle
     public boolean save(Vehicle vehicle) {
         String sql = "INSERT INTO Vehicles (resident_id, plate_number, brand, model, color, vehicle_type, is_active) VALUES (?, ?, ?, ?, ?, ?, 1)";
         try (Connection con = DatabaseConnection.getConnection();
@@ -75,7 +74,6 @@ public class VehicleRepository {
         }
     }
 
-    // Aracı Sil (Pasife Çek)
     public void delete(int vehicleId) {
         String sql = "UPDATE Vehicles SET is_active = 0 WHERE vehicle_id = ?";
         try (Connection con = DatabaseConnection.getConnection();
@@ -86,8 +84,6 @@ public class VehicleRepository {
             e.printStackTrace();
         }
     }
-    
-
 
 
     public List<Vehicle> findVehiclesByUserId(int userId) {

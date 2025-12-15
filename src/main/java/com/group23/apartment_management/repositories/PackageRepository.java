@@ -1,15 +1,14 @@
 package com.group23.apartment_management.repositories;
 
+import com.group23.apartment_management.config.DatabaseConnection;
+import com.group23.apartment_management.entities.Package;
+import org.springframework.stereotype.Repository;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.springframework.stereotype.Repository;
-
-import com.group23.apartment_management.config.DatabaseConnection;
-import com.group23.apartment_management.entities.Package;
 
 @Repository
 public class PackageRepository {
@@ -85,7 +84,6 @@ public class PackageRepository {
         return list;
     }
 
-    // paket teslim durumunu ve teslim tarihini günceller
     public void updateDeliveryStatus(int packageId, boolean delivered) {
         String sql = "UPDATE Packages SET is_delivered = ?, delivery_date = ? WHERE package_id = ?";
         try (Connection con = DatabaseConnection.getConnection();
