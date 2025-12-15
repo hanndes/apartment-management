@@ -34,6 +34,7 @@ public class AdminController {
     private final DebtTypeService debtTypeService;
     private final DuesPeriodService duesPeriodService;
     private final PackageService packageService;
+    private final DuesService duesService;
 
     //guvenlik kontrolu
     private boolean isAdmin(HttpSession session) {
@@ -509,5 +510,37 @@ public class AdminController {
         return "redirect:/admin/packages";
     }
 
+    // AdminController.java içine ekle:
+
+    // 1. TOPLU AİDAT SAYFASINI GÖSTER (GET)
+    @GetMapping("/debts/bulk-add")
+    public String showBulkDuesPage(HttpSession session, Model model) {
+        if (!isAdmin(session)) return "redirect:/login";
+        User user = (User) session.getAttribute("loggedInUser");
+        model.addAttribute("user", user);
+
+        // Dropdownlar için veriler
+        model.addAttribute("blocks", residentService.getAllBlocks());       // Hangi Blok?
+        model.addAttribute("periods", duesPeriodService.getAllPeriods());   // Hangi Ay?
+        model.addAttribute("debtTypes", debtTypeService.getAllDebtTypes()); // Borç Türü (Aidat)
+
+        model.addAttribute("currentPage", "debts");
+        return "admin-debts-bulk"; // HTML'iniz mevcut
+    }
+
+    // 2. TİP BAZLI AİDAT KAYDETME İŞLEMİ (POST)
+    @PostMapping("/debts/bulk-add")
+    public String processBulkDues(@RequestParam Integer blockId,
+                                  @RequestParam Integer periodId,
+                                  @RequestParam Integer debtTypeId,
+                                  HttpSession session) {
+        if (!isAdmin(session)) return "redirect:/login";
+
+        // DuesService'i çağır
+        // Bu çağrı artık DuesService'te, DebtService'te DEĞİL.
+        duesService.applyDefinedDuesToDebts(blockId, periodId, debtTypeId);
+
+        return "redirect:/admin/debts";
+    }
 
 }
