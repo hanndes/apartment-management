@@ -17,7 +17,6 @@ public class DuesPeriodService {
     }
 
     public void createPeriod(DuesPeriod period) {
-        // Otomatik isim oluşturma (Örn: "Ocak 2025") - Eğer formdan gelmiyorsa
         if (period.getPeriodName() == null || period.getPeriodName().isEmpty()) {
             period.setPeriodName(period.getMonth() + "/" + period.getYear() + " Dönemi");
         }

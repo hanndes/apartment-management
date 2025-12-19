@@ -32,7 +32,6 @@ public class ParkingSpotRepository {
                 // is_guest sütununu okuyoruz
                 boolean isGuest = rs.getBoolean("is_guest");
 
-// DİKKAT: is_guest true ise, spot.occupied de true (dolu) olsun.
                 p.setOccupied(isGuest);
                 p.setOccupied(rs.getBoolean("is_guest"));
                 p.setBlockName(rs.getString("block_name"));

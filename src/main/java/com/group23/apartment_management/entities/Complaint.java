@@ -8,12 +8,12 @@ import java.text.SimpleDateFormat;
 @Data
 public class Complaint {
     private int id;
-    private int userId;         // SQL: user_id
+    private int userId;
     private String title;
     private String description;
     private String category;
-    private String status;      // Bekliyor, Çözüldü
-    private String priority;    // Acil, Normal
+    private String status;
+    private String priority;
     private String adminResponse;
     private Timestamp createdAt;
     private Timestamp resolvedAt;
@@ -30,7 +30,6 @@ public class Complaint {
         if ("Reddedildi".equals(status)) return "danger";
         return "warning";
     }
-    // Öncelik Rengi
     public String getPriorityClass() {
         if ("Acil".equals(priority)) return "danger";
         if ("Yüksek".equals(priority)) return "warning";

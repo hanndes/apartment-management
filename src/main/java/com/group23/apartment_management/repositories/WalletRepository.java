@@ -54,10 +54,8 @@ public class WalletRepository {
             ps.executeUpdate();
         } catch (Exception e) { e.printStackTrace(); }
     }
-    // MEVCUT METODUN AYNISI AMA 'Connection' PARAMETRESİ ALIYOR
     public void updateBalance(Connection con, int walletId, BigDecimal newBalance) throws Exception {
         String sql = "UPDATE Wallets SET balance = ?, last_updated = GETDATE() WHERE wallet_id = ?";
-        // Dikkat: Burada 'try (Connection...)' YOK. Dışarıdan gelen 'con' kullanılıyor.
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setBigDecimal(1, newBalance);
             ps.setInt(2, walletId);

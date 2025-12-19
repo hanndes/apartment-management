@@ -31,7 +31,6 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    // Kullanıcı ekle ve seçilen sakine bağla
     public void addUser(User user, Integer residentId) {
         int newUserId = userRepository.save(user);
 

@@ -22,7 +22,6 @@ public class Vehicle {
     private String ownerName; // Sahibinin adı (Ahmet Yılmaz)
     private String flatInfo;  // Daire bilgisi (A Blok No:5)
 
-    // HTML'de rozet rengi için
     public String getStatusClass() {
         return active ? "success" : "danger";
     }

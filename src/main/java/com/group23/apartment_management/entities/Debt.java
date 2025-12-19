@@ -11,16 +11,16 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 public class Debt {
     
-    private int id;              // debt_id
-    private int apartmentId;     // apartment_id
-    private int periodId;        // period_id
-    private int debtTypeId;      // debt_type_id
-    private BigDecimal amount;   // amount (Asıl Tutar)
+    private int id;
+    private int apartmentId;
+    private int periodId;
+    private int debtTypeId;
+    private BigDecimal amount;
 
-    private BigDecimal remainingAmount; // remaining_amt (Kalan Tutar)
-    private boolean isPaid;             // is_paid (Tamamen ödendi mi?)
+    private BigDecimal remainingAmount;
+    private boolean isPaid;
 
-    private Timestamp createdAt; // created_at
+    private Timestamp createdAt;
 
     
     private String apartmentInfo; // "A Blok - D:1"

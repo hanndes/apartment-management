@@ -16,7 +16,6 @@ public class LoginController {
 
     private final UserService userService;
 
-    //sakin girisi
     @GetMapping("/login")
     public String showLoginPage() {
         return "login";

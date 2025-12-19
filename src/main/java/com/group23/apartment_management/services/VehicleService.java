@@ -1,14 +1,10 @@
 package com.group23.apartment_management.services;
 
-import com.group23.apartment_management.config.DatabaseConnection;
 import com.group23.apartment_management.entities.Vehicle;
 import com.group23.apartment_management.repositories.VehicleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.util.List;
 
 @Service

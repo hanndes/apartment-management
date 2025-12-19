@@ -8,9 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ApartmentType {
-    // Veritabanındaki 'type_id'
     private int id;
-
-    // Veritabanındaki 'type_name' (Örn: 1+1, 2+1)
     private String typeName;
 }

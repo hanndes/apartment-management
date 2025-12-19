@@ -34,14 +34,13 @@ public class ExpenseRepository {
                 Expense ex = new Expense();
                 ex.setId(rs.getInt("exp_id"));
                 ex.setCategoryId(rs.getInt("cat_id"));
-                ex.setBlockId(rs.getInt("block_id")); // Blok ID
+                ex.setBlockId(rs.getInt("block_id"));
                 ex.setAmount(rs.getBigDecimal("amount"));
                 ex.setDate(rs.getDate("exp_date"));
                 ex.setDescription(rs.getString("description"));
 
-                // JOIN ile gelen isimler
                 ex.setCategoryName(rs.getString("cat_name"));
-                ex.setBlockName(rs.getString("block_name")); // Blok Adı (Örn: A Blok)
+                ex.setBlockName(rs.getString("block_name"));
 
                 list.add(ex);
             }

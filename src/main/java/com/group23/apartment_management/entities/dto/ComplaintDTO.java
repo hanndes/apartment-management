@@ -4,7 +4,6 @@ import lombok.Data;
 
 import java.sql.Timestamp;
 
-// ComplaintDTO.java
 @Data // Lombok getter/setter'ları oluşturur
 public class ComplaintDTO {
     private int id;

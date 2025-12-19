@@ -23,7 +23,7 @@ public class AdminController {
     private final PaymentService paymentService;
     private final AnnouncementService announcementService;
     private final VehicleService vehicleService;
-    private final ResidentService residentService; 
+    private final ResidentService residentService;
     private final ComplaintService complaintService;
     private final StaffService staffService;
     private final ParkingSpotService parkingSpotService;
@@ -48,7 +48,7 @@ public class AdminController {
         model.addAttribute("collectionRate", debtService.getCurrentCollectionRate());
         model.addAttribute("totalFlats", debtService.getTotalFlatCount());
         model.addAttribute("paidFlats", debtService.getPaidFlatCountForCurrentPeriod());
-        model.addAttribute("currentBalance", debtService.getTotalPaidAmount()); // SUM(amount)
+        model.addAttribute("currentBalance", debtService.getTotalPaidAmount());
 
         int pendingCount = complaintService.getPendingComplaintCount();
         model.addAttribute("pendingComplaints", pendingCount);
@@ -108,7 +108,7 @@ public class AdminController {
 
         return "redirect:/admin/payments";
     }
-    
+
 
     @GetMapping("/announcements")
     public String showAnnouncements(HttpSession session, Model model) {
@@ -176,7 +176,7 @@ public class AdminController {
     public String addAnnouncement(@ModelAttribute Announcement announcement, HttpSession session) {
         if (!isAdmin(session)) return "redirect:/login";
 
-        
+
         announcement.setCreatedAt(new java.sql.Timestamp(System.currentTimeMillis()));
         announcement.setActive(true);
 
@@ -217,13 +217,13 @@ public class AdminController {
 
         if (!isAdmin(session)) return "redirect:/login";
 
-        
+
         complaintService.respondToComplaint(id, response, status);
 
-        
+
         return "redirect:/admin/complaints/detail/" + id;
     }
-   
+
 
     @GetMapping("/residents")
     public String showResidents(HttpSession session, Model model) {
@@ -231,10 +231,10 @@ public class AdminController {
         User user = (User) session.getAttribute("loggedInUser");
         model.addAttribute("user", user);
 
-        
+
         model.addAttribute("residents", residentService.getAllResidentsDetailed());
 
-        
+
         model.addAttribute("residentTypes", residentService.getResidentTypes());
         model.addAttribute("apartments", residentService.getApartmentsForDropdown());
 
@@ -294,7 +294,7 @@ public class AdminController {
         User user = (User) session.getAttribute("loggedInUser");
         model.addAttribute("user", user);
 
-        
+
         model.addAttribute("users", userService.getAllUsers());
 
         model.addAttribute("residents", residentService.getAllResidentsDetailed());
@@ -305,7 +305,7 @@ public class AdminController {
 
     @PostMapping("/users/add")
     public String addUser(@ModelAttribute User newUser,
-                          @RequestParam(required = false) Integer residentId, 
+                          @RequestParam(required = false) Integer residentId,
                           HttpSession session) {
         if (!isAdmin(session)) return "redirect:/login";
 
@@ -411,11 +411,11 @@ public class AdminController {
 
         model.addAttribute("debts", debtService.getAllDebts());
 
-        model.addAttribute("residents", residentService.getAllResidentsDetailed()); // Kime borç yazılacak?
+        model.addAttribute("residents", residentService.getAllResidentsDetailed());
         model.addAttribute("periods", duesPeriodService.getAllPeriods());           // Hangi dönem?
         model.addAttribute("types", debtTypeService.getAllDebtTypes());             // Hangi tür? (Aidat/Yakıt)
 
-        model.addAttribute("currentPage", "debts"); 
+        model.addAttribute("currentPage", "debts");
         return "admin-debts";
     }
 

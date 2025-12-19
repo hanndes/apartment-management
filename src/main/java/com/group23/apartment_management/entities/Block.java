@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 public class Block {
 
     private int blockId;            // Veritabanı: block_id
-    private String blockName;       // Veritabanı: block_name (Örn: A Blok)
+    private String blockName;       // Veritabanı: block_name
 
     private int totalFloors;        // Veritabanı: total_floors
     private int totalApartments;    // Veritabanı: total_apartments

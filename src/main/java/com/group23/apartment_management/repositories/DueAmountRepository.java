@@ -13,12 +13,6 @@ import java.util.List;
 @Repository
 public class DueAmountRepository {
 
-    /**
-     * Belirli bir döneme ait tanımlanmış aidat şablonlarını (DueAmounts) getirir.
-     * Bu metot, DuesService tarafından borç tutarlarını belirlemek için kullanılır.
-     * * @param periodId Aranacak dönem ID'si.
-     * @return List<DueAmount> Belirtilen döneme ait tüm daire tipi aidatları.
-     */
     public List<DueAmount> findByPeriodId(int periodId) {
         List<DueAmount> list = new ArrayList<>();
 
@@ -38,7 +32,6 @@ public class DueAmountRepository {
                 }
             }
         } catch (Exception e) {
-            // Aidat tanımlaması bulunamaması yaygın bir durumdur, ancak hata kaydı tutulabilir.
             e.printStackTrace();
         }
         return list;

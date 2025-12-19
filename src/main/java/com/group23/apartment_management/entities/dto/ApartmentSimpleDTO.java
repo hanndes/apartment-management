@@ -9,9 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ApartmentSimpleDTO {
 
-    private int id;            // apartment_id
-    private String doorNumber; // Kapı No (String olması "1A", "B2" gibi durumlar için daha güvenlidir)
+    private int id;
+    private String doorNumber;
 
-    // Eğer veritabanında door_number kesinlikle sayı ise (int) yapabilirsin:
-    // private int doorNumber;
 }

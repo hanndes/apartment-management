@@ -5,14 +5,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp; // created_at DATETIME için gerekli olabilir
 
 @Data // Getter, Setter, toString, equals, hashCode sağlar
 @NoArgsConstructor // No-argument constructor sağlar
 @AllArgsConstructor // Tüm argümanlarla constructor sağlar
 public class DueAmount {
 
-    // Veritabanı Sütunları
 
     private Integer dueId;             // PK: due_id
 
@@ -22,7 +20,5 @@ public class DueAmount {
 
     private BigDecimal amount;         // Tutar (Örn: 2500.00)
 
-    // Opsiyonel olarak, eğer DueAmounts tablonuzda varsa, bu alanları da ekleyebilirsiniz:
-    // private Timestamp createdAt;
 
 }

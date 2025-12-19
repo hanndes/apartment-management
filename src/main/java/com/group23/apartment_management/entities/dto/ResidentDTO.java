@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class ResidentDTO {
-    // Resident Entity'sinden gelen alanlar
+
     private int residentId;
     private int residentTypeId;
     private int apartmentId;
@@ -13,11 +13,9 @@ public class ResidentDTO {
     private String phoneNumber;
     private String email;
 
-    // Ekstra Gösterim Alanları
-    private String typeName;   // Örn: "Ev Sahibi"
-    private String flatInfo;   // Örn: "A Blok - D:5"
+    private String typeName;
+    private String flatInfo;
 
-    // İsim soyisim birleştirme yardımcısı (HTML'de kullanmak için)
     public String getFullName() {
         return firstName + " " + lastName;
     }

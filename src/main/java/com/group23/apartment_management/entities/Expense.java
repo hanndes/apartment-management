@@ -16,10 +16,8 @@ public class Expense {
     private Date date;
     private String description;
 
-    // YENİ EKLENEN: Blok ID (Hangi binaya harcandı?)
     private Integer blockId;
 
-    // Ekranda Göstermek İçin
     private String categoryName;
     private String blockName; 
 }

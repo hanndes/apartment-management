@@ -15,7 +15,6 @@ import com.group23.apartment_management.entities.Debt;
 @Repository
 public class DebtRepository {
 
-    // 1. SAKİN PANELİ: Giriş yapan kullanıcının (User) oturduğu dairenin borçlarını getirir
     public List<Debt> findDebtsByUserId(int userId) {
         List<Debt> list = new ArrayList<>();
 

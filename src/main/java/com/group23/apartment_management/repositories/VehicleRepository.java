@@ -13,7 +13,6 @@ import java.util.List;
 @Repository
 public class VehicleRepository {
 
-    // Tüm araçları getir (Sahiplerinin isimleriyle birlikte JOIN yaparak)
     public List<Vehicle> findAllVehicles() {
         List<Vehicle> list = new ArrayList<>();
         String sql = """
@@ -89,7 +88,6 @@ public class VehicleRepository {
     public List<Vehicle> findVehiclesByUserId(int userId) {
         List<Vehicle> list = new ArrayList<>();
 
-        // JOIN işlemi: Araç -> Sakin -> Kullanıcı
         String sql = "SELECT v.* " +
                 "FROM Vehicles v " +
                 "JOIN Residents r ON v.resident_id = r.resident_id " +

@@ -8,19 +8,18 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Resident {
-    private int residentId;       // PK
-    private Integer userId;       // Users tablosuyla bağlantı 
-    private int residentTypeId;   // 1: Ev Sahibi, 2: Kiracı
-    private int apartmentId;      // Hangi daire?
+    private int residentId;
+    private Integer userId;
+    private int residentTypeId;
+    private int apartmentId;
 
     private String firstName;
     private String lastName;
     private String email;
     private String phoneNumber;
 
-    private boolean isActive = true; // Varsayılan olarak aktif
+    private boolean isActive = true;
 
-    //Ekranda göstermek için yardımcı alanlar
-    private String flatInfo;    // "A Blok - D:1" gibi göstermek için
-    private String typeName;    // "Kiracı" yazısı için
+    private String flatInfo;
+    private String typeName;
 }

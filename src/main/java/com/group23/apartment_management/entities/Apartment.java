@@ -8,12 +8,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Apartment {
-    private int apartmentId;     // apartment_id (PK)
-    private int blockId;         // block_id (FK - Blocks tablosuna gider)
-    private int typeId;          // type_id (FK - ApartmentTypes tablosuna gider)
+    private int apartmentId;
+    private int blockId;
+    private int typeId;
 
-    private int floorNumber;     // floor_number
-    private String doorNumber;   // door_number 
+    private int floorNumber;
+    private String doorNumber;
 
-    private boolean isOccupied;  // is_occupied (Dolu mu boş mu?)
+    private boolean isOccupied;
 }

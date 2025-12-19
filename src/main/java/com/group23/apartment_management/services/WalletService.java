@@ -25,19 +25,13 @@ public class WalletService {
         return walletRepository.findByUserId(userId);
     }
 
-    // MANUEL TRANSACTION (Eski Usul - Çok Güvenli)
     public void payDebtWithWallet(int userId, int debtId) {
 
         Connection con = null;
 
         try {
-            // 1. BAĞLANTIYI AÇ VE KİLİTLE
             con = DatabaseConnection.getConnection();
-            con.setAutoCommit(false); // Transaction Başladı!
-
-            // --- İŞLEMLER ---
-
-            // A) Cüzdanı ve Borcu Getir
+            con.setAutoCommit(false);
             Wallet wallet = walletRepository.findByUserId(userId);
             if (wallet == null) throw new RuntimeException("Cüzdan bulunamadı!");
 
@@ -49,14 +43,11 @@ public class WalletService {
                 throw new RuntimeException("Yetersiz Bakiye! Lütfen para yükleyiniz.");
             }
 
-            // B) Cüzdanı Güncelle (Aynı 'con' ile)
             BigDecimal newBalance = wallet.getBalance().subtract(amountToPay);
             walletRepository.updateBalance(con, wallet.getWalletId(), newBalance);
 
-            // C) Log At (Aynı 'con' ile)
             walletRepository.logTransaction(con, wallet.getWalletId(), amountToPay.negate(), "PAYMENT", "Borç: " + debtId);
 
-            // D) Ödemeyi Kaydet (Aynı 'con' ile)
             Payment payment = new Payment();
             payment.setDebtId(debtId);
             payment.setResidentId(wallet.getResidentId());
@@ -66,20 +57,16 @@ public class WalletService {
             payment.setPaymentDate(new java.sql.Timestamp(System.currentTimeMillis()));
             paymentRepository.save(con, payment);
 
-            // E) Borcu Kapat (Aynı 'con' ile)
             debtRepository.updateRemainingAndStatus(con, debtId, BigDecimal.ZERO, true);
 
-            // --- BİTİŞ ---
-            con.commit(); // Hepsini Veritabanına Yaz!
+            con.commit();
 
         } catch (Exception e) {
-            // HATA VARSA GERİ AL
             if (con != null) {
                 try { con.rollback(); } catch (Exception ex) { ex.printStackTrace(); }
             }
             throw new RuntimeException("Ödeme başarısız: " + e.getMessage());
         } finally {
-            // BAĞLANTIYI KAPAT
             if (con != null) {
                 try { con.close(); } catch (Exception ex) { ex.printStackTrace(); }
             }

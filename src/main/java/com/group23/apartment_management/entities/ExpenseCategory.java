@@ -8,6 +8,6 @@ import lombok.AllArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ExpenseCategory {
-    private int id;        // cat_id
-    private String name;   // cat_name
+    private int id;
+    private String name;
 }

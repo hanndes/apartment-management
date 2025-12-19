@@ -41,12 +41,9 @@ public class ApartmentRepository {
         return list;
     }
 
-    // --- 2. METOT: DROPDOWN (APARTMENT SERVICE) İÇİN GEREKLİ BİLGİLER ---
-    // ID ve Kapı Numarasını döndürür. ApartmentService bunu çağırır.
     public List<ApartmentDropdownDTO> findApartmentsForDropdownByBlockId(int blockId) {
         List<ApartmentDropdownDTO> list = new ArrayList<>();
 
-        // NOT: ApartmentDropdownDTO sınıfınızın 2 parametreli constructor'ı olmalı.
         String sql = "SELECT apartment_id, door_number FROM Apartments WHERE block_id = ?";
 
         try (Connection con = DatabaseConnection.getConnection();

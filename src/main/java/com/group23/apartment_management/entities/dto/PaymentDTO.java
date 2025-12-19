@@ -11,13 +11,11 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 public class PaymentDTO {
 
-    // Veritabanından gelen temel bilgiler
     private int id;
     private BigDecimal amount;      
     private Timestamp paymentDate;
     private String paymentMethod;
 
-    // Ekranda göstermek için ekstra alanlar
-    private String flatNumber;      // "A Blok - D:1"
-    private String userName;        // "Ahmet Yılmaz"
+    private String flatNumber;
+    private String userName;
 }
